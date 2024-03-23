@@ -35,6 +35,7 @@ const SignIn = () => {
         userError: validateUsername(loginDetails.userName),
         passwordError: validatePassword(loginDetails.password),
       };
+      console.log(errorObj);
       setLoginErrorMsgs(errorObj);
       if (
         errorObj.userError.length <= 0 &&
@@ -66,7 +67,7 @@ const SignIn = () => {
         localStorage.setItem(
           "user",
           JSON.stringify({
-            userName: "gowtham123",
+            userName: "jayasri123",
             role: "Empolyer",
           })
         );

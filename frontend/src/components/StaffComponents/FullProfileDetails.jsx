@@ -76,7 +76,7 @@ const FullProfileDetails = ({ customerType, operationType }) => {
             <EducationList educationDetails={educationDetails} />
           )}
           <h3>Categories:</h3>
-          {<CategoryList categoryList={categoryies} />}
+          {<CategoryList Lists={categoryies} />}
         </div>
       )}
       {operationType == "review" && (
