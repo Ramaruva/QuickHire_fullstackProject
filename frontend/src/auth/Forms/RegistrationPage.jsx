@@ -86,9 +86,9 @@ const RegistrationPage = () => {
       console.log(errorObj);
       setUserErrors(errorObj);
       if (!checkKeysEmpty(errorObj)) {
-        alert("Registration success!");
         setUserErrors(erroMsg);
         setUserDetails(details);
+        alert("Registration success!");
         handleNavigation();
       }
     } catch (error) {
