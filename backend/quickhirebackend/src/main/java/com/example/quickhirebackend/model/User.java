@@ -1,8 +1,5 @@
 package com.example.quickhirebackend.model;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import java.util.Arrays;
 
@@ -16,8 +13,10 @@ public class User {
     @Id
     @Column(name = "username", length = 30)
     private String username; // Corresponds to the "username" column
-    private String usertype; // Corresponds to the "usertype" column
-    private String status; // Corresponds to the "status" column, nullable
+    @Enumerated(EnumType.STRING)
+    private AllTypesEnums.UserType usertype; // Corresponds to the "usertype" column
+    @Enumerated(EnumType.STRING)
+    private AllTypesEnums.UserStatus status; // Corresponds to the "status" column, nullable
 
     private  String ispasswordchanged;
 
@@ -51,19 +50,19 @@ public class User {
         this.username = username;
     }
 
-    public String getUserType() {
+    public  AllTypesEnums.UserType getUserType() {
         return usertype;
     }
 
-    public void setUserType(String userType) {
+    public void setUserType(AllTypesEnums.UserType userType) {
         this.usertype = userType;
     }
 
-    public String getStatus() {
+    public AllTypesEnums.UserStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(AllTypesEnums.UserStatus status) {
         this.status = status;
     }
 

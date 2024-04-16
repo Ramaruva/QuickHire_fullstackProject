@@ -13,7 +13,8 @@ public class UserProfile {
     private String phone;
     private String pincode;
     private String state;
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private AllTypesEnums.UserProfileStatus status;
     private String username;
     // Assuming 'userprofileid' is a foreign key to another table, we'll represent it as an integer.
     // If it's an object relation to another class, you'll need to use the class type instead.
@@ -88,11 +89,11 @@ public class UserProfile {
         this.state = state;
     }
 
-    public String getStatus() {
+    public AllTypesEnums.UserProfileStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(AllTypesEnums.UserProfileStatus status) {
         this.status = status;
     }
 

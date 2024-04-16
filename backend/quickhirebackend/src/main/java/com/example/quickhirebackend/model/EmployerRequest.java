@@ -11,7 +11,8 @@ public class EmployerRequest {
     private Integer erequestid; // Corresponds to the "erequestid" column which is auto-incremented
     private String companyname; // Corresponds to the "companyname" column
     private Integer profid; // Corresponds to the "profid" column, Nullable
-    private String requesttype; // Corresponds to the "requesttype" column
+    @Enumerated(EnumType.STRING)
+    private AllTypesEnums.UserRequestType requesttype; // Corresponds to the "requesttype" column
 
     // Getters and setters
     public Integer getRequestId() {
@@ -38,11 +39,11 @@ public class EmployerRequest {
         this.profid = profId;
     }
 
-    public String getRequestType() {
+    public AllTypesEnums.UserRequestType getRequestType() {
         return requesttype;
     }
 
-    public void setRequestType(String requestType) {
+    public void setRequestType(AllTypesEnums.UserRequestType requestType) {
         this.requesttype = requestType;
     }
 
