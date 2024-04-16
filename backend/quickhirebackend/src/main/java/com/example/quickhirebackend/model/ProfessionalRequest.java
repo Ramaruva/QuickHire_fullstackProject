@@ -10,7 +10,8 @@ public class ProfessionalRequest {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer prequestid;
-    private String requesttype;
+    @Enumerated(EnumType.STRING)
+    private AllTypesEnums.UserRequestType requesttype;
     private String schoolname;
     private String major;
     private Date completiontime;
@@ -34,11 +35,11 @@ public class ProfessionalRequest {
         this.prequestid = requestId;
     }
 
-    public String getRequestType() {
+    public AllTypesEnums.UserRequestType getRequestType() {
         return requesttype;
     }
 
-    public void setRequestType(String requestType) {
+    public void setRequestType(AllTypesEnums.UserRequestType requestType) {
         this.requesttype = requestType;
     }
 

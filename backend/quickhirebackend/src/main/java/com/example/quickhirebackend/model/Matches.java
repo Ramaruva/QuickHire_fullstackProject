@@ -10,9 +10,12 @@ public class Matches {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int matchid; // Primary key, auto-incremented
-    private String matchpercentage;
+    private Integer matchpercentage;
     private Integer professionalid; // Nullable foreign key
     private Integer staffid; // Nullable foreign key
+    private  String jobNotify;
+    @Enumerated(EnumType.STRING)
+    private AllTypesEnums.MatchType matchType;
 
     // Constructors, getters, and setters
 
@@ -32,16 +35,32 @@ public class Matches {
         return matchid;
     }
 
+    public String getJobNotify() {
+        return jobNotify;
+    }
+
+    public void setJobNotify(String jobNotify) {
+        this.jobNotify = jobNotify;
+    }
+
+    public AllTypesEnums.MatchType getMatchType() {
+        return matchType;
+    }
+
+    public void setMatchType(AllTypesEnums.MatchType matchType) {
+        this.matchType = matchType;
+    }
+
     // No setter for auto-incremented primary key
     // public void setMatchId(int matchId) {
     //     this.matchId = matchId;
     // }
 
-    public String getMatchPercentage() {
+    public Integer getMatchPercentage() {
         return matchpercentage;
     }
 
-    public void setMatchPercentage(String matchPercentage) {
+    public void setMatchPercentage(Integer matchPercentage) {
         this.matchpercentage = matchPercentage;
     }
 
