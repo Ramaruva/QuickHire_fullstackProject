@@ -5,17 +5,17 @@ import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import Link from "@mui/material/Link";
 import Box from "@mui/material/Box";
-
+ 
 function MainFeaturedPost(props) {
   const { post } = props;
-
+ 
   return (
     <Paper
       sx={{
         position: "relative",
         backgroundColor: "grey.800",
         color: "#fff",
-        mb: 4,
+        mb: 2,
         backgroundSize: "cover",
         backgroundRepeat: "no-repeat",
         backgroundPosition: "center",
@@ -40,30 +40,34 @@ function MainFeaturedPost(props) {
           backgroundColor: "rgba(0,0,0,.3)",
         }}
       />
-
+ 
       <Grid container>
-        <Grid item md={6}>
+        <Grid item md={6} xs={12} >
           <Box
             sx={{
               position: "relative",
-              p: { xs: 3, md: 6 },
+              p: { xs: 3, sm:4, md: 6 },
               pr: { md: 0 },
             }}
           >
-            <div>
-              <div className="flex flex-col items-center justify-between">
-                <h1 className="text-2xl text-center font-bold text-white m-3 p-3">
-                  {post.description}
-                </h1>
-              </div>
-            </div>
+            <Typography
+              component="h1"
+              variant="h3"
+              color="inherit"
+              gutterBottom
+              sx={{
+                fontSize: { xs: '1.5rem', sm: '2rem', md: '2.5rem', lg: '3rem' }, // Adjust font size per breakpoint
+              }}
+            >
+              {post.description}
+            </Typography>
           </Box>
         </Grid>
       </Grid>
     </Paper>
   );
 }
-
+ 
 MainFeaturedPost.propTypes = {
   post: PropTypes.shape({
     description: PropTypes.string.isRequired,
@@ -73,5 +77,6 @@ MainFeaturedPost.propTypes = {
     title: PropTypes.string.isRequired,
   }).isRequired,
 };
-
+ 
 export default MainFeaturedPost;
+ 
