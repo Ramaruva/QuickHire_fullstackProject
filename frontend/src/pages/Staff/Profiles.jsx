@@ -1,9 +1,17 @@
-import React from 'react'
+import React from "react";
+import SingleProfileBox from "../../components/StaffComponents/SingleProfileBox";
 
-const Profiles = () => {
+const Profiles = ({ customerType, viewType }) => {
   return (
-    <div>Profiles</div>
-  )
-}
+    <div className="grid grid-cols-3 gap-3">
+      <SingleProfileBox customerType={customerType} viewType={viewType} />
+      <SingleProfileBox customerType={customerType} viewType={viewType} />
+      <SingleProfileBox customerType={customerType} viewType={viewType} />
+      <SingleProfileBox customerType={customerType} viewType={viewType} />
+      <SingleProfileBox customerType={customerType} viewType={viewType} />
+      <SingleProfileBox customerType={customerType} viewType={viewType} />
+    </div>
+  );
+};
 
-export default Profiles
+export default Profiles;

@@ -1,4 +1,42 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;600;700;800&family=Play:wght@700&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+@layer base {
+  html {
+    @apply font-Montserrat;
+  }
+  body {
+    background: #f1f1f1;
+  }
+  h1 {
+    @apply text-xl font-medium capitalize;
+  }
+}
+
+.link {
+  @apply p-2.5 flex rounded-md gap-6 items-center md:cursor-pointer cursor-default duration-300 font-medium;
+}
+
+.active {
+  @apply bg-blue-100 text-blue-600;
+}
+
+.regInput{
+  @apply h-[48px] w-[468px] p-2 bg-[#f4f4f4] decoration-[#000000] font-medium leading-4 text-sm;
+  border-radius: 24px;
+}
+
+.passwordinput{
+  @apply mb-4 w-full px-3 py-2 text-xs border rounded shadow appearance-none ;
+}
 
