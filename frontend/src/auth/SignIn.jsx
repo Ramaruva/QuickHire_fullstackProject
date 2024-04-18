@@ -103,7 +103,7 @@ const SignIn = () => {
         {/* <TopNavBar  /> */}
         {/*
       This example requires updating your template:
-
+      console.
       ```
       <html class="h-full bg-white">
       <body class="h-full">
