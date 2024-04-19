@@ -1,5 +1,7 @@
 package com.example.quickhirebackend.dto;
 
+import com.example.quickhirebackend.model.AllTypesEnums;
+
 import java.util.Date;
 import java.util.List;
 
@@ -21,7 +23,7 @@ public class ProfessionalRegistrationRequest {
 
 
     // Fields for the ProfessionalRequest
-    private String requestType;
+    private AllTypesEnums.UserRequestType requestType;
     private String major;
     private String schoolName;
 
@@ -138,11 +140,11 @@ public class ProfessionalRegistrationRequest {
         return qualifications;
     }
 
-    public String getRequestType() {
+    public AllTypesEnums.UserRequestType getRequestType() {
         return requestType;
     }
 
-    public void setRequestType(String requestType) {
+    public void setRequestType(AllTypesEnums.UserRequestType requestType) {
         this.requestType = requestType;
     }
 

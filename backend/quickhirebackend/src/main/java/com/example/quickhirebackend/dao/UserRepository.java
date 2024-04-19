@@ -23,6 +23,8 @@ public interface UserRepository extends JpaRepository<User, String> {
    @Query("SELECT new com.example.quickhirebackend.dto.UserActiveInfo("+"u.username,u.usertype,u.status,u.profid,u.ispasswordchanged)"+"FROM User u WHERE u.username = :username AND u.status = 'active'")
     Optional<UserActiveInfo> findActiveUserWithoutPassword(@Param("username") String username);
 
+    Optional<User> findByUsername(String username);
+
    @Transactional
    @Modifying
    @Query("UPDATE User u SET u.password = :password WHERE u.username = :username")

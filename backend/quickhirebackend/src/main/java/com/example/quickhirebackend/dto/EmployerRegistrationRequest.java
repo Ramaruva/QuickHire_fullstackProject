@@ -1,5 +1,7 @@
 package com.example.quickhirebackend.dto;
 
+import com.example.quickhirebackend.model.AllTypesEnums;
+
 public class EmployerRegistrationRequest {
     // Fields for UserProfile information
     private String address;
@@ -13,7 +15,7 @@ public class EmployerRegistrationRequest {
     private String username;
 
     // Fields specific to EmployerRequest
-    private String requestType;
+    private AllTypesEnums.UserRequestType requestType;
     private String companyName;
 
     private  Integer userprofileid;
@@ -92,11 +94,11 @@ public class EmployerRegistrationRequest {
         this.username = username;
     }
 
-    public String getRequestType() {
+    public AllTypesEnums.UserRequestType getRequestType() {
         return requestType;
     }
 
-    public void setRequestType(String requestType) {
+    public void setRequestType(AllTypesEnums.UserRequestType requestType) {
         this.requestType = requestType;
     }
 

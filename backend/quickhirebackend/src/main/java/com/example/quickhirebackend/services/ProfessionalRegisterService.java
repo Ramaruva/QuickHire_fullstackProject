@@ -111,7 +111,7 @@ public class ProfessionalRegisterService {
         if(professionalRequestData==null){
             throw  new NullPointerException();
         }
-        professionalRequestData.setRequestType("Delete Requested");
+        professionalRequestData.setRequestType(AllTypesEnums.UserRequestType.DELETE_REQUESTED);
         professionalRequestRepository.save(professionalRequestData);
         return "Delete Requested successfully!";
     }
