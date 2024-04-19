@@ -5,6 +5,7 @@ import TopNavBar from "../components/TopNavBar";
 
 const Home = () => {
   return (
+    
     <div className="max-h-screen flex flex-col">
       <TopNavBar />
       <main className="flex gap-5">

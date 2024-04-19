@@ -7,12 +7,10 @@ import com.example.quickhirebackend.services.LoginService;
 import org.antlr.v4.runtime.misc.Pair;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class CommonController {
 
     private final LoginService loginService;
@@ -21,7 +19,7 @@ public class CommonController {
         this.loginService = loginService;
     }
     record LoginData(String username, String password){}
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<?> loginOperation(@RequestBody LoginData loginData){
         try{
             //Pair<UserActiveInfo, UserProfile> data = loginService.userLogin(loginData.username(),loginData.password());
