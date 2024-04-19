@@ -1,0 +1,3 @@
+# Ignore resources folder
+backend/quickhirebackend/src/main/resources/application.properties
+/backend/quickhirebackend/src/main/resources/application.properties
