@@ -1,4 +1,7 @@
 package com.example.quickhirebackend.dto;
 
-public record UserActiveInfo(String username, String usertype, String status, Integer profid, String ispasswordchanged) {
+import com.example.quickhirebackend.model.AllTypesEnums;
+
+public record UserActiveInfo(String username, AllTypesEnums.UserType usertype, AllTypesEnums.UserStatus status, Integer profid, String ispasswordchanged) {
 }
+ 

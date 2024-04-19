@@ -24,9 +24,10 @@ public class CommonController {
     @GetMapping("/login")
     public ResponseEntity<?> loginOperation(@RequestBody LoginData loginData){
         try{
-            Pair<UserActiveInfo, UserProfile> data = loginService.userLogin(loginData.username(),loginData.password());
-            record LoginResponse(UserActiveInfo user, UserProfile userDetails){};
-            return new ResponseEntity<>(new LoginResponse(data.a,data.b),HttpStatus.OK);
+            //Pair<UserActiveInfo, UserProfile> data = loginService.userLogin(loginData.username(),loginData.password());
+            record LoginResponse(String token){};
+            String token = loginService.userLogin(loginData.username(),loginData.password());
+            return new ResponseEntity<>(new LoginResponse(token),HttpStatus.OK);
         }
         catch (LoginException e){
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
