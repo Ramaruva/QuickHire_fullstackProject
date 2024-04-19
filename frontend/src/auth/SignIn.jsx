@@ -1,14 +1,14 @@
 import React, { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import TopNavBar from "../components/TopNavBar";
 import {
   validatePassword,
   validateUsername,
 } from "../validations/standardValidations";
+import { postRequest } from "../API/config";
+import axios from "axios";
 
 const userDetails = {
-  userName: "",
+  username: "",
   password: "",
 };
 
@@ -28,11 +28,11 @@ const SignIn = () => {
   };
   const navigate = useNavigate()
 
-  const handleSubmit = (e) => {
+   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
       const errorObj = {
-        userError: validateUsername(loginDetails.userName),
+        userError: validateUsername(loginDetails.username),
         passwordError: validatePassword(loginDetails.password),
       };
       console.log(errorObj);
@@ -41,10 +41,16 @@ const SignIn = () => {
         errorObj.userError.length <= 0 &&
         errorObj.passwordError.length <= 0
       ) {
-        alert("login success");
-        setLoginErrorMsgs(errorMsg);
-        tempSignIn(loginDetails.userName);
-        setLoginDetails(userDetails);
+        const token = await postRequest("login", loginDetails);
+        localStorage.setItem('token', token); // user Token is the token received from the backend
+        
+;
+
+
+        // alert("login success");
+        // setLoginErrorMsgs(errorMsg);
+        // tempSignIn(loginDetails.userName);
+        // setLoginDetails(userDetails);
       }
     } catch (error) {
       console.log(error);
@@ -143,11 +149,11 @@ const SignIn = () => {
                   </label>
                   <div className="mt-2">
                     <input
-                      name="userName"
+                      name="username"
                       type="text"
-                      value={loginDetails.userName}
+                      value={loginDetails.username}
                       onChange={handleChange}
-                      autoComplete="userName"
+                      autoComplete="username"
                       className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 ${
                         !(loginErrorMsgs?.userError.length > 0)
                           ? "border-gray-300"
