@@ -57,4 +57,3 @@ export default LandingPage;
 //       </div>
 //       <Link to={"/SignUp"}>SignUp</Link> */
 }
-LAnding 
