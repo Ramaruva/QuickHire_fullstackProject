@@ -46,7 +46,7 @@ const RegistrationPage = () => {
       "user",
       JSON.stringify({
         userName: userDetails.userName,
-        role: customerType == "Professional" ? "Professional" : "Empolyer",
+        role: customerType == "Professional" ? "Professional" : "Employer",
       })
     );
     if (customerType == "Professional") {

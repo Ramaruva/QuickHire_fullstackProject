@@ -43,25 +43,25 @@ const App = () => {
           }
         />
         <Route
-          path="/home/empolyerReviews"
-          element={<Profiles customerType={"Empolyer"} viewType={"review"} />}
+          path="/home/employerReviews"
+          element={<Profiles customerType={"Employer"} viewType={"review"} />}
         />
         <Route
           path="/home/ProfessionalLists"
           element={<Profiles customerType={"Professional"} viewType={"list"} />}
         />
         <Route
-          path="/home/empolyerLists"
-          element={<Profiles customerType={"Empolyer"} viewType={"list"} />}
+          path="/home/employerLists"
+          element={<Profiles customerType={"Employer"} viewType={"list"} />}
         />
         <Route path="/home/individual" element={<IndividualPage />} />
 
         {/* Staff routes end here */}
 
-        {/* Empolyer routes start here */}
+        {/* Employer routes start here */}
         <Route path="/home/CreateJobs" element={<CreateJob />} />
         <Route path="/home/JobLists" element={<JobList />} />
-        {/* Empolyer routes end here */}
+        {/* Employer routes end here */}
 
         {/* Professional routes start here */}
         <Route path="/home/BrowseJobs" element={<BrowseJobs />} />
