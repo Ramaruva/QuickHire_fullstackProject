@@ -82,7 +82,7 @@ public class MatchService {
                //need to write logic for match percentage based on qualifications
                Matches matchData = new Matches();
                matchData.setJobId(jobMatchData.jobId());
-               matchData.setMatchPercentage("70%");
+               matchData.setMatchPercentage(70);
                matchData.setProfessionalId(jobMatchData.professionalId());
                if(jobMatchData.staffId()!=null){
                    matchData.setStaffId(jobMatchData.staffId());

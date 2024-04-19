@@ -5,6 +5,7 @@ import com.example.quickhirebackend.dao.EmployerDetailsRepository;
 import com.example.quickhirebackend.dao.UserProfileDao;
 import com.example.quickhirebackend.dao.UserProfileRepository;
 import com.example.quickhirebackend.dto.EmployerRegistrationRequest;
+import com.example.quickhirebackend.model.AllTypesEnums;
 import com.example.quickhirebackend.model.EmployerDetails;
 import com.example.quickhirebackend.model.EmployerRequest;
 import com.example.quickhirebackend.model.UserProfile;
@@ -63,7 +64,7 @@ public class EmployerRegisterService {
         try{
             EmployerRequest employerRequest = employerRequestService.getEmployerRequestByUserProfileId(userProfileId).stream().findFirst().orElse(null);
             if(employerRequest!=null){
-              employerRequest.setRequestType("Delete Requested");
+              employerRequest.setRequestType(AllTypesEnums.UserRequestType.DELETE_REQUESTED);
               employerRequestService.updateEmployerRequest(employerRequest);
               return "Delete Requested Successfully!";
             }

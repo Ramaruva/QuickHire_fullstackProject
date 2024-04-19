@@ -1,4 +1,6 @@
 package com.example.quickhirebackend.dto;
 
-public record ReviewRecord(int id, String requestType, String reviewMessage) {
+import com.example.quickhirebackend.model.AllTypesEnums;
+
+public record ReviewRecord(int id, AllTypesEnums.UserRequestType requestType, String reviewMessage) {
 }

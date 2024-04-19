@@ -37,7 +37,7 @@ public class RequestService {
         try{
        EmployerRequest employerRequestData = employerRequestRepository.findById(employerRequest.id()).stream().findFirst().orElse(null);
        UserProfile userProfile = userProfileRepository.findById(employerRequestData.getProfId()).stream().findFirst().orElse(null);
-       if (employerRequest.requestType() == "Rejected"){
+       if (employerRequest.requestType() == AllTypesEnums.UserRequestType.ACCOUNT_REJECTED){
         return "";
        }else {
            // change request type
@@ -54,11 +54,11 @@ public class RequestService {
            // set status to active
 
            assert userProfile != null;
-           userProfile.setStatus("Active");
+           userProfile.setStatus(AllTypesEnums.UserProfileStatus.ACTIVATED);
            userProfileRepository.save(userProfile);
 
            // update user table
-           createNewUser(employerRequestData.getProfId(),"Employer","Active",userProfile.getUsername(),userProfile.getEmail());
+           createNewUser(employerRequestData.getProfId(), AllTypesEnums.UserType.EMPLOYER,AllTypesEnums.UserStatus.ACTIVE,userProfile.getUsername(),userProfile.getEmail());
 
            return "Employer has been Succesfully Accepted";
        }}
@@ -71,7 +71,7 @@ public class RequestService {
         try{
            ProfessionalRequest professionalRequestData = professionalRequestRepository.findById(professionalRequest.id()).stream().findFirst().orElse(null);
            UserProfile userProfile = userProfileRepository.findById(professionalRequestData.getProfId()).stream().findFirst().orElse(new UserProfile());
-        if (professionalRequest.requestType() == "Rejected"){
+        if (professionalRequest.requestType() == AllTypesEnums.UserRequestType.ACCOUNT_REJECTED){
             return "";
         }else {
             // change the status
@@ -88,11 +88,11 @@ public class RequestService {
 
             // set status in user profile
 
-            userProfile.setStatus("Active");
+            userProfile.setStatus(AllTypesEnums.UserProfileStatus.ACTIVATED);
             userProfileRepository.save(userProfile);
 
             // create  username password usertype status profid ispasswordchanges
-            createNewUser(userProfile.getUserprofileid(),"Professional","Active",userProfile.getUsername(),userProfile.getEmail());
+            createNewUser(userProfile.getUserprofileid(), AllTypesEnums.UserType.PROFESSIONAL,AllTypesEnums.UserStatus.ACTIVE,userProfile.getUsername(),userProfile.getEmail());
 
             return "Professional account has been Created!";
         }
@@ -101,7 +101,7 @@ public class RequestService {
     }
     }
 
-    public void createNewUser(Integer profId, String userType, String status, String userName, String email){
+    public void createNewUser(Integer profId, AllTypesEnums.UserType userType, AllTypesEnums.UserStatus status, String userName, String email){
         User user = new User();
         user.setProfId(profId);
         user.setUserType(userType);
@@ -121,7 +121,7 @@ public class RequestService {
     public String professionalDeleteRequest(Integer requestID){
         //need to update in professional request data
         ProfessionalRequest professionalRequest = professionalRequestRepository.findById(requestID).stream().findFirst().orElse(new ProfessionalRequest());
-        professionalRequest.setRequestType("Account Deleted");
+        professionalRequest.setRequestType(AllTypesEnums.UserRequestType.DELETE_ACCEPTED);
         professionalRequestRepository.save(professionalRequest);
         //need to update in userprofile
         DeleteUserDetails(professionalRequest.getProfId());
@@ -131,7 +131,7 @@ public class RequestService {
     public  String employerDeleteRequest(Integer requestID){
         //update employerReq
         EmployerRequest employerRequestData = employerRequestRepository.findById(requestID).stream().findFirst().orElse(new EmployerRequest());
-        employerRequestData.setRequestType("Account Deleted");
+        employerRequestData.setRequestType(AllTypesEnums.UserRequestType.DELETE_ACCEPTED);
         employerRequestRepository.save(employerRequestData);
         //update the userprofile
         DeleteUserDetails(employerRequestData.getProfId());
@@ -139,11 +139,11 @@ public class RequestService {
     }
     public void DeleteUserDetails(Integer userID){
         UserProfile userData = userProfileRepository.findById(userID).stream().findFirst().orElse(new UserProfile());
-        userData.setStatus("Deleted");
+        userData.setStatus(AllTypesEnums.UserProfileStatus.DELETED);
         userProfileRepository.save(userData);
 
         User user = userRepository.findById(userData.getUsername()).stream().findFirst().orElse(new User());
-        user.setStatus("Inactive");
+        user.setStatus(AllTypesEnums.UserStatus.INACTIVE);
         userRepository.save(user);
     }
 
@@ -153,7 +153,7 @@ public class RequestService {
             UserProfile newStaffMember = new UserProfile();
             newStaffMember.setFirstname(staffData.getFirstname());
             newStaffMember.setLastname(staffData.getLastname());
-            newStaffMember.setStatus("Active");
+            newStaffMember.setStatus(AllTypesEnums.UserProfileStatus.ACTIVATED);
             newStaffMember.setCity(staffData.getCity());
             newStaffMember.setState(staffData.getState());
             newStaffMember.setPincode(staffData.getPincode());
@@ -164,7 +164,7 @@ public class RequestService {
             newStaffMember.setPhone(staffData.getPhone());
             UserProfile savedStaffUserProfile = userProfileRepository.save(newStaffMember);
 
-            createNewUser(savedStaffUserProfile.getUserprofileid(), "Staff", "Active", savedStaffUserProfile.getUsername(), savedStaffUserProfile.getEmail());
+            createNewUser(savedStaffUserProfile.getUserprofileid(), AllTypesEnums.UserType.STAFF, AllTypesEnums.UserStatus.ACTIVE, savedStaffUserProfile.getUsername(), savedStaffUserProfile.getEmail());
             //creating staff profile
             StaffDetails staffDetails = new StaffDetails();
             staffDetails.setStaffUserProfileId(savedStaffUserProfile.getUserprofileid());

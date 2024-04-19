@@ -6,6 +6,9 @@ import com.example.quickhirebackend.dao.UserRepository;
 import com.example.quickhirebackend.dto.UserActiveInfo;
 import com.example.quickhirebackend.model.UserProfile;
 import org.antlr.v4.runtime.misc.Pair;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +20,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 @Service
-public class LoginService {
+public class LoginService implements UserDetailsService {
 
 
     private  final UserRepository userRepository;
@@ -133,7 +136,12 @@ public class LoginService {
     }
 
 
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByUsername(username).
+                orElseThrow(()->new UsernameNotFoundException("User not found"));
 
+    }
 }
 
 
