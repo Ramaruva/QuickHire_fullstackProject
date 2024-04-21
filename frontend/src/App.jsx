@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import SignIn from "./auth/SignIn";
 import SignUp from "./auth/signUp";
@@ -21,8 +21,16 @@ import BrowseJobs from "./pages/Professionals/BrowseJobs";
 import MatchedJobs from "./pages/Professionals/MatchedJobs";
 import JobDetailsPage from "./pages/common/JobDetailsPage";
 import CategoryPage from "./pages/common/CategoryPage";
+import { useDispatch } from "react-redux";
+import { checkAuthentication } from "./redux/authSlice";
 
 const App = () => {
+  const dispatch = useDispatch();
+
+  useEffect(()=>{
+   let decode = checkAuthentication(dispatch);
+   console.log(decode);
+  },[dispatch])
   return (
     <Routes>
       <Route index element={<LandingPage />} />

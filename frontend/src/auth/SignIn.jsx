@@ -6,6 +6,10 @@ import {
 } from "../validations/standardValidations";
 import { postRequest } from "../API/config";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { setLocalItem } from "../localStrorage";
+import { checkAuthentication } from "../redux/authSlice";
+import { USERTYPE } from "../types";
 
 const userDetails = {
   username: "",
@@ -19,6 +23,8 @@ const errorMsg = {
 const SignIn = () => {
   const [loginDetails, setLoginDetails] = useState(userDetails);
   const [loginErrorMsgs, setLoginErrorMsgs] = useState(errorMsg);
+  const disPatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
   const handleChange = (e) => {
     try {
       setLoginDetails({ ...loginDetails, [e.target.name]: e.target.value });
@@ -26,9 +32,9 @@ const SignIn = () => {
       console.log(error);
     }
   };
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
-   const handleSubmit = async (e) => {
+  const handleSubmit = async (e) => {
     try {
       e.preventDefault();
       const errorObj = {
@@ -41,63 +47,32 @@ const SignIn = () => {
         errorObj.userError.length <= 0 &&
         errorObj.passwordError.length <= 0
       ) {
-        const token = await postRequest("login", loginDetails);
-        localStorage.setItem('token', token); // user Token is the token received from the backend
-        
-;
-
-
-        // alert("login success");
-        // setLoginErrorMsgs(errorMsg);
-        // tempSignIn(loginDetails.userName);
-        // setLoginDetails(userDetails);
+        const data = await postRequest("login", loginDetails);
+        console.log(data?.data?.token);
+        setLocalItem("token", data?.data?.token);
+        let decode = checkAuthentication(disPatch);
+        console.log(decode);
+        redirect(decode.userType);
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  const tempSignIn = (name) => {
-    switch (name) {
-      case "gowtham123":
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            userName: "gowtham123",
-            role: "Professional",
-          })
-        );
-         navigate("/home/BrowseJobs")
+  const redirect = (userType) => {
+    console.log(userType,USERTYPE.root);
+    switch (userType) {
+      case USERTYPE.professional:
+        navigate("/home/BrowseJobs");
         break;
-      case "jayasri123":
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            userName: "jayasri123",
-            role: "Empolyer",
-          })
-        );
-        navigate("/home/CreateJobs")
+      case USERTYPE.employer:
+        navigate("/home/CreateJobs");
         break;
-      case "quickstaff123":
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            userName: "gowtham123",
-            role: "staff",
-          })
-        );
-        navigate("/home/professionalReviews")
+      case USERTYPE.staff:
+        navigate("/home/professionalReviews");
         break;
-      case "quickroot123":
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            userName: "quickroot123",
-            role: "root",
-          })
-        );
-        navigate("/home/createAccount")
+      case USERTYPE.root:
+        navigate("/home/createAccount");
         break;
       default:
         break;

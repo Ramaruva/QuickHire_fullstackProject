@@ -17,7 +17,7 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private static final  String SECRET_KEY="02b8721e0cdc9f75fdc5a4fdb9e949e7128c719bd88880ac20650cd60ad502d0";
+    private static final  String SECRET_KEY="";
 
     private  Claims extractAllClaims(String token){
         return  Jwts
@@ -54,7 +54,7 @@ public class JwtService {
           claims.put("userType",user.getUserType());
           claims.put("profileID",user.getProfId());
           claims.put("isPasswordChanged",user.getIsPasswordChanged());
-        return Jwts.builder().setSubject(user.getUsername())
+        return Jwts.builder().setClaims(claims).setSubject(user.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis()+24*60*60*1000))
                 .signWith(getSigningKey())
