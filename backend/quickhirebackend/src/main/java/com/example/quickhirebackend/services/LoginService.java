@@ -48,6 +48,7 @@ public class LoginService implements UserDetailsService {
             user.setIsPasswordChanged(userActiveInfo.ispasswordchanged());
             user.setStatus(userActiveInfo.status());
             String token = jwtService.generateToken(user);
+            System.out.println(user+"am");
             UserProfile userDetails = userProfileRepository.findById(user.getProfId()).stream().findFirst().orElse(new UserProfile());
             return token;
         } else {
