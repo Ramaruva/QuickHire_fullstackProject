@@ -1,9 +1,8 @@
-import React, { useState } from "react";
-
+import React, { useEffect, useState } from "react";
+import { getRequest } from "../../API/config";
+ 
 const StaffAccounts = () => {
   const [data, setData] = useState([
-    { username: "JohnDoe", phone: "123-456-7890", email: "john@example.com" },
-    { username: "JaneDoe", phone: "987-654-3210", email: "jane@example.com" },
     // Add more data as needed
   ]);
   const handleDelete = (index) => {
@@ -11,9 +10,22 @@ const StaffAccounts = () => {
     newData.splice(index, 1);
     setData(newData);
   };
+  const getAllStaffDetails =async()=>{
+    try {
+      const data = await getRequest("getAllStaffAccounts");
+      console.log(data.data);
+      setData(data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+ 
+  useEffect(()=>{
+    getAllStaffDetails();
+  },[])
   return (
     <div>
-        <h2 className="text-xl font-semibold mb-2">Staff Accounts</h2>
+      <h2 className="text-xl font-semibold mb-2">Staff Accounts</h2>
       <div className="overflow-x-auto">
         <table className="table-auto min-w-full border-collapse border border-gray-300">
           <thead>
@@ -26,7 +38,7 @@ const StaffAccounts = () => {
             </tr>
           </thead>
           <tbody>
-            {data.map((row, index) => (
+            {data && data.map((row, index) => (
               <tr key={index}>
                 <td className="border px-4 py-2">{row.username}</td>
                 <td className="border px-4 py-2">{row.phone}</td>
@@ -57,5 +69,6 @@ const StaffAccounts = () => {
     </div>
   );
 };
-
+ 
 export default StaffAccounts;
+ 
