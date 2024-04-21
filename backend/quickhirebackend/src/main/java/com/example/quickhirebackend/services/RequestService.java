@@ -1,16 +1,20 @@
 package com.example.quickhirebackend.services;
-
+ 
 import com.example.quickhirebackend.customExceptions.CustomDuplicateUsernameException;
 import com.example.quickhirebackend.dao.*;
 import com.example.quickhirebackend.dto.ReviewRecord;
 import com.example.quickhirebackend.dto.StaffAccountCreationDTO;
+import com.example.quickhirebackend.dto.UserActiveInfo;
 import com.example.quickhirebackend.model.*;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-
+ 
+import java.util.ArrayList;
+import java.util.List;
+ 
 @Service
 public class RequestService {
-
+ 
     private final EmployerRequestRepository employerRequestRepository;
     private final EmployerDetailsRepository employerDetailsRepository;
     private final UserProfileRepository userProfileRepository;
@@ -32,7 +36,7 @@ public class RequestService {
         this.emailService = emailService;
         this.staffDetailsRepository = staffDetailsRepository;
     }
-
+ 
     public String employerRequest(ReviewRecord employerRequest) throws Exception {
         try{
        EmployerRequest employerRequestData = employerRequestRepository.findById(employerRequest.id()).stream().findFirst().orElse(null);
@@ -56,17 +60,17 @@ public class RequestService {
            assert userProfile != null;
            userProfile.setStatus(AllTypesEnums.UserProfileStatus.ACTIVATED);
            userProfileRepository.save(userProfile);
-
+ 
            // update user table
            createNewUser(employerRequestData.getProfId(), AllTypesEnums.UserType.EMPLOYER,AllTypesEnums.UserStatus.ACTIVE,userProfile.getUsername(),userProfile.getEmail());
-
+ 
            return "Employer has been Succesfully Accepted";
        }}
         catch (Exception e){
             throw  new Exception(e.getMessage());
         }
     }
-
+ 
     public String professionalRequest(ReviewRecord professionalRequest) throws Exception {
         try{
            ProfessionalRequest professionalRequestData = professionalRequestRepository.findById(professionalRequest.id()).stream().findFirst().orElse(null);
@@ -77,7 +81,7 @@ public class RequestService {
             // change the status
             professionalRequestData.setRequestType(professionalRequest.requestType());
             professionalRequestRepository.save(professionalRequestData);
-
+ 
             // set schoolname, major completiontime profid
             ProfessionalDetails professionalDetails = new ProfessionalDetails();
             professionalDetails.setSchoolName(professionalRequestData.getSchoolName());
@@ -85,22 +89,22 @@ public class RequestService {
             professionalDetails.setCompletionTime(professionalRequestData.getCompletionTime());
             professionalDetails.setProfId(professionalRequestData.getProfId());
             professionalDetailsRepository.save(professionalDetails);
-
+ 
             // set status in user profile
-
+ 
             userProfile.setStatus(AllTypesEnums.UserProfileStatus.ACTIVATED);
             userProfileRepository.save(userProfile);
-
+ 
             // create  username password usertype status profid ispasswordchanges
             createNewUser(userProfile.getUserprofileid(), AllTypesEnums.UserType.PROFESSIONAL,AllTypesEnums.UserStatus.ACTIVE,userProfile.getUsername(),userProfile.getEmail());
-
+ 
             return "Professional account has been Created!";
         }
     }catch (Exception e){
         throw  new Exception(e.getMessage());
     }
     }
-
+ 
     public void createNewUser(Integer profId, AllTypesEnums.UserType userType, AllTypesEnums.UserStatus status, String userName, String email){
         User user = new User();
         user.setProfId(profId);
@@ -115,9 +119,9 @@ public class RequestService {
         String subject = "QuickHire Account Accepted";
         String body="We are happy to share you that your account has been Activated, and this is your credentials  to login username:"+userName+"password:"+randomPassword+"/n"+"Best"+"/n"+"Team QuickHire";
         emailService.sendMail(email,subject,body);
-
+ 
     }
-
+ 
     public String professionalDeleteRequest(Integer requestID){
         //need to update in professional request data
         ProfessionalRequest professionalRequest = professionalRequestRepository.findById(requestID).stream().findFirst().orElse(new ProfessionalRequest());
@@ -127,7 +131,7 @@ public class RequestService {
         DeleteUserDetails(professionalRequest.getProfId());
         return "Account Deleted Successfully!";
     }
-
+ 
     public  String employerDeleteRequest(Integer requestID){
         //update employerReq
         EmployerRequest employerRequestData = employerRequestRepository.findById(requestID).stream().findFirst().orElse(new EmployerRequest());
@@ -141,12 +145,12 @@ public class RequestService {
         UserProfile userData = userProfileRepository.findById(userID).stream().findFirst().orElse(new UserProfile());
         userData.setStatus(AllTypesEnums.UserProfileStatus.DELETED);
         userProfileRepository.save(userData);
-
+ 
         User user = userRepository.findById(userData.getUsername()).stream().findFirst().orElse(new User());
         user.setStatus(AllTypesEnums.UserStatus.INACTIVE);
         userRepository.save(user);
     }
-
+ 
     public String staffAccountCreation(StaffAccountCreationDTO staffData){
         //creating userprofile
         try {
@@ -163,7 +167,7 @@ public class RequestService {
             newStaffMember.setEmail(staffData.getEmail());
             newStaffMember.setPhone(staffData.getPhone());
             UserProfile savedStaffUserProfile = userProfileRepository.save(newStaffMember);
-
+ 
             createNewUser(savedStaffUserProfile.getUserprofileid(), AllTypesEnums.UserType.STAFF, AllTypesEnums.UserStatus.ACTIVE, savedStaffUserProfile.getUsername(), savedStaffUserProfile.getEmail());
             //creating staff profile
             StaffDetails staffDetails = new StaffDetails();
@@ -174,7 +178,23 @@ public class RequestService {
         catch (DataIntegrityViolationException e){
             throw  new CustomDuplicateUsernameException("Username Already Existed!");
         }
-
+ 
     }
-
+ 
+    public List<UserProfile> allStaffAccounts(){
+        try{
+          //  List<UserActiveInfo> staffUsers = userRepository.findActiveStaffWithoutPassword();
+            List<Integer> staffIds = userRepository.findActiveStaffProfIds(AllTypesEnums.UserType.STAFF,AllTypesEnums.UserStatus.ACTIVE);
+            List<UserProfile> staffUserProfiles = new ArrayList<>();
+            for(Integer id:staffIds){
+                UserProfile userProfile = userProfileRepository.findById(id).stream().findFirst().orElseThrow();
+                staffUserProfiles.add(userProfile);
+            }
+            return staffUserProfiles;
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+ 
 }

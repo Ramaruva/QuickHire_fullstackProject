@@ -1,6 +1,4 @@
 package com.example.quickhirebackend.controller.staffContoller;
-
-
 import com.example.quickhirebackend.customExceptions.CustomDuplicateUsernameException;
 import com.example.quickhirebackend.dto.JobMatchRequestRecord;
 import com.example.quickhirebackend.dto.ReviewRecord;
@@ -9,21 +7,18 @@ import com.example.quickhirebackend.services.MatchService;
 import com.example.quickhirebackend.services.RequestService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.bind.annotation.*;
+ 
 @RestController
 public class StaffController {
     private final RequestService requestService;
     private final MatchService matchService;
-
+ 
     public StaffController(RequestService requestService, MatchService matchService) {
         this.requestService = requestService;
         this.matchService = matchService;
     }
-
+ 
     @PostMapping("/employerRequestReview")
     public ResponseEntity<?> employerRequestReview(@RequestBody ReviewRecord employerRequest){
     try{
@@ -34,7 +29,7 @@ public class StaffController {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error occurred while Accepting Employer Review Request"+e.getMessage());
     }
     }
-
+ 
     @PostMapping("/professionalRequestReview")
     public ResponseEntity<?> professionalRequestReview(@RequestBody ReviewRecord professionalRequest){
     try{
@@ -43,9 +38,9 @@ public class StaffController {
     }catch (Exception e){
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error occurred while Accepting Professional Review Request"+e.getMessage());
     }
-
+ 
     }
-
+ 
     record DeleteRequestID(Integer requestId){};
     @PutMapping("/professionalDeleteAccept")
     public ResponseEntity<?> professionalDeleteRequest(@RequestBody DeleteRequestID deleteID){
@@ -56,7 +51,7 @@ public class StaffController {
             return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-
+ 
     @PutMapping("/employerDeleteAccept")
     public ResponseEntity<?> employerDeleteRequest(@RequestBody DeleteRequestID deleteId){
         try{
@@ -66,8 +61,8 @@ public class StaffController {
             return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-
-
+ 
+ 
     @PostMapping("/staffJobMatch")
     public ResponseEntity<?> staffJobMatch(@RequestBody JobMatchRequestRecord jobMatchRequestRecord){
        try{
@@ -77,7 +72,7 @@ public class StaffController {
            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
        }
     }
-
+ 
     @PostMapping("/createStaff")
     public  ResponseEntity<?>  staffAccountCreation(@RequestBody StaffAccountCreationDTO staffAccountDetails){
         try{
@@ -91,5 +86,17 @@ public class StaffController {
             return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-
+ 
+    @GetMapping("/getAllStaffAccounts")
+    public  ResponseEntity<?> getAllStaffAccounts(){
+        try{
+            return ResponseEntity.ok(requestService.allStaffAccounts());
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+ 
+ 
 }
+ 
