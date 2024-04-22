@@ -9,17 +9,19 @@ import {
   validateUsername,
   validateZipcode,
 } from "../../validations/standardValidations";
+import { USERREQUESTTYPE } from "../../types";
 const details = {
-  firstName: "",
-  lastName: "",
+  firstname: "",
+  lastname: "",
   email: "",
   phone: "",
   address: "",
-  userName: "",
+  username: "",
   state: "",
   city: "",
-  zipcode: "",
+  pincode: "",
   companyName: "",
+  requestType:USERREQUESTTYPE.newAccount
 };
 const erroMsg = {
   firstNameError: "",
@@ -42,18 +44,9 @@ const RegistrationPage = () => {
   const [userErrors, setUserErrors] = useState(erroMsg);
 
   const handleNavigation = () => {
-    localStorage.setItem(
-      "user",
-      JSON.stringify({
-        userName: userDetails.userName,
-        role: customerType == "Professional" ? "Professional" : "Employer",
-      })
-    );
     if (customerType == "Professional") {
       navigation("/education");
-    } else {
-      navigation("/home/CreateJobs");
-    }
+    } 
   };
   const handleChange = (e) => {
     try {
@@ -70,12 +63,12 @@ const RegistrationPage = () => {
     try {
       e.preventDefault();
       const errorObj = {
-        firstNameError: validateFirstName(userDetails.firstName),
-        lastNameError: validateLastName(userDetails.lastName),
+        firstNameError: validateFirstName(userDetails.firstname),
+        lastNameError: validateLastName(userDetails.lastname),
         emailError: validateEmail(userDetails.email),
         phoneError: validatePhone(userDetails.phone),
         addressError: userDetails.address.length > 0 ? "" : "Address is Empty",
-        userNameError: validateUsername(userDetails.userName),
+        userNameError: validateUsername(userDetails.username),
         stateError:
           userDetails.state.length > 0 ? "" : "Please Enter state Name",
         cityError: userDetails.city.length > 0 ? "" : "Please Enter city Name",
@@ -126,8 +119,8 @@ const RegistrationPage = () => {
               type="text"
               id="firstName"
               placeholder="First Name"
-              value={userDetails.firstName}
-              name="firstName"
+              value={userDetails.firstname}
+              name="firstname"
               onChange={handleChange}
             />
             {userErrors?.firstNameError.length > 0 && (
@@ -147,8 +140,8 @@ const RegistrationPage = () => {
               type="text"
               id="lastName"
               placeholder="Last Name"
-              value={userDetails.lastName}
-              name="lastName"
+              value={userDetails.lastname}
+              name="lastname"
               onChange={handleChange}
             />
             {userErrors?.lastNameError.length > 0 && (
@@ -193,8 +186,8 @@ const RegistrationPage = () => {
               type="text"
               id="Preferred Username"
               placeholder="Create your unique Username Name"
-              value={userDetails.userName}
-              name="userName"
+              value={userDetails.username}
+              name="username"
               onChange={handleChange}
             />
             {userErrors?.userNameError.length > 0 && (
