@@ -8,11 +8,13 @@ import {
   validateSchoolName,
 } from "../../validations/standardValidations";
 import ErrorMsgComponent from "../../components/shared/ErrorMsgComponent";
+import { useDispatch } from "react-redux";
+import { setData, setEducationList } from "../../redux/professionalRegisterSlice";
 
 const details = {
   schoolName: "",
   major: "",
-  endTime: "",
+  completiontime: "",
 };
 const Error = {
   schoolNameError: "",
@@ -23,6 +25,8 @@ const Education = () => {
   const [educationDetails, setEducationDetails] = useState(details);
   const [educationErrors, setEducationErrors] = useState(Error);
   const [totalEducationDetails, setTotalEducationDetails] = useState([]);
+  const dispatch = useDispatch();
+  let sample = { ...details };
   const mystyle = {
     Header: {
       color: "#5856d6",
@@ -59,7 +63,7 @@ const Education = () => {
       const errorObj = {
         schoolNameError: validateSchoolName(educationDetails.schoolName),
         majorNameError: validateMajorName(educationDetails.major),
-        endTimeError: validateDate(educationDetails.endTime),
+        endTimeError: validateDate(educationDetails.completiontime),
       };
       setEducationErrors(errorObj);
       console.log(educationErrors);
@@ -79,8 +83,15 @@ const Education = () => {
   const handleNext = (e) => {
     try {
       e.preventDefault();
-      if(totalEducationDetails.length>0){
+      if (totalEducationDetails.length > 0) {
+        sample = { ...totalEducationDetails[0] };
+        dispatch(setData({...sample}));
+        let education = {
+          educationList: totalEducationDetails,
+        };
+        dispatch(setEducationList(totalEducationDetails));
         navigation("/category");
+        return;
       }
     } catch (error) {}
   };
@@ -128,9 +139,9 @@ const Education = () => {
               <label>Completion Time:</label>
               <br></br>
               <input
-                value={educationDetails.endTime}
-                onChange={(e) => handleChange("endTime", e.target.value)}
-                type="date"
+                value={educationDetails.completiontime}
+                onChange={(e) => handleChange("completiontime", e.target.value)}
+                type="Date"
                 className={`${
                   educationErrors.endTimeError.length > 0
                     ? "border-red-500"
