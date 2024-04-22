@@ -10,6 +10,8 @@ import {
   validateZipcode,
 } from "../../validations/standardValidations";
 import { USERREQUESTTYPE } from "../../types";
+import { useDispatch } from "react-redux";
+import { setData } from "../../redux/professionalRegisterSlice";
 const details = {
   firstname: "",
   lastname: "",
@@ -39,12 +41,14 @@ const RegistrationPage = () => {
   const query = useQuery();
   const customerType = query.get("type");
   const navigation = useNavigate();
+  const dispatch = useDispatch();
   if (customerType == "Professional") details.companyName = "dummy";
   const [userDetails, setUserDetails] = useState(details);
   const [userErrors, setUserErrors] = useState(erroMsg);
 
   const handleNavigation = () => {
     if (customerType == "Professional") {
+      
       navigation("/education");
     } 
   };
@@ -80,6 +84,9 @@ const RegistrationPage = () => {
       setUserErrors(errorObj);
       if (!checkKeysEmpty(errorObj)) {
         setUserErrors(erroMsg);
+        if(customerType == "Professional"){
+          dispatch(setData(userDetails))
+        }
         setUserDetails(details);
         alert("Registration success!");
         handleNavigation();

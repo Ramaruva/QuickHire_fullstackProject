@@ -31,6 +31,8 @@ public class ProfessionalRegistrationRequest {
 
     private  List<QualificationRecord> qualifications;
 
+    private List<EducationRecord> educationList;
+
     private Date completiontime;
     public Date getCompletiontime() {
         return completiontime;
@@ -131,6 +133,13 @@ public class ProfessionalRegistrationRequest {
         this.qualificationKeywords = qualificationKeywords;
     }
 
+    public List<EducationRecord> getEducationList() {
+        return educationList;
+    }
+
+    public void setEducationList(List<EducationRecord> educationList) {
+        this.educationList = educationList;
+    }
 
     public  void  setQualifications(List<QualificationRecord> qualifications){
         this.qualifications=qualifications;

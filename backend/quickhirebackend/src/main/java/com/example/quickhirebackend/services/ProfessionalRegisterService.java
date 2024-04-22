@@ -1,10 +1,8 @@
 package com.example.quickhirebackend.services;
 
 import com.example.quickhirebackend.customExceptions.CustomDuplicateUsernameException;
-import com.example.quickhirebackend.dao.ProfessionalDetailsRepository;
-import com.example.quickhirebackend.dao.ProfessionalRequestRepository;
-import com.example.quickhirebackend.dao.QualificationRepository;
-import com.example.quickhirebackend.dao.UserProfileRepository;
+import com.example.quickhirebackend.dao.*;
+import com.example.quickhirebackend.dto.EducationRecord;
 import com.example.quickhirebackend.dto.ProfessionalRegistrationRequest;
 import com.example.quickhirebackend.dto.QualificationRecord;
 import com.example.quickhirebackend.model.*;
@@ -19,12 +17,14 @@ public class ProfessionalRegisterService {
     private  final QualificationRepository qualificationRepository;
     private  final ProfessionalRequestRepository professionalRequestRepository;
     private  final ProfessionalDetailsRepository professionalDetailsRepository;
+    private  final EducationRepository educationRepository;
 
-    public ProfessionalRegisterService(UserProfileRepository userProfileRepository, QualificationRepository qualificationRepository, ProfessionalRequestRepository professionalRequestRepository, ProfessionalDetailsRepository professionalDetailsRepository) {
+    public ProfessionalRegisterService(UserProfileRepository userProfileRepository, QualificationRepository qualificationRepository, ProfessionalRequestRepository professionalRequestRepository, ProfessionalDetailsRepository professionalDetailsRepository, EducationRepository educationRepository) {
         this.userProfileRepository = userProfileRepository;
         this.qualificationRepository = qualificationRepository;
         this.professionalRequestRepository = professionalRequestRepository;
         this.professionalDetailsRepository = professionalDetailsRepository;
+        this.educationRepository = educationRepository;
     }
 
     public int newProfessionalRegister(ProfessionalRegistrationRequest registrationRequest) throws Exception {
@@ -51,6 +51,15 @@ public class ProfessionalRegisterService {
                qualificationRepository.save(qualification);
            }
 
+           //creating the education table
+           for(EducationRecord educationRecord: registrationRequest.getEducationList()){
+               Education education = new Education();
+               education.setCompletionTime(educationRecord.completiontime());
+               education.setSchoolName(educationRecord.schoolname());
+               education.setMajor(educationRecord.major());
+               education.setProfId(educationRecord.profid());
+                educationRepository.save(education);
+           }
            //creating professional request
            ProfessionalRequest professionalRequest = new ProfessionalRequest();
            professionalRequest.setRequestType(registrationRequest.getRequestType());
