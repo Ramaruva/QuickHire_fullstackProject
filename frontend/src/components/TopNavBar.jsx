@@ -1,21 +1,29 @@
 import React, { useEffect, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
- 
+import { useSelector, useDispatch } from "react-redux";
+import { logout } from "../redux/authSlice";
+
 const TopNavBar = ({ isLandingPage = false, isSignin = false }) => {
   const [isOpen, setIsOpen] = useState(false);
   const navigate = useNavigate();
-  const [userDetails, setUserDetails] = useState({
-    userName: "gowtham123",
-    role: "staff",
-  });
+  const dispatch = useDispatch();
+  const { user, isAuthenticated } = useSelector((state) => state.auth);
+
   useEffect(() => {
-    try {
-      const userDetails1 = JSON.parse(localStorage.getItem("user"));
-      setUserDetails(userDetails1);
-    } catch (error) {
-      console.log(error);
+    // Redirect to sign-in page if not authenticated
+    if (!isAuthenticated) {
+      navigate("/SignIn", { replace: true });
     }
-  }, []);
+  }, [isAuthenticated, navigate]);
+
+  const handleLogout = async () => {
+    try {
+      await dispatch(logout()).unwrap(); // Ensure logout is completed before navigating
+      navigate("/SignIn");
+    } catch (error) {
+      console.error('Failed to logout:', error);
+    }
+  };
   return (
     <div className="bg-white space-y-4 rounded-md p-3 sm:p-1  lg:p-3 xl:px-6 xl:py-4">
       <div className="flex items-center justify-center border-b">
@@ -28,6 +36,14 @@ const TopNavBar = ({ isLandingPage = false, isSignin = false }) => {
           </h2>
         </div>
         <div className="w-1/6 flex justify-end items-center">
+        {!isLandingPage && user && (
+            <>
+              <div className="text-sm font-semibold hidden sm:block">
+                {user.sub}
+              </div>
+              {/* Other components */}
+            </>
+          )}
           {isLandingPage ? (
             <button
               className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
@@ -35,9 +51,9 @@ const TopNavBar = ({ isLandingPage = false, isSignin = false }) => {
             >
               Login
             </button>
-          ) : (
+          ) : user && (
             <>
-              <div className="hidden sm:flex sm:items-center sm:space-x-4">
+              <div className="hidden ml-2 sm:flex sm:items-center sm:space-x-4">
                 <img
                   src="/assets/Profile-pic.jpg"
                   alt="Profile"
@@ -54,11 +70,7 @@ const TopNavBar = ({ isLandingPage = false, isSignin = false }) => {
                       Change Password
                     </NavLink>
                     <NavLink
-                      onClick={() => {
-                        // Reset any user-specific state/store
-                        localStorage.clear();
-                        navigate("/SignIn");
-                      }}
+                      onClick={handleLogout}
                       className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
                       Logout
@@ -86,11 +98,9 @@ const TopNavBar = ({ isLandingPage = false, isSignin = false }) => {
                   </svg>
                 </button>
               </div>
-              <div className="text-sm font-semibold hidden sm:block">
-                {userDetails && userDetails.userName}
-              </div>
+              
               <div className="text-xs text-gray-600 hidden sm:block">
-                { userDetails &&userDetails.role}
+                {user && user.type}
               </div>
             </>
           )}
@@ -99,5 +109,5 @@ const TopNavBar = ({ isLandingPage = false, isSignin = false }) => {
     </div>
   );
 };
- 
+
 export default TopNavBar;
