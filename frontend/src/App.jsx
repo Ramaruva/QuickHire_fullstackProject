@@ -23,6 +23,8 @@ import JobDetailsPage from "./pages/common/JobDetailsPage";
 import CategoryPage from "./pages/common/CategoryPage";
 import { useDispatch } from "react-redux";
 import { checkAuthentication } from "./redux/authSlice";
+import LoadingSpinner from "./components/LoadingSpinner";
+
 
 const App = () => {
   const dispatch = useDispatch();
@@ -32,6 +34,8 @@ const App = () => {
    console.log(decode);
   },[dispatch])
   return (
+    <>
+    <LoadingSpinner/>
     <Routes>
       <Route index element={<LandingPage />} />
 
@@ -91,6 +95,7 @@ const App = () => {
         {/* common routes end here */}
       </Route>
     </Routes>
+    </>
   );
 };
 
