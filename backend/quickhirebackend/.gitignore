@@ -8,7 +8,7 @@ target/
 
 ###  properties###
 !**/src/main/resources/application.properties
-backend/quickhirebackend/src/main/resources/application.properties
+/backend/quickhirebackend/src/main/resources/application.properties
 
 ### STS ###
 .apt_generated
