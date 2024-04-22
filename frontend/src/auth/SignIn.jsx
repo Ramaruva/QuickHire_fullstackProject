@@ -8,7 +8,7 @@ import { postRequest } from "../API/config";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { setLocalItem } from "../localStrorage";
-import { checkAuthentication } from "../redux/authSlice";
+import {  checkAuthenticationAsync } from "../redux/authSlice";
 import { USERTYPE } from "../types";
 
 const userDetails = {
@@ -50,9 +50,8 @@ const SignIn = () => {
         const data = await postRequest("login", loginDetails);
         console.log(data?.data?.token);
         setLocalItem("token", data?.data?.token);
-        let decode = checkAuthentication(disPatch);
-        console.log(decode);
-        redirect(decode.userType);
+        await disPatch(checkAuthenticationAsync());
+        redirect(user.userType);
       }
     } catch (error) {
       console.log(error);

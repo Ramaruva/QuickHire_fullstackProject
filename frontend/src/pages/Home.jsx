@@ -3,7 +3,6 @@ import { Navigate, Outlet } from "react-router-dom";
 import SideNavBar from "../components/SideNavBar";
 import TopNavBar from "../components/TopNavBar";
 import { useDispatch, useSelector } from "react-redux";
-import { checkAuthentication } from "../redux/authSlice";
 
 const Home = () => {
   // const isAuth = useSelector((state)=>state.auth.isAuthenticated);
