@@ -87,10 +87,10 @@ const TopNavBar = ({ isLandingPage = false, isSignin = false }) => {
                 </button>
               </div>
               <div className="text-sm font-semibold hidden sm:block">
-                {userDetails.userName}
+                {userDetails && userDetails.userName}
               </div>
               <div className="text-xs text-gray-600 hidden sm:block">
-                {userDetails.role}
+                { userDetails &&userDetails.role}
               </div>
             </>
           )}
