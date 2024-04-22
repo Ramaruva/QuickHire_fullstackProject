@@ -22,7 +22,7 @@ import MatchedJobs from "./pages/Professionals/MatchedJobs";
 import JobDetailsPage from "./pages/common/JobDetailsPage";
 import CategoryPage from "./pages/common/CategoryPage";
 import { useDispatch } from "react-redux";
-import { checkAuthentication } from "./redux/authSlice";
+import { checkAuthenticationAsync } from "./redux/authSlice";
 import LoadingSpinner from "./components/LoadingSpinner";
 
 
@@ -30,8 +30,8 @@ const App = () => {
   const dispatch = useDispatch();
 
   useEffect(()=>{
-   let decode = checkAuthentication(dispatch);
-   console.log(decode);
+   dispatch(checkAuthenticationAsync());
+   //console.log(decode);
   },[dispatch])
   return (
     <>

@@ -7,9 +7,10 @@ import {
 import { postRequest } from "../API/config";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
-import { setLocalItem } from "../localStrorage";
-import { checkAuthentication } from "../redux/authSlice";
+import { getLocalItem, setLocalItem } from "../localStrorage";
+import {  checkAuthenticationAsync } from "../redux/authSlice";
 import { USERTYPE } from "../types";
+import { jwtDecode } from "jwt-decode";
 
 const userDetails = {
   username: "",
@@ -50,7 +51,9 @@ const SignIn = () => {
         const data = await postRequest("login", loginDetails);
         console.log(data?.data?.token);
         setLocalItem("token", data?.data?.token);
-        let decode = checkAuthentication(disPatch);
+        await disPatch(checkAuthenticationAsync());
+        let token = getLocalItem("token");
+        let decode = jwtDecode(token);
         console.log(decode);
         redirect(decode.userType);
       }
