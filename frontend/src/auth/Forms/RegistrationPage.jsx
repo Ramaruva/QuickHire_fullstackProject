@@ -76,7 +76,7 @@ const RegistrationPage = () => {
         stateError:
           userDetails.state.length > 0 ? "" : "Please Enter state Name",
         cityError: userDetails.city.length > 0 ? "" : "Please Enter city Name",
-        zipcodeError: validateZipcode(userDetails.zipcode),
+        zipcodeError: validateZipcode(userDetails.pincode),
         companyNameError:
           userDetails.companyName.length > 0 ? "" : "Please Enter Company Name",
       };
@@ -85,10 +85,11 @@ const RegistrationPage = () => {
       if (!checkKeysEmpty(errorObj)) {
         setUserErrors(erroMsg);
         if(customerType == "Professional"){
+          console.log(userDetails);
           dispatch(setData(userDetails))
         }
         setUserDetails(details);
-        alert("Registration success!");
+        alert("Registration success!"); 
         handleNavigation();
       }
     } catch (error) {
@@ -319,10 +320,10 @@ const RegistrationPage = () => {
                   : "border-gray-300"
               }`}
               type="text"
-              placeholder="Zipcode"
-              value={userDetails.zipcode}
+              placeholder="pincode"
+              value={userDetails.pincode}
               onChange={handleChange}
-              name="zipcode"
+              name="pincode"
             />
             {userErrors?.stateError.length > 0 && (
               <p className="mt-2 text-sm text-red-600" id="username-error">

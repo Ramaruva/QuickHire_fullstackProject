@@ -13,7 +13,7 @@ const TopNavBar = ({ isLandingPage = false, isSignin = false }) => {
   useEffect(() => {
     // Redirect to sign-in page if not authenticated
     if (!isAuthenticated) {
-      navigate("/SignIn", { replace: true });
+      navigate("/", { replace: true });
     }
     
     // Function to check if click is outside the dropdown
