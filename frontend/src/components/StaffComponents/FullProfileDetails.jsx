@@ -9,6 +9,8 @@ import { BsBank } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { USERREQUESTTYPE, USERTYPE } from "../../types";
 import {
+  asyncEmployerDataReviews,
+  asyncEmployerReviewOperation,
   asyncProfessionalDataReviews,
   asyncProfessionalReviewOperation,
 } from "../../redux/staffSlicer";
@@ -17,6 +19,9 @@ import { useNavigate } from "react-router-dom";
 const FullProfileDetails = ({ customerType, operationType, requestID }) => {
   const professionalReviews = useSelector(
     (state) => state.staffStates.professionalReviews
+  );
+  const employerReviews = useSelector(
+    (state) => state.staffStates.employerReviews
   );
   const dispatch = useDispatch();
   const [userData, setUserData] = useState();
@@ -35,7 +40,18 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
           );
         });
       }
-      if (professionalReviews) {
+      if (employerReviews == null && customerType == "Employer") {
+        const prom = dispatch(asyncEmployerDataReviews());
+        prom.then((res) => {
+          setUserData(
+            res.payload.find((element) => element.prequestid == requestID)
+          );
+        });
+      }
+      if (employerReviews && customerType == "Employer") {
+        setUserData(employerReviews.find((element) => element.prequestid));
+      }
+      if (professionalReviews && customerType == "Professional") {
         setUserData(
           professionalReviews.find((element) => element.prequestid == requestID)
         );
@@ -44,21 +60,6 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
       console.log(error);
     }
   }, [dispatch]);
-  const educationDetails = [
-    { schoolName: "Smu", major: "Computer science", endTime: "2020-01-27" },
-    { schoolName: "Smu", major: "Computer science", endTime: "2020-01-27" },
-  ];
-
-  const categoryies = [
-    {
-      type: "exp",
-      keywords: "2 year in java",
-    },
-    {
-      type: "skills",
-      keywords: "java,python",
-    },
-  ];
 
   const handleReview = (reviewType) => {
     try {
@@ -67,7 +68,12 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
         requestType: reviewType,
         reviewMessage: rejectMsg,
       };
-      const data = dispatch(asyncProfessionalReviewOperation(postData));
+      if (customerType == "Professional") {
+        const data = dispatch(asyncProfessionalReviewOperation(postData));
+      }
+      else{
+          const data = dispatch(asyncEmployerReviewOperation(postData));
+      }
       // history("-1");
     } catch (error) {
       console.log(error);
@@ -97,7 +103,15 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
             <h5>{userData?.lastname}</h5>
           </div>
           <div className="text-gray-400 text-sm mt-1">
-            <h5>{userData?.address}</h5>
+            <h5>
+              {userData?.address +
+                " " +
+                userData?.city +
+                " " +
+                userData?.state +
+                "" +
+                userData?.pincode}
+            </h5>
           </div>
         </div>
         <div>
