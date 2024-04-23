@@ -7,6 +7,7 @@ import professionalReducer from './professionalRegisterSlice';
 import loadingReducer from './loadingSlice';
 import staffReducer from './staffSlicer';
 import { thunk } from 'redux-thunk';
+import jobReducer from './jobSlice';
 
 // Define the persist config
 const persistConfig = {
@@ -20,7 +21,8 @@ const rootReducer = combineReducers({
   auth: authReducer,
   professionalRegister: professionalReducer,
   loading: loadingReducer,
-  staffStates:staffReducer
+  staffStates:staffReducer,
+  jobSlice:jobReducer
 });
 
 // Create a persisted reducer

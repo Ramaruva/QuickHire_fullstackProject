@@ -54,7 +54,7 @@ const JobDetailsPage = () => {
           <span className="ml-2 text-gray-700">{jobDetails.payPerHour}</span>
         </div>
         <div className="w-[600px] h-fit mt-6">
-          <CategoryList categoryList={categoryList} />
+          <CategoryList Lists={categoryList} />
         </div>
       </div>
 

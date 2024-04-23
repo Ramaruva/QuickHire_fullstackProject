@@ -10,21 +10,26 @@ import {
   validateFirstName,
   validateLastName,
   validatePay,
+  validatePhone,
 } from "../../validations/standardValidations";
 import ErrorMsgComponent from "../shared/ErrorMsgComponent";
+import {  useSelector } from "react-redux";
+import { postRequest } from "../../API/config";
 
 const details = {
   positionName: "",
-  uniqueID: "",
-  firstName: "",
-  lastName: "",
+  jobId: "",
+  firstname: "",
+  lastname: "",
   email: "",
-  pay: "",
+  payPerHour: "",
   startDate: "",
   endDate: "",
   startTime: "",
   endTime: "",
-  categoryLists: [],
+  phone:"",
+  qualifications: [],
+  empid:0
 };
 
 const error = {
@@ -39,16 +44,18 @@ const error = {
   startTimeError: "",
   endTimeError: "",
   categoryrError: "",
+  phoneError:""
 };
 
 const JobPosting = ({ isView = false }) => {
   const [jobDetails, setJobDetails] = useState(details);
   const [jobError, setJobError] = useState(error);
   const [isEditable, setIsEditable] = useState(!isView);
+  const user  =  useSelector((state) => state.auth.user);
   const handleChange = (e) => {
     setJobDetails({ ...jobDetails, [e.target.name]: e.target.value });
   };
-  const handleJobSave = (e) => {
+  const handleJobSave = async(e) => {
     try {
       e.preventDefault();
       const errorObj = {
@@ -56,11 +63,11 @@ const JobPosting = ({ isView = false }) => {
           jobDetails.positionName,
           "Position is Empty!"
         ),
-        uniqueIDError: validateEmptiness(jobDetails.uniqueID, "Job ID is empty!"),
-        firsNameError: validateFirstName(jobDetails.firstName),
-        lastNameError: validateLastName(jobDetails.lastName),
+        uniqueIDError: validateEmptiness(jobDetails.jobId, "Job ID is empty!"),
+        firsNameError: validateFirstName(jobDetails.firstname),
+        lastNameError: validateLastName(jobDetails.lastname),
         emailError: validateEmail(jobDetails.email),
-        payError: validatePay(jobDetails.pay),
+        payError: validatePay(jobDetails.payPerHour),
         startDateError: validateEmptiness(
           jobDetails.startDate,
           "StartDate is Empty"
@@ -77,14 +84,20 @@ const JobPosting = ({ isView = false }) => {
           jobDetails.endTime,
           "End Time is empty"
         ),
+        phoneError:validatePhone(jobDetails.phone),
         categoryrError:
-          jobDetails.categoryLists.length >= 2
+          jobDetails?.qualifications?.length >= 2
             ? ""
             : "Need atleast two categories",
       };
+      
       setJobError(errorObj);
       if (!checkKeysEmpty(errorObj)) {
-        alert("Job saved successfully");
+        jobDetails.empid=user.profileID;
+        console.log(jobDetails);
+        const data = await postRequest("jobPosting",jobDetails);
+        console.log(jobDetails,data);
+       // alert("Job saved successfully");
         setJobError(error);
         setJobDetails(details);
       }
@@ -95,8 +108,8 @@ const JobPosting = ({ isView = false }) => {
 
   const handleCategoryAdd = (obj) => {
     try {
-      let array = [...jobDetails.categoryLists, obj];
-      setJobDetails({ ...jobDetails, categoryLists: array });
+      let array = [...jobDetails.qualifications, obj];
+      setJobDetails({ ...jobDetails, qualifications: array });
     } catch (error) {
       console.log(error);
     }
@@ -142,7 +155,7 @@ const JobPosting = ({ isView = false }) => {
         <ErrorMsgComponent msg={jobError.positionError} />
         <div className="flex flex-wrap -mx-2 mb-2">
           <div className="w-full md:w-1/2 px-2 mb-2 md:mb-0">
-            <h1 className="text-xs font-semibold mb-2">Unique ID</h1>
+            <h1 className="text-xs font-semibold mb-2">Job ID</h1>
             <input
               className={`w-full px-3 py-2 text-xs border rounded shadow appearance-none text-grey-darker ${
                 jobError.uniqueIDError.length > 0
@@ -152,8 +165,8 @@ const JobPosting = ({ isView = false }) => {
               type="text"
               placeholder="First Name"
               readOnly={!isEditable}
-              value={jobDetails.uniqueID}
-              name="uniqueID"
+              value={jobDetails.jobId}
+              name="jobId"
               onChange={handleChange}
             />
             <br></br>
@@ -170,8 +183,8 @@ const JobPosting = ({ isView = false }) => {
               type="text"
               placeholder="First Name"
               readOnly={!isEditable}
-              value={jobDetails.firstName}
-              name="firstName"
+              value={jobDetails.firstname}
+              name="firstname"
               onChange={handleChange}
             />
             <br></br>
@@ -188,8 +201,25 @@ const JobPosting = ({ isView = false }) => {
               type="text"
               placeholder="Last Name"
               readOnly={!isEditable}
-              value={jobDetails.lastName}
-              name="lastName"
+              value={jobDetails.lastname}
+              name="lastname"
+              onChange={handleChange}
+            />
+            <ErrorMsgComponent msg={jobError.lastNameError} />
+          </div>
+          <div className="w-full md:w-1/2 px-2">
+            <h1 className="text-xs font-semibold mb-2">Phone:</h1>
+            <input
+              className={`w-full px-3 py-2 text-xs border rounded shadow appearance-none text-grey-darker ${
+                jobError.lastNameError.length > 0
+                  ? "border-red-500"
+                  : "border-gray-300"
+              }`}
+              type="text"
+              placeholder="phone"
+              readOnly={!isEditable}
+              value={jobDetails.phone}
+              name="phone"
               onChange={handleChange}
             />
             <ErrorMsgComponent msg={jobError.lastNameError} />
@@ -228,8 +258,8 @@ const JobPosting = ({ isView = false }) => {
                 type="text"
                 placeholder="Enter pay per hour in $"
                 readOnly={!isEditable}
-                value={jobDetails.pay}
-                name="pay"
+                value={jobDetails.payPerHour}
+                name="payPerHour"
                 onChange={handleChange}
               />
               <ErrorMsgComponent msg={jobError.payError} />
@@ -337,9 +367,9 @@ const JobPosting = ({ isView = false }) => {
           <Category handleCategoryAdd={handleCategoryAdd} />
         </div>
         <ErrorMsgComponent msg={jobError.categoryrError} />
-        {jobDetails.categoryLists.length > 0 && (
+        {jobDetails.qualifications?.length > 0 && (
           <CategoryList
-            Lists={jobDetails.categoryLists}
+            Lists={jobDetails?.qualifications}
             handleDelete={handleCategoryDelete}
           />
         )}
