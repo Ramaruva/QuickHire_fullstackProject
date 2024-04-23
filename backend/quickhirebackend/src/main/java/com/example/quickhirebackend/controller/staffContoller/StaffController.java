@@ -1,9 +1,6 @@
 package com.example.quickhirebackend.controller.staffContoller;
 import com.example.quickhirebackend.customExceptions.CustomDuplicateUsernameException;
-import com.example.quickhirebackend.dto.JobMatchRequestRecord;
-import com.example.quickhirebackend.dto.ProfessionalRegistrationRequest;
-import com.example.quickhirebackend.dto.ReviewRecord;
-import com.example.quickhirebackend.dto.StaffAccountCreationDTO;
+import com.example.quickhirebackend.dto.*;
 import com.example.quickhirebackend.services.MatchService;
 import com.example.quickhirebackend.services.RequestService;
 import org.springframework.http.HttpStatus;
@@ -111,7 +108,16 @@ public class StaffController {
         }
     }
 
- 
- 
+    @GetMapping("/getAllEmployerRequests")
+    public ResponseEntity<?> getAllEmployerRequests(){
+        try{
+           List<EmployerRegistrationRequest> employerRegistrationRequests = requestService.getEmployerRequests();
+           return ResponseEntity.ok(employerRegistrationRequests);
+        }
+        catch(Exception e){
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
 }
  

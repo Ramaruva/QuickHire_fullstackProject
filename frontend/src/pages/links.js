@@ -6,7 +6,7 @@ export const routelinks = {
     },
     {
       title: "Empolyer Reviews",
-      link: "/home/empolyerReviews",
+      link: "/home/employerReviews",
     },
     {
       title: "Professional lists",

@@ -31,7 +31,7 @@ public class SecurityConfig {
                         req -> req.requestMatchers("/login/**","/professionalRegister/**", "/employerRegister/**")
                                 .permitAll()
                                 .requestMatchers("/createStaff").hasAuthority(String.valueOf(AllTypesEnums.UserType.ROOT))
-                                .requestMatchers("/getAllProfessionalRequests/**").hasAuthority(String.valueOf(AllTypesEnums.UserType.STAFF))
+                                .requestMatchers("/getAllProfessionalRequests/**","/professionalRequestReview/**","/getAllEmployerRequests/**","/employerRequestReview/**").hasAuthority(String.valueOf(AllTypesEnums.UserType.STAFF))
                                 .anyRequest()
                                 .authenticated()
                 ).userDetailsService(loginService)
