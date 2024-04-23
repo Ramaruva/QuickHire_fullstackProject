@@ -1,6 +1,8 @@
 package com.example.quickhirebackend.dto;
 
 import com.example.quickhirebackend.model.AllTypesEnums;
+import com.example.quickhirebackend.model.Education;
+import com.example.quickhirebackend.model.Qualification;
 
 import java.util.Date;
 import java.util.List;
@@ -17,6 +19,16 @@ public class ProfessionalRegistrationRequest {
     private String pincode;
     private String username;
 
+    public Integer getPrequestid() {
+        return prequestid;
+    }
+
+    public void setPrequestid(Integer prequestid) {
+        this.prequestid = prequestid;
+    }
+
+    private Integer prequestid;
+
     // Fields for the Qualification
     private String qualificationType;
     private String qualificationKeywords;
@@ -32,6 +44,26 @@ public class ProfessionalRegistrationRequest {
     private  List<QualificationRecord> qualifications;
 
     private List<EducationRecord> educationList;
+
+    public List<Qualification> getQualification() {
+        return qualification;
+    }
+
+    public void setQualification(List<Qualification> qualification) {
+        this.qualification = qualification;
+    }
+
+    private List<Qualification> qualification;
+
+    public List<Education> getEducation() {
+        return education;
+    }
+
+    public void setEducation(List<Education> education) {
+        this.education = education;
+    }
+
+    private  List<Education> education;
 
     private Date completiontime;
     public Date getCompletiontime() {

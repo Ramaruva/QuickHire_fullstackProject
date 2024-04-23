@@ -3,18 +3,8 @@ import { FaUserTie } from "react-icons/fa"; // react-icons for professional icon
 import { BsBank } from "react-icons/bs";
 import { useNavigate } from "react-router-dom";
 
-const SingleProfileBox = ({ customerType, viewType }) => {
+const SingleProfileBox = ({ customerType, viewType, userData }) => {
   const navigate = useNavigate();
-  const category = [
-    {
-      type: "Experience :",
-      keyword: "2 years in web development",
-    },
-    {
-      type: "Skills :",
-      keyword: "Java, Python, sql, aws",
-    },
-  ];
   const companyDetails = [
     {
       title: "Google",
@@ -23,9 +13,7 @@ const SingleProfileBox = ({ customerType, viewType }) => {
   ];
 
   const navigator = () => {
-    navigate(
-      "/home/individual?type=" + customerType + "&" + "op=" + viewType
-    );
+    navigate("/home/individual?type=" + customerType + "&" + "op=" + viewType);
   };
 
   return (
@@ -44,14 +32,14 @@ const SingleProfileBox = ({ customerType, viewType }) => {
           </h2>
         </div>
         <div className="flex items-center justify-between">
-          <h4 className="text-base font-semibold"> Username</h4>
+          <h4 className="text-base font-semibold"> {userData?.username}</h4>
         </div>
         {customerType == "Professional"
-          ? category.map((item, index) => {
+          ? userData?.qualification.map((item, index) => {
               return (
                 <div key={index} className="mt-4">
                   <p className="mb-2 text-gray-800 font-medium text-xs">
-                    {item.type} {item.keyword}
+                    {item.type} {item.keywords}
                   </p>
                 </div>
               );
