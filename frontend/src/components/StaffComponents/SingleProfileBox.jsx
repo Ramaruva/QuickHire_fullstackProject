@@ -13,7 +13,7 @@ const SingleProfileBox = ({ customerType, viewType, userData }) => {
   ];
 
   const navigator = () => {
-    navigate("/home/individual?type=" + customerType + "&" + "op=" + viewType);
+    navigate("/home/individual?type=" + customerType + "&" + "op=" + viewType+"&"+"reqId="+userData.prequestid);
   };
 
   return (
