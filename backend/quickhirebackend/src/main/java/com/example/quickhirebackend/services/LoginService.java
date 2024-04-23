@@ -55,12 +55,12 @@ public class LoginService implements UserDetailsService {
             throw new LoginException("Login Failed! Invalid Credentials.");
         }
     }
-    public String changePassword(String username, String password) {
+    public boolean changePassword(String username, String password) {
         int val = userRepository.updatePasswordByUsername(username, passwordHasher(password));
         if (val > 0) {
-            return "Password changed successfully!";
+            return true;
         } else {
-            return "Unable to change password please try again!";
+            return false;
         }
     }
     public String passwordGenerator() {
