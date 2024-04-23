@@ -1,4 +1,5 @@
 package com.example.quickhirebackend.services;
+import com.example.quickhirebackend.dao.EmployerDetailsRepository;
 import com.example.quickhirebackend.dao.JobDescriptionRepository;
 import com.example.quickhirebackend.dao.QualificationRepository;
 import com.example.quickhirebackend.dto.JobPostRequest;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -19,11 +21,13 @@ public class JobService {
 
     private final JobDescriptionRepository jobDescriptionRepository;
     private  final QualificationRepository qualificationRepository;
+    private final EmployerDetailsRepository employerDetailsRepository;
 
     @Autowired
-    public JobService(JobDescriptionRepository jobDescriptionRepository, QualificationRepository qualificationRepository) {
+    public JobService(JobDescriptionRepository jobDescriptionRepository, QualificationRepository qualificationRepository, EmployerDetailsRepository employerDetailsRepository) {
         this.jobDescriptionRepository = jobDescriptionRepository;
         this.qualificationRepository = qualificationRepository;
+        this.employerDetailsRepository = employerDetailsRepository;
     }
 
     @Transactional
@@ -80,6 +84,8 @@ public class JobService {
 
             //Date startDate = dateFormat.parse(jobData.getStartDate());
             //need to create a job details table
+            //get employ id
+             Integer empid = employerDetailsRepository.findByProfid(jobData.getEmpid()).stream().findFirst().orElseThrow().getEmployerId();
             JobDescription newJobDesc = new JobDescription();
             newJobDesc.setJobId(jobData.getJobId());
             newJobDesc.setPositionName(jobData.getPositionName());
@@ -91,7 +97,8 @@ public class JobService {
             newJobDesc.setEndDate(jobData.getEndDate());
             newJobDesc.setStartTime(jobData.getStartTime());
             newJobDesc.setEndTime(jobData.getEndTime());
-            newJobDesc.setEmpid(jobData.getEmpid());
+            newJobDesc.setEmpid(empid);
+            newJobDesc.setPayPerHour(jobData.getPayPerHour());
            int jobdescriptionId= createJobDescription(newJobDesc).getJobdescriptionId();
 
            //need to assign qualifications with jobdescid;
@@ -109,5 +116,42 @@ public class JobService {
              throw  new Exception(e.getMessage());
         }
     }
+
+    public List<JobPostRequest> employerSpecificJobs(Integer userProfileId){
+        try{
+            Integer empid = employerDetailsRepository.findByProfid(userProfileId).stream().findFirst().orElseThrow().getEmployerId();
+            List<JobDescription> jobDescriptions = jobDescriptionRepository.findByempid(empid);
+            List<JobPostRequest> jobPostRequests = new ArrayList<>();
+            for(JobDescription jobDescription:jobDescriptions){
+               List<Qualification> qualifications = qualificationRepository.findByJobid(jobDescription.getJobdescriptionId());
+                JobPostRequest jobPostRequest = getJobPostRequest(jobDescription, qualifications);
+                jobPostRequests.add(jobPostRequest);
+            }
+            return jobPostRequests;
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    private static JobPostRequest getJobPostRequest(JobDescription jobDescription, List<Qualification> qualifications) {
+        JobPostRequest jobPostRequest = new JobPostRequest();
+
+        jobPostRequest.setQualification(qualifications);
+        jobPostRequest.setPositionName(jobDescription.getPositionName());
+        jobPostRequest.setEmail(jobDescription.getEmail());
+        jobPostRequest.setFirstname(jobDescription.getFirstname());
+        jobPostRequest.setLastname(jobDescription.getLastname());
+        jobPostRequest.setPhone(jobDescription.getPhone());
+        jobPostRequest.setStartDate(jobDescription.getStartDate());
+        jobPostRequest.setEndDate(jobDescription.getEndDate());
+        jobPostRequest.setStartTime(jobDescription.getStartTime());
+        jobPostRequest.setEndTime(jobDescription.getEndTime());
+        jobPostRequest.setPayPerHour(jobDescription.getPayPerHour());
+        jobPostRequest.setJobId(jobDescription.getJobId());
+        jobPostRequest.setJobdescId(jobDescription.getJobdescriptionId());
+        return jobPostRequest;
+    }
+
 }
 
