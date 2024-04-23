@@ -1,10 +1,13 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   checkKeysEmpty,
   validatePassword,
   validateTwoPassword,
 } from "../../validations/standardValidations";
+import { useDispatch, useSelector } from "react-redux";
+import { changePasswordAsync, clearNotification } from "../../redux/authSlice";
 import ErrorMsgComponent from "../../components/shared/ErrorMsgComponent";
+import Notification from "../../components/shared/Notifications";
 
 const initialDetails = {
   currentPassword: "",
@@ -18,6 +21,11 @@ const errorDetails = {
 const PasswordChange = () => {
   const [passwordDetails, setPasswordDetails] = useState(initialDetails);
   const [passwordErrors, setPasswordErrors] = useState(errorDetails);
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
+  const notification = useSelector((state) => state.auth.notification);
+  const [showNotification, setShowNotification] = useState(false);
+
   const handleChange = (e) => {
     try {
       setPasswordDetails({
@@ -28,7 +36,7 @@ const PasswordChange = () => {
       console.log(error);
     }
   };
-  const savePassword = (e) => {
+  const savePassword = async (e) => {
     try {
       e.preventDefault();
       const errorObj = {
@@ -40,7 +48,13 @@ const PasswordChange = () => {
       };
       setPasswordErrors(errorObj);
       if (!checkKeysEmpty(errorObj)) {
-        alert("Password changed successful");
+        let data = dispatch(
+          changePasswordAsync({
+            username: user.sub,
+            newPassword: passwordDetails.newPassword,
+          })
+        );
+        console.log(data);
         setPasswordDetails(initialDetails);
         setPasswordErrors(errorDetails);
       }
@@ -48,6 +62,17 @@ const PasswordChange = () => {
       console.log(error);
     }
   };
+  // Listen to state changes for notifications
+  React.useEffect(() => {
+    if (notification) {
+      setShowNotification(true);
+      setTimeout(() => {
+        setShowNotification(false);
+        dispatch(clearNotification());
+      }, 3000*10); // Close the notification automatically after 3 seconds
+    }
+  }, [notification, dispatch]);
+
   return (
     <div className="bg-gray-50 min-h-screen flex justify-center w-full">
       <div className="bg-white rounded-lg shadow-lg p-8 m-4 max-w-xl w-1/2">
@@ -99,6 +124,12 @@ const PasswordChange = () => {
             </button>
           </div>
         </div>
+        <Notification
+          message={notification?.message}
+          type={notification?.type}
+          isOpen={showNotification}
+          onClose={() => setShowNotification(false)}
+        />
       </div>
     </div>
   );

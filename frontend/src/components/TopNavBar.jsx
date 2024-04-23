@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { logout } from "../redux/authSlice";
@@ -8,13 +8,29 @@ const TopNavBar = ({ isLandingPage = false, isSignin = false }) => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const dropdownRef = useRef(null);
 
   useEffect(() => {
     // Redirect to sign-in page if not authenticated
     if (!isAuthenticated) {
       navigate("/SignIn", { replace: true });
     }
+    
+    // Function to check if click is outside the dropdown
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setIsOpen(false);
+      }
+    }
+
+    // Bind the event listener
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      // Unbind the event listener on clean up
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, [isAuthenticated, navigate]);
+
 
   const handleLogout = async () => {
     try {
@@ -25,7 +41,7 @@ const TopNavBar = ({ isLandingPage = false, isSignin = false }) => {
     }
   };
   return (
-    <div className="bg-white space-y-4 rounded-md p-3 sm:p-1  lg:p-3 xl:px-6 xl:py-4">
+    <div className=" bg-white space-y-4 rounded-md p-3 sm:p-1  lg:p-3 xl:px-6 xl:py-4">
       <div className="flex items-center justify-center border-b">
         <div className="w-1/6 flex justify-start">
           <img src="/assets/logo.png" alt="QuickHire" className="h-8 w-auto" />
@@ -53,7 +69,7 @@ const TopNavBar = ({ isLandingPage = false, isSignin = false }) => {
             </button>
           ) : user && (
             <>
-              <div className="hidden ml-2 sm:flex sm:items-center sm:space-x-4">
+              <div className=" hidden ml-2 sm:flex sm:items-center sm:space-x-4">
                 <img
                   src="/assets/Profile-pic.jpg"
                   alt="Profile"
@@ -61,7 +77,7 @@ const TopNavBar = ({ isLandingPage = false, isSignin = false }) => {
                   onClick={() => setIsOpen(!isOpen)}
                 />
                 {isOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white shadow-md rounded-md py-1 z-50">
+                  <div ref={dropdownRef} className=" mt-2 w-48 bg-white shadow-md rounded-md py-1">
                     <NavLink
                       onClick={() => setIsOpen(false)}
                       to="/home/PasswordChange"
