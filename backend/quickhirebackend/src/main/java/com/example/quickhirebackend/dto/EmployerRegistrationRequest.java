@@ -14,6 +14,16 @@ public class EmployerRegistrationRequest {
     private String pincode;
     private String username;
 
+    public Integer getPrequestid() {
+        return prequestid;
+    }
+
+    public void setPrequestid(Integer prequestid) {
+        this.prequestid = prequestid;
+    }
+
+    private  Integer prequestid;
+
     // Fields specific to EmployerRequest
     private AllTypesEnums.UserRequestType requestType;
     private String companyName;

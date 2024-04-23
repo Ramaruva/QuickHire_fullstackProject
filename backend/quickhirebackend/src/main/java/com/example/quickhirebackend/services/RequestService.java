@@ -2,6 +2,7 @@ package com.example.quickhirebackend.services;
  
 import com.example.quickhirebackend.customExceptions.CustomDuplicateUsernameException;
 import com.example.quickhirebackend.dao.*;
+import com.example.quickhirebackend.dto.EmployerRegistrationRequest;
 import com.example.quickhirebackend.dto.ProfessionalRegistrationRequest;
 import com.example.quickhirebackend.dto.ReviewRecord;
 import com.example.quickhirebackend.dto.StaffAccountCreationDTO;
@@ -43,13 +44,21 @@ public class RequestService {
  
     public String employerRequest(ReviewRecord employerRequest) throws Exception {
         try{
-       EmployerRequest employerRequestData = employerRequestRepository.findById(employerRequest.id()).stream().findFirst().orElse(null);
-       UserProfile userProfile = userProfileRepository.findById(employerRequestData.getProfId()).stream().findFirst().orElse(null);
+       EmployerRequest employerRequestData = employerRequestRepository.findById(employerRequest.id()).stream().findFirst().orElseThrow();
+       UserProfile userProfile = userProfileRepository.findById(employerRequestData.getProfId()).stream().findFirst().orElseThrow();
        if (employerRequest.requestType() == AllTypesEnums.UserRequestType.ACCOUNT_REJECTED){
-        return "";
+            employerRequestData.setRequestType(employerRequest.requestType());
+            employerRequestRepository.save(employerRequestData);
+           String subject = "QuickHire Account Reject!";
+           String body = "Dear User ,\n\n"
+                   + employerRequest.reviewMessage() +"\n"
+                   + "Best Regards,\n"
+                   + "Team QuickHire\n\n"
+                   + "Thanks,\n";
+           emailService.sendMail(userProfile.getEmail(),subject,body);
+           return "Rejected Successfully!";
        }else {
            // change request type
-           assert employerRequestData != null;
            employerRequestData.setRequestType(employerRequest.requestType());
            employerRequestRepository.save(employerRequestData);
 
@@ -61,7 +70,6 @@ public class RequestService {
 
            // set status to active
 
-           assert userProfile != null;
            userProfile.setStatus(AllTypesEnums.UserProfileStatus.ACTIVATED);
            userProfileRepository.save(userProfile);
  
@@ -246,5 +254,39 @@ public class RequestService {
             System.out.println(e.getMessage());
             throw new RuntimeException(e);
         }
+    }
+
+    public  List<EmployerRegistrationRequest>  getEmployerRequests(){
+        try{
+             List<EmployerRequest> employerRequests = employerRequestRepository.findByRequesttype(AllTypesEnums.UserRequestType.NEW_ACCOUNT);
+             List<EmployerRegistrationRequest> employerRegistrationRequests = new ArrayList<>();
+             for(EmployerRequest employerRequest: employerRequests){
+                 UserProfile userProfile = userProfileRepository.findById(employerRequest.getProfId()).stream().findFirst().orElseThrow();
+                 EmployerRegistrationRequest employerRegistrationRequest = getEmployerRegistrationRequest(employerRequest, userProfile);
+                 employerRegistrationRequests.add(employerRegistrationRequest);
+             }
+             return  employerRegistrationRequests;
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
+
+    private static EmployerRegistrationRequest getEmployerRegistrationRequest(EmployerRequest employerRequest, UserProfile userProfile) {
+        EmployerRegistrationRequest employerRegistrationRequest = new EmployerRegistrationRequest();
+        employerRegistrationRequest.setFirstname(userProfile.getFirstname());
+        employerRegistrationRequest.setLastname(userProfile.getLastname());
+        employerRegistrationRequest.setAddress(userProfile.getAddress());
+        employerRegistrationRequest.setRequestType(employerRequest.getRequestType());
+        employerRegistrationRequest.setCity(userProfile.getCity());
+        employerRegistrationRequest.setPhone(userProfile.getPhone());
+        employerRegistrationRequest.setPincode(userProfile.getPincode());
+        employerRegistrationRequest.setCompanyName(employerRequest.getCompanyName());
+        employerRegistrationRequest.setState(userProfile.getState());
+        employerRegistrationRequest.setUsername(userProfile.getUsername());
+        employerRegistrationRequest.setEmail(userProfile.getEmail());
+        employerRegistrationRequest.setPrequestid(employerRequest.getRequestId());
+        return employerRegistrationRequest;
     }
 }
