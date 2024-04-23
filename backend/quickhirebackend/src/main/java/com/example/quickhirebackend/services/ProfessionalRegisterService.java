@@ -57,7 +57,7 @@ public class ProfessionalRegisterService {
                education.setCompletionTime(educationRecord.completiontime());
                education.setSchoolName(educationRecord.schoolname());
                education.setMajor(educationRecord.major());
-               education.setProfId(educationRecord.profid());
+               education.setProfId(savedUserProfile.getUserprofileid());
                 educationRepository.save(education);
            }
            //creating professional request

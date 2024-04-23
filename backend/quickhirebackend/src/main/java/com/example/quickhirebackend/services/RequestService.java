@@ -2,9 +2,10 @@ package com.example.quickhirebackend.services;
  
 import com.example.quickhirebackend.customExceptions.CustomDuplicateUsernameException;
 import com.example.quickhirebackend.dao.*;
+import com.example.quickhirebackend.dto.EducationRecord;
+import com.example.quickhirebackend.dto.ProfessionalRegistrationRequest;
 import com.example.quickhirebackend.dto.ReviewRecord;
 import com.example.quickhirebackend.dto.StaffAccountCreationDTO;
-import com.example.quickhirebackend.dto.UserActiveInfo;
 import com.example.quickhirebackend.model.*;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -24,8 +25,10 @@ public class RequestService {
     private  final  LoginService loginService;
     private  final  EmailService emailService;
     private  final  StaffDetailsRepository staffDetailsRepository;
+    private  final  EducationRepository educationRepository;
+    private  final  QualificationRepository qualificationRepository;
 
-    public RequestService(EmployerRequestRepository employerRequestRepository, EmployerDetailsRepository employerDetailsRepository, UserProfileRepository userProfileRepository, UserRepository userRepository, ProfessionalRequestRepository professionalRequestRepository, ProfessionalDetailsRepository professionalDetailsRepository, LoginService loginService, EmailService emailService, StaffDetailsRepository staffDetailsRepository) {
+    public RequestService(EmployerRequestRepository employerRequestRepository, EmployerDetailsRepository employerDetailsRepository, UserProfileRepository userProfileRepository, UserRepository userRepository, ProfessionalRequestRepository professionalRequestRepository, ProfessionalDetailsRepository professionalDetailsRepository, LoginService loginService, EmailService emailService, StaffDetailsRepository staffDetailsRepository, EducationRepository educationRepository, QualificationRepository qualificationRepository) {
         this.employerRequestRepository = employerRequestRepository;
         this.employerDetailsRepository = employerDetailsRepository;
         this.userProfileRepository = userProfileRepository;
@@ -35,6 +38,8 @@ public class RequestService {
         this.loginService = loginService;
         this.emailService = emailService;
         this.staffDetailsRepository = staffDetailsRepository;
+        this.educationRepository = educationRepository;
+        this.qualificationRepository = qualificationRepository;
     }
  
     public String employerRequest(ReviewRecord employerRequest) throws Exception {
@@ -196,5 +201,36 @@ public class RequestService {
             throw new RuntimeException(e);
         }
     }
- 
+
+    public List<ProfessionalRegistrationRequest> getProfessionalRequests(){
+        try{
+              List<ProfessionalRequest> professionalRequests = professionalRequestRepository.findByRequesttype(AllTypesEnums.UserRequestType.NEW_ACCOUNT);
+              List<ProfessionalRegistrationRequest> professionalRegistrationRequests = new ArrayList<>();
+              for(ProfessionalRequest professionalRequest:professionalRequests){
+                  UserProfile userProfile = userProfileRepository.findById(professionalRequest.getProfId()).stream().findFirst().orElseThrow();
+                  List<Education> educations = educationRepository.findByProfId(userProfile.getUserprofileid());
+                  List<Qualification> qualification = qualificationRepository.findByProfid(userProfile.getUserprofileid());
+                  ProfessionalRegistrationRequest professionalRequest1 = new ProfessionalRegistrationRequest();
+                  professionalRequest1.setPrequestid(professionalRequest.getRequestId());
+                  professionalRequest1.setFirstname(userProfile.getFirstname());
+                  professionalRequest1.setLastname(userProfile.getLastname());
+                  professionalRequest1.setAddress(userProfile.getAddress());
+                  professionalRequest1.setEmail(userProfile.getEmail());
+                  professionalRequest1.setPhone(userProfile.getPhone());
+                  professionalRequest1.setCity(userProfile.getCity());
+                  professionalRequest1.setState(userProfile.getState());
+                  professionalRequest1.setPincode(userProfile.getPincode());
+                  professionalRequest1.setUsername(userProfile.getUsername());
+                  professionalRequest1.setQualification(qualification);
+                  professionalRequest1.setEducation(educations);
+                  professionalRegistrationRequests.add(professionalRequest1);
+              }
+
+            return professionalRegistrationRequests;
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+            throw new RuntimeException(e);
+        }
+    }
 }
