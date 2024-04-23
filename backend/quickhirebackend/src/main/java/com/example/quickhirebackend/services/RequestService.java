@@ -2,7 +2,6 @@ package com.example.quickhirebackend.services;
  
 import com.example.quickhirebackend.customExceptions.CustomDuplicateUsernameException;
 import com.example.quickhirebackend.dao.*;
-import com.example.quickhirebackend.dto.EducationRecord;
 import com.example.quickhirebackend.dto.ProfessionalRegistrationRequest;
 import com.example.quickhirebackend.dto.ReviewRecord;
 import com.example.quickhirebackend.dto.StaffAccountCreationDTO;
@@ -81,7 +80,16 @@ public class RequestService {
            ProfessionalRequest professionalRequestData = professionalRequestRepository.findById(professionalRequest.id()).stream().findFirst().orElse(null);
            UserProfile userProfile = userProfileRepository.findById(professionalRequestData.getProfId()).stream().findFirst().orElse(new UserProfile());
         if (professionalRequest.requestType() == AllTypesEnums.UserRequestType.ACCOUNT_REJECTED){
-            return "";
+            professionalRequestData.setRequestType(AllTypesEnums.UserRequestType.ACCOUNT_REJECTED);
+            professionalRequestRepository.save(professionalRequestData);
+            String subject = "QuickHire Account Reject!";
+            String body = "Dear User ,\n\n"
+                          + professionalRequest.reviewMessage() +"\n"
+                          + "Best Regards,\n"
+                    + "Team QuickHire\n\n"
+                    + "Thanks,\n";
+            emailService.sendMail(userProfile.getEmail(),subject,body);
+            return "Rejected Successfully!";
         }else {
             // change the status
             professionalRequestData.setRequestType(professionalRequest.requestType());
@@ -122,7 +130,13 @@ public class RequestService {
         user.setPassword(hashedPassword);
         userRepository.save(user);
         String subject = "QuickHire Account Accepted";
-        String body="We are happy to share you that your account has been Activated, and this is your credentials  to login username:"+userName+"password:"+randomPassword+"/n"+"Best"+"/n"+"Team QuickHire";
+        String body = "Dear User,\n\n"
+                + "We are happy to share with you that your QuickHire account has been activated. Below are your login credentials:\n\n"
+                + "Username: " + userName + "\n"
+                + "Password: " + randomPassword + "\n\n"
+                + "Best Regards,\n"
+                + "Team QuickHire\n\n"
+                + "Thanks,\n";
         emailService.sendMail(email,subject,body);
  
     }
