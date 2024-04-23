@@ -14,6 +14,13 @@ const JobList = () => {
        console.log(jobData);
   },[disPatch])
    
+  const navigateJobSpecific =(id)=>{
+      try {
+         navigate("/home/jobdetails"+"?"+"id="+id);
+      } catch (error) {
+        
+      }
+  }
 
   return (
     <div   className="bg-gray-100 min-h-screen p-8 ">
@@ -37,7 +44,7 @@ const JobList = () => {
         <tbody>
           {jobData &&jobData.map((job, index) => (
             <tr   key={index} className="h-12 border-gray-300 border-b cursor-pointer">
-              <td className="px-6">{job?.positionName}</td>
+              <td onClick={()=>navigateJobSpecific(job?.jobdescId)} className="px-6">{job?.positionName}</td>
               <td className="px-6">{job?.jobId}</td>
               <td className="px-6">{job?.startDate}</td>
               <td className="px-6">{job?.endDate}</td>
