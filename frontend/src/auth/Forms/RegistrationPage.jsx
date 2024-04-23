@@ -12,6 +12,7 @@ import {
 import { USERREQUESTTYPE } from "../../types";
 import { useDispatch } from "react-redux";
 import { setData } from "../../redux/professionalRegisterSlice";
+import { postRequest } from "../../API/config";
 const details = {
   firstname: "",
   lastname: "",
@@ -45,7 +46,7 @@ const RegistrationPage = () => {
   if (customerType == "Professional") details.companyName = "dummy";
   const [userDetails, setUserDetails] = useState(details);
   const [userErrors, setUserErrors] = useState(erroMsg);
-
+  const navigate = useNavigate();
   const handleNavigation = () => {
     if (customerType == "Professional") {
       
@@ -76,7 +77,7 @@ const RegistrationPage = () => {
         stateError:
           userDetails.state.length > 0 ? "" : "Please Enter state Name",
         cityError: userDetails.city.length > 0 ? "" : "Please Enter city Name",
-        zipcodeError: validateZipcode(userDetails.zipcode),
+        zipcodeError: validateZipcode(userDetails.pincode),
         companyNameError:
           userDetails.companyName.length > 0 ? "" : "Please Enter Company Name",
       };
@@ -86,10 +87,17 @@ const RegistrationPage = () => {
         setUserErrors(erroMsg);
         if(customerType == "Professional"){
           dispatch(setData(userDetails))
+          handleNavigation();
+          // navigate('/registration-success', { state: { userType: 'Professional' } });
+
+        } else {
+          postRequest("employerRegister", userDetails)
+          navigate('/registration-success', { state: { userType: 'Employer' } });
+
         }
         setUserDetails(details);
-        alert("Registration success!");
-        handleNavigation();
+        // alert("Registration success!");
+        
       }
     } catch (error) {
       console.log(error);
@@ -320,9 +328,9 @@ const RegistrationPage = () => {
               }`}
               type="text"
               placeholder="Zipcode"
-              value={userDetails.zipcode}
+              value={userDetails.pincode}
               onChange={handleChange}
-              name="zipcode"
+              name="pincode"
             />
             {userErrors?.stateError.length > 0 && (
               <p className="mt-2 text-sm text-red-600" id="username-error">
