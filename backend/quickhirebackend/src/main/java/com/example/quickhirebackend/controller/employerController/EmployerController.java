@@ -65,28 +65,7 @@ public class EmployerController {
     }
 
 
-    record PaymentReturnDataRecord(Double intialBalance, Double updatedBalance, Payments paymentsDetails){}
-    @PostMapping("/employer/payment")
-    public ResponseEntity<?> employPayment(@RequestBody PaymentDTO paymentDTO){
-        try{
-             Double intialAmount = 0.0;
-            Payments payments = new Payments();
-            payments.setProfId(paymentDTO.getProfId());
-            payments.setAmount(paymentDTO.getAmount());
-            payments.setStartDate(paymentDTO.getStartDate());
-            payments.setEndDate(paymentDTO.getEndDate());
-            Payments payedDetails= paymentService.createPayment(payments);
-            Double updatedAmount = 0.0;
 
-            PaymentReturnDataRecord paymentReturnData = new PaymentReturnDataRecord(intialAmount,updatedAmount,payedDetails);
-
-            return new ResponseEntity<>(paymentReturnData,HttpStatus.CREATED);
-
-        }
-        catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error occurred while Posting job"+e.getMessage()+"  "+paymentDTO.getProfId()+" "+ paymentDTO.getAmount());
-        }
-    }
 
     record Response(boolean isEdited, String msg){};
     @PutMapping("/employer/editAccount")
@@ -150,5 +129,7 @@ public class EmployerController {
             return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
    }
+
+
 
 }

@@ -1,13 +1,12 @@
 package com.example.quickhirebackend.services;
 import com.example.quickhirebackend.customExceptions.CustomDuplicateUsernameException;
 import com.example.quickhirebackend.customExceptions.CustomMatchException;
-import com.example.quickhirebackend.dao.MatchRepository;
-import com.example.quickhirebackend.dao.ProfessionalDetailsRepository;
-import com.example.quickhirebackend.dao.QualificationRepository;
+import com.example.quickhirebackend.dao.*;
 import com.example.quickhirebackend.dto.JobMatchRequestRecord;
-import com.example.quickhirebackend.model.Matches;
-import com.example.quickhirebackend.model.ProfessionalDetails;
-import com.example.quickhirebackend.model.Qualification;
+import com.example.quickhirebackend.dto.MatchResponse;
+import com.example.quickhirebackend.model.*;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -19,16 +18,22 @@ import java.util.Optional;
 @Service
 public class MatchService {
 
+    @PersistenceContext
+    private EntityManager entityManager;
     private final MatchRepository matchRepository;
 
     private  final QualificationRepository qualificationRepository;
     private  final ProfessionalDetailsRepository professionalDetailsRepository;
+    private  final JobDescriptionRepository jobDescriptionRepository;
+    private final UserProfileRepository userProfileRepository;
 
     @Autowired
-    public MatchService(MatchRepository matchRepository, QualificationRepository qualificationRepository, ProfessionalDetailsRepository professionalDetailsRepository) {
+    public MatchService(MatchRepository matchRepository, QualificationRepository qualificationRepository, ProfessionalDetailsRepository professionalDetailsRepository, JobDescriptionRepository jobDescriptionRepository, UserProfileRepository userProfileRepository) {
         this.matchRepository = matchRepository;
         this.qualificationRepository = qualificationRepository;
         this.professionalDetailsRepository = professionalDetailsRepository;
+        this.jobDescriptionRepository = jobDescriptionRepository;
+        this.userProfileRepository = userProfileRepository;
     }
 
     // Create or Update a Match record
@@ -37,7 +42,8 @@ public class MatchService {
             return matchRepository.save(match);
         }
         catch (DataIntegrityViolationException e){
-            return matchRepository.findByProfessionalidAndJobid(match.getProfessionalId(),match.getJobId()).stream().findFirst().orElse(null);
+            throw new RuntimeException(e.getMessage());
+           // return matchRepository.findByProfessionalidAndJobid(match.getProfessionalId(),match.getJobId()).stream().findFirst().orElse(null);
         }
 
     }
@@ -70,6 +76,26 @@ public class MatchService {
         matchRepository.deleteById(id);
     }
 
+    public boolean professionalJobRequest(JobMatchRequestRecord jobRequest){
+        try{
+            entityManager.clear();
+            Matches matches = new Matches();
+            //matches.setMatchType(AllTypesEnums.MatchType.PROFESSIONAL_REQUEST);
+            matches.setJobId(jobRequest.jobId());
+            matches.setMatchPercentage(0);
+            Integer profid = professionalDetailsRepository.findByProfid(jobRequest.userProfileID()).stream().findFirst().orElseThrow().getProfessionalId();
+            matches.setProfessionalId(profid);
+            matches.setStatus(AllTypesEnums.MatchType.PROFESSIONAL_REQUEST);
+            System.out.println(matches);
+            matchRepository.save(matches);
+             return true;
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+            throw  new RuntimeException(e.getMessage());
+        }
+    }
+
     public  JobMatchRequestRecord  professionalJobMatch(JobMatchRequestRecord jobMatchData) throws Exception {
         //need to bring the qualifications of job and professional from table
         List<Qualification> jobQualifications =  qualificationRepository.findByJobid(jobMatchData.jobId());
@@ -88,13 +114,33 @@ public class MatchService {
                    matchData.setStaffId(jobMatchData.staffId());
                }
                Matches savedMatch= saveMatch(matchData);
-              return   new JobMatchRequestRecord(savedMatch.getMatchId(), savedMatch.getProfessionalId(), savedMatch.getJobId(), savedMatch.getStaffId(), jobQualifications,professionalQualifications);
+              return   new JobMatchRequestRecord(savedMatch.getMatchId(), savedMatch.getProfessionalId(), savedMatch.getJobId(), savedMatch.getStaffId(), userProfilId,jobQualifications,professionalQualifications);
            }
         }
         catch (Exception e){
          throw  new Exception(e.getMessage());
         }
         return jobMatchData;
+    }
+
+    public  List<MatchResponse> getAllJobMatch(){
+        try{
+            List<Matches> matches = findAllMatches();
+            List<MatchResponse> matchResponses = new ArrayList<>();
+            for(Matches match: matches){
+                //need to find jobdetails
+                JobDescription jobDescription = jobDescriptionRepository.findById(match.getJobId()).stream().findFirst().orElseThrow();
+                //need to find the userprofil
+                Integer profid = professionalDetailsRepository.findById(match.getProfessionalId()).stream().findFirst().orElseThrow().getProfId();
+                UserProfile userProfile = userProfileRepository.findById(profid).stream().findFirst().orElseThrow();
+                MatchResponse matchResponse = new MatchResponse(match.getMatchId(), match.getStatus(),userProfile,jobDescription);
+                matchResponses.add(matchResponse);
+            }
+           return matchResponses;
+        }
+        catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
 

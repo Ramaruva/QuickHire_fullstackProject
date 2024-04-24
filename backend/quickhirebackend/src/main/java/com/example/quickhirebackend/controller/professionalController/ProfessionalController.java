@@ -46,36 +46,13 @@ public class ProfessionalController {
     @PostMapping("/professionalJobMatchRequest")
     public  ResponseEntity<?> professionalJobMatch(@RequestBody JobMatchRequestRecord jobMatchData){
         try{
-            JobMatchRequestRecord jobMatch = matchService.professionalJobMatch(jobMatchData);
+            boolean jobMatch = matchService.professionalJobRequest(jobMatchData);
             return new ResponseEntity<>(jobMatch,HttpStatus.OK);
         } catch(CustomMatchException e){
             return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
         }
         catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error occurred while Match Register"+e.getMessage());
-        }
-    }
-
-    record PaymentReturnDataRecord(Double intialBalance, Double updatedBalance, Payments paymentsDetails){}
-    @PostMapping("/professional/payment")
-    public ResponseEntity<?> employPayment(@RequestBody PaymentDTO paymentDTO){
-        try{
-            Double intialAmount = paymentService.balanceChecker(paymentDTO.getProfId());
-            Payments payments = new Payments();
-            payments.setProfId(paymentDTO.getProfId());
-            payments.setAmount(paymentDTO.getAmount());
-            payments.setStartDate(paymentDTO.getStartDate());
-            payments.setEndDate(paymentDTO.getEndDate());
-            Payments payedDetails= paymentService.createPayment(payments);
-            Double updatedAmount = paymentService.balanceChecker(paymentDTO.getProfId());
-
-            PaymentReturnDataRecord paymentReturnData = new PaymentReturnDataRecord(intialAmount,updatedAmount,payedDetails);
-
-            return new ResponseEntity<>(paymentReturnData,HttpStatus.CREATED);
-
-        }
-        catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error occurred while Posting job"+e.getMessage());
         }
     }
 
@@ -110,6 +87,18 @@ public class ProfessionalController {
     public ResponseEntity<?> getAllJobs(){
         try {
             return  ResponseEntity.ok(jobService.getAllJobs());
+        }
+        catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/getUserData/{id}")
+    public ResponseEntity<?> getUserData(@PathVariable("id") Integer id){
+        try{
+            System.out.println(id);
+            ProfessionalRegistrationRequest professionalRegistrationRequest = professionalRegisterService.getProfessionalData(id);
+            return ResponseEntity.ok(professionalRegistrationRequest);
         }
         catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

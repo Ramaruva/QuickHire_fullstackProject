@@ -1,6 +1,7 @@
 package com.example.quickhirebackend.services;
 
 import com.example.quickhirebackend.dao.PaymentRepository;
+import com.example.quickhirebackend.dto.PaymentDTO;
 import com.example.quickhirebackend.model.Payments;
 import org.springframework.stereotype.Service;
 
@@ -54,4 +55,30 @@ public class PaymentService {
         return  0.0;
     }
 
+    public boolean makePayment(PaymentDTO paymentDTO){
+        try{
+            System.out.println(paymentDTO.getProfId());
+            System.out.println(paymentDTO);
+             Payments payments = new Payments();
+             payments.setAmount(paymentDTO.getAmount());
+             payments.setStartDate(paymentDTO.getStartDate());
+             payments.setEndDate(paymentDTO.getEndDate());
+             payments.setStatus(paymentDTO.getStatus());
+             payments.setProfId(paymentDTO.getProfId());
+             createPayment(payments);
+             return true;
+        }
+        catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public List<Payments> getAllPaymentofProfId(Integer id){
+        try{
+             return paymentRepository.findAllByProfId(id);
+        }
+        catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
+    }
 }

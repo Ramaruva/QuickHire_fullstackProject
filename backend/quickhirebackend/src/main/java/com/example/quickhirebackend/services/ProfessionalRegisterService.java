@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class ProfessionalRegisterService {
 
@@ -98,11 +100,7 @@ public class ProfessionalRegisterService {
 
         //now we need to modify the professional details
 
-        ProfessionalDetails professionalDetails = professionalDetailsRepository.findByProfid(userProfile.getUserprofileid()).stream().findFirst().orElse(new ProfessionalDetails());
-        professionalDetails.setMajor(professionalEditData.getMajor());
-        professionalDetails.setSchoolName(professionalEditData.getSchoolName());
-        professionalDetails.setCompletionTime(professionalEditData.getCompletiontime());
-        professionalDetailsRepository.save(professionalDetails);
+
 
         for(QualificationRecord q:professionalEditData.getQualifications()){
              Qualification qualification = new Qualification();
@@ -111,7 +109,29 @@ public class ProfessionalRegisterService {
              }
              qualification.setType(q.type());
              qualification.setKeywords(q.keywords());
-             qualificationRepository.save(qualification);
+             qualification.setProfId(userProfile.getUserprofileid());
+             if(q.delete()){
+                 qualificationRepository.delete(qualification);
+             }else {
+                 qualificationRepository.save(qualification);
+             }
+        }
+        //modify of education details
+        for(EducationRecord educationRecord: professionalEditData.getEducationList()){
+            Education education = new Education();
+            if(educationRecord.education_id()!=null){
+                education.setEducationId(educationRecord.education_id());
+            }
+            education.setMajor(educationRecord.major());
+            education.setCompletionTime(educationRecord.completiontime());
+            education.setSchoolName(educationRecord.schoolname());
+            education.setProfId(userProfile.getUserprofileid());
+            if(educationRecord.delete()){
+                educationRepository.delete(education);
+            }
+            else {
+                educationRepository.save(education);
+            }
         }
        return "Your Account Details have been modified successfully!";
     }
@@ -124,5 +144,32 @@ public class ProfessionalRegisterService {
         professionalRequestData.setRequestType(AllTypesEnums.UserRequestType.DELETE_REQUESTED);
         professionalRequestRepository.save(professionalRequestData);
         return "Delete Requested successfully!";
+    }
+
+    public ProfessionalRegistrationRequest getProfessionalData(Integer id) {
+        //get userprofile
+        UserProfile userProfile = userProfileRepository.findById(id).stream().findFirst().orElseThrow();
+        //now get his education details
+        List<Education> educations = educationRepository.findByProfId(id);
+        //now get his qualifications
+        List<Qualification> qualifications = qualificationRepository.findByProfid(id);
+
+        return getProfessionalRegistrationRequest(userProfile, educations, qualifications);
+    }
+
+    private static ProfessionalRegistrationRequest getProfessionalRegistrationRequest(UserProfile userProfile, List<Education> educations, List<Qualification> qualifications) {
+        ProfessionalRegistrationRequest professionalRegistrationRequest = new ProfessionalRegistrationRequest();
+        professionalRegistrationRequest.setFirstname(userProfile.getFirstname());
+        professionalRegistrationRequest.setLastname(userProfile.getLastname());
+        professionalRegistrationRequest.setEducation(educations);
+        professionalRegistrationRequest.setQualification(qualifications);
+        professionalRegistrationRequest.setEmail(userProfile.getEmail());
+        professionalRegistrationRequest.setCity(userProfile.getCity());
+        professionalRegistrationRequest.setState(userProfile.getState());
+        professionalRegistrationRequest.setPincode(userProfile.getPincode());
+        professionalRegistrationRequest.setPhone(userProfile.getPhone());
+        professionalRegistrationRequest.setAddress(userProfile.getAddress());
+        professionalRegistrationRequest.setUserprofileid(userProfile.getUserprofileid());
+        return professionalRegistrationRequest;
     }
 }

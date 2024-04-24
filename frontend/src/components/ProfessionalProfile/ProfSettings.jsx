@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import ErrorMsgComponent from "../shared/ErrorMsgComponent";
 import EducationList from "../EducationList";
 import Category from "../Category";
 import CategoryList from "../CategoryList";
+import { useDispatch, useSelector } from "react-redux";
 import {
   checkKeysEmpty,
   validateDate,
@@ -17,18 +18,19 @@ import {
   validateSchoolName,
   validateZipcode,
 } from "../../validations/standardValidations";
+import { getRequest, putRequest } from "../../API/config";
 
 const education = [
   {
     schoolName: "SMU",
     major: "Msc Software engineering",
-    endTime: "05/25/2025",
+    completionTime: "05/25/2025",
     ID: "1234",
   },
   {
     schoolName: "UNT",
     major: "Bsc Comp science",
-    endTime: "05/25/2020",
+    completionTime: "05/25/2020",
     ID: "1233",
   },
 ];
@@ -45,16 +47,16 @@ const category = [
   },
 ];
 const intitalDetails = {
-  firstName: "jaya",
-  lastName: "Payili",
-  emailName: "jaya@gmail.com",
-  phoneNo: "9988985533",
-  mailAddress: "23 mcfarlin apt11",
+  firstname: "jaya",
+  lastname: "Payili",
+  email: "jaya@gmail.com",
+  phone: "9988985533",
+  address: "23 mcfarlin apt11",
   city: "Dallas",
   state: "Texas",
-  zipcode: "72509",
-  educationDetails: education,
-  categoryList: category,
+  pincode: "72509",
+  education: education,
+  qualification: category,
 };
 
 const errorDetails = {
@@ -76,7 +78,7 @@ const Error = {
 const details = {
   schoolName: "",
   major: "",
-  endTime: "",
+  completionTime: "",
 };
 const ProfSettings = () => {
   const [accountDetails, setAccountDetails] = useState(intitalDetails);
@@ -84,21 +86,23 @@ const ProfSettings = () => {
   const [isEditable, setIsEditable] = useState(false);
   const [educationDetails, setEducationDetails] = useState(details);
   const [educationError, setEducationError] = useState(Error);
+  const user = useSelector((state) => state.auth.user);
+
   const handleEducationAdd = (e) => {
     e.preventDefault();
     const error = {
       schoolNameError: validateSchoolName(educationDetails.schoolName),
       majorNameError: validateMajorName(educationDetails.major),
-      endTimeError: validateDate(educationDetails.endTime),
+      endTimeError: validateDate(educationDetails.completionTime),
     };
     setEducationError(error);
     if (!checkKeysEmpty(error)) {
       setEducationError(Error);
       let array = [
-        ...accountDetails.educationDetails,
+        ...accountDetails.education,
         { ...educationDetails, ID: Date.now() + Math.random() },
       ];
-      setAccountDetails({ ...accountDetails, educationDetails: array });
+      setAccountDetails({ ...accountDetails, education: array });
       setEducationDetails(details);
     }
   };
@@ -121,8 +125,8 @@ const ProfSettings = () => {
   };
   const handleCategory = (obj) => {
     try {
-      let array = [...accountDetails.categoryList, obj];
-      setAccountDetails({ ...accountDetails, categoryList: array });
+      let array = [...accountDetails.qualification, obj];
+      setAccountDetails({ ...accountDetails, qualification: array });
     } catch (error) {
       console.log(error);
     }
@@ -130,32 +134,44 @@ const ProfSettings = () => {
 
   const handleEducationDelete = (id) => {
     try {
-      const array = accountDetails.educationDetails.filter(
+      const education = accountDetails.education.map((item)=>{
+         if(item.educationId==id){
+            item={...item,delete:true};
+         }
+         return item;
+      })
+      const array = education.filter(
         (item) => id != item.ID
       );
-      setAccountDetails({ ...accountDetails, educationDetails: array });
+      setAccountDetails({ ...accountDetails, education: array });
     } catch (error) {
       console.log(error);
     }
   };
   const handleCategoryDelete = (id) => {
     try {
-      const array = accountDetails.categoryList.filter((item) => id != item.ID);
-      setAccountDetails({ ...accountDetails, categoryList: array });
+      const qualification = accountDetails.qualification.map((item)=>{
+          if(item.qualificationId==id){
+            item={...item,delete:true};
+          }
+          return item;
+      })
+      const array = qualification.filter((item) => id != item.ID);
+      setAccountDetails({ ...accountDetails, qualification: array });
     } catch (error) {
       console.log(error);
     }
   };
-  const handleSave = (e) => {
+  const handleSave = async (e) => {
     try {
       e.preventDefault();
       const errorObj = {
-        firstNameError: validateFirstName(accountDetails.firstName),
-        lastNameError: validateLastName(accountDetails.lastName),
-        emailError: validateEmail(accountDetails.emailName),
-        phoneError: validatePhone(accountDetails.phoneNo),
+        firstNameError: validateFirstName(accountDetails.firstname),
+        lastNameError: validateLastName(accountDetails.lastname),
+        emailError: validateEmail(accountDetails.email),
+        phoneError: validatePhone(accountDetails.phone),
         mailAddressError: validateEmptiness(
-          accountDetails.mailAddress,
+          accountDetails.address,
           "Address field is empty!"
         ),
         cityError: validateEmptiness(
@@ -166,14 +182,31 @@ const ProfSettings = () => {
           accountDetails.state,
           "State Field is Empty"
         ),
-        zipCodeError: validateZipcode(accountDetails.zipcode),
+        zipCodeError: validateZipcode(accountDetails.pincode),
         categoryError:
-          accountDetails.categoryList.length >= 2
+          accountDetails.qualification.length >= 2
             ? ""
             : "Need atleast two Categories",
       };
       setAccountErrors(errorObj);
-      if(!checkKeysEmpty(errorObj)){
+      if (!checkKeysEmpty(errorObj)) {
+        let updatedEducation = []
+        accountDetails.education.map((item)=>{
+            let obj ={
+              schoolname:item.schoolName,
+              major:item.major,
+              completiontime:item.completionTime,
+              delete:item?.delete
+            }
+            if(item?.educationId){
+              obj ={...obj,education_id:item.educationId}
+            }
+            updatedEducation.push(obj);
+        })
+        let obj ={...accountDetails,qualifications:accountDetails.qualification,educationList:updatedEducation};
+        console.log(obj);
+        const data = await putRequest("professional/editAccount",obj);
+        console.log(data);
         setIsEditable(false);
         setAccountErrors(errorDetails);
       }
@@ -181,6 +214,18 @@ const ProfSettings = () => {
       console.log(error);
     }
   };
+
+  const getData = async () => {
+    try {
+      const data = await getRequest("getUserData" + "/" + user.profileID);
+      console.log(data.data);
+      setAccountDetails(data.data);
+    } catch (error) {}
+  };
+
+  useEffect(() => {
+    getData();
+  }, []);
   return (
     <div className="bg-gray-50 min-h-screen flex justify-center w-full">
       <div className="bg-white rounded-lg shadow-lg p-8 m-4 max-w-2xl w-full">
@@ -207,8 +252,8 @@ const ProfSettings = () => {
               type="text"
               placeholder="First Name"
               readOnly={!isEditable}
-              value={accountDetails.firstName}
-              name="firstName"
+              value={accountDetails?.firstname}
+              name="firstname"
               onChange={handleChange}
             />
             <ErrorMsgComponent msg={accountErrors.firstNameError} />
@@ -224,8 +269,8 @@ const ProfSettings = () => {
               type="text"
               placeholder="Last Name"
               readOnly={!isEditable}
-              value={accountDetails.lastName}
-              name="lastName"
+              value={accountDetails?.lastname}
+              name="lastname"
               onChange={handleChange}
             />
             <ErrorMsgComponent msg={accountErrors.lastNameError} />
@@ -243,8 +288,8 @@ const ProfSettings = () => {
               type="text"
               placeholder="Email"
               readOnly={!isEditable}
-              value={accountDetails.emailName}
-              name="emailName"
+              value={accountDetails.email}
+              name="email"
               onChange={handleChange}
             />
             <ErrorMsgComponent msg={accountErrors.emailError} />
@@ -260,8 +305,8 @@ const ProfSettings = () => {
               type="text"
               placeholder="Phone No"
               readOnly={!isEditable}
-              value={accountDetails.phoneNo}
-              name="phoneNo"
+              value={accountDetails.phone}
+              name="phone"
               onChange={handleChange}
             />
             <ErrorMsgComponent msg={accountErrors.phoneError} />
@@ -279,8 +324,8 @@ const ProfSettings = () => {
               type="text"
               placeholder="Mailing Address"
               readOnly={!isEditable}
-              value={accountDetails.mailAddress}
-              name="mailAddress"
+              value={accountDetails?.address}
+              name="address"
               onChange={handleChange}
             />
             <ErrorMsgComponent msg={accountErrors.mailAddressError} />
@@ -298,7 +343,7 @@ const ProfSettings = () => {
               type="text"
               placeholder="City"
               readOnly={!isEditable}
-              value={accountDetails.city}
+              value={accountDetails?.city}
               name="city"
               onChange={handleChange}
             />
@@ -315,7 +360,7 @@ const ProfSettings = () => {
               type="text"
               placeholder="State"
               readOnly={!isEditable}
-              value={accountDetails.state}
+              value={accountDetails?.state}
               name="state"
               onChange={handleChange}
             />
@@ -332,8 +377,8 @@ const ProfSettings = () => {
               type="text"
               placeholder="Zipcode"
               readOnly={!isEditable}
-              value={accountDetails.zipcode}
-              name="zipcode"
+              value={accountDetails?.pincode}
+              name="pincode"
               onChange={handleChange}
             />
             <ErrorMsgComponent msg={accountErrors.zipCodeError} />
@@ -380,8 +425,8 @@ const ProfSettings = () => {
             <br></br>
             <input
               type="date"
-              value={educationDetails.endTime}
-              name="endTime"
+              value={educationDetails.completionTime}
+              name="completionTime"
               onChange={handleEducationChange}
               className={`${
                 educationError.schoolNameError.length > 0
@@ -402,19 +447,22 @@ const ProfSettings = () => {
           </div>
         </div>
         <div className="mt-10">
-          <EducationList educationDetails={accountDetails.educationDetails} handleDelete={isEditable&&handleEducationDelete} />
+          <EducationList
+            educationDetails={accountDetails.education}
+            handleDelete={isEditable && handleEducationDelete}
+          />
         </div>
         <div className="mt-5">
           <Category handleCategoryAdd={handleCategory} />
         </div>
         <div className="mt-5">
-          {accountDetails.categoryList.length > 0 && (
+          {accountDetails.qualification.length > 0 && (
             <CategoryList
-              Lists={accountDetails.categoryList}
-              handleDelete={isEditable&&handleCategoryDelete}
+              Lists={accountDetails.qualification}
+              handleDelete={isEditable && handleCategoryDelete}
             />
           )}
-          <ErrorMsgComponent msg={accountErrors.categoryError}/>
+          <ErrorMsgComponent msg={accountErrors.categoryError} />
         </div>
         <div className="flex items-center justify-between mt-8 mb-8">
           {isEditable && (

@@ -119,5 +119,15 @@ public class StaffController {
         }
     }
 
+    @GetMapping("/getAllMatchRequets")
+    public ResponseEntity<?> getAllMatches(){
+        try{
+            List<MatchResponse> matchResponses = matchService.getAllJobMatch();
+          return ResponseEntity.ok(matchResponses);
+        }
+        catch (Exception e){
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 }
  

@@ -2,7 +2,8 @@ package com.example.quickhirebackend.model;
 
 import jakarta.persistence.*;
 
-import java.sql.Date;
+import java.util.Date;
+
 
 @Entity
 @Table(name = "payments")
