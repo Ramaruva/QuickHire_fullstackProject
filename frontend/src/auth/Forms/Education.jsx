@@ -120,7 +120,7 @@ const Education = () => {
               <ErrorMsgComponent msg={educationErrors.schoolNameError} />
             </div>
             <div>
-              <label>Major:</label>
+              <label>Degree/Majors:</label>
               <br></br>
               <input
                 value={educationDetails.major}
