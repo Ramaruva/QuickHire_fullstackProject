@@ -96,11 +96,17 @@ public class EmployerRegisterService {
 
         //need to update the employer details
 
-        EmployerDetails  employerDetails = employerDetailsRepository.findByProfid(employerUserProfile.getUserprofileid()).stream().findFirst().orElse(new EmployerDetails());
-        employerDetails.setCompanyName(editDataDetails.getCompanyName());
-        employerDetailsRepository.save(employerDetails);
-
         return "Employer Details Updated successfully!";
 
+    }
+
+    public UserProfile getEmployDetail(Integer id) {
+        try{
+            UserProfile userProfile = userProfileRepository.findById(id).stream().findFirst().orElseThrow();
+            return  userProfile;
+        }
+        catch (Exception e){
+          throw new RuntimeException(e.getMessage());
+        }
     }
 }

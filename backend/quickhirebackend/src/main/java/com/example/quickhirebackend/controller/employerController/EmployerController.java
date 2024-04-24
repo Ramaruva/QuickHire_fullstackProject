@@ -5,6 +5,7 @@ import com.example.quickhirebackend.dto.EmployerRegistrationRequest;
 import com.example.quickhirebackend.dto.JobPostRequest;
 import com.example.quickhirebackend.dto.PaymentDTO;
 import com.example.quickhirebackend.model.Payments;
+import com.example.quickhirebackend.model.UserProfile;
 import com.example.quickhirebackend.services.EmployerRegisterService;
 import com.example.quickhirebackend.services.JobService;
 import com.example.quickhirebackend.services.PaymentService;
@@ -126,5 +127,15 @@ public class EmployerController {
         }
     }
 
+  @GetMapping("/getEmployDetails/{id}")
+    public  ResponseEntity<?> getEmployDetail(@PathVariable("id") Integer id){
+        try{
+            UserProfile userProfile = employerRegisterService.getEmployDetail(id);
+            return ResponseEntity.ok(userProfile);
+        }
+        catch (Exception e){
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+   }
 
 }
