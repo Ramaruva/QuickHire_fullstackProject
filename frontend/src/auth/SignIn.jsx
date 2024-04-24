@@ -5,7 +5,6 @@ import {
   validateUsername,
 } from "../validations/standardValidations";
 import { postRequest } from "../API/config";
-import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { getLocalItem, setLocalItem } from "../localStrorage";
 import {  checkAuthenticationAsync } from "../redux/authSlice";
