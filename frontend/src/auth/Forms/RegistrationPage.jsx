@@ -12,6 +12,7 @@ import {
 import { USERREQUESTTYPE } from "../../types";
 import { useDispatch } from "react-redux";
 import { setData } from "../../redux/professionalRegisterSlice";
+import { postRequest } from "../../API/config";
 const details = {
   firstname: "",
   lastname: "",
@@ -45,7 +46,7 @@ const RegistrationPage = () => {
   if (customerType == "Professional") details.companyName = "dummy";
   const [userDetails, setUserDetails] = useState(details);
   const [userErrors, setUserErrors] = useState(erroMsg);
-
+  const navigate = useNavigate();
   const handleNavigation = () => {
     if (customerType == "Professional") {
       
@@ -87,10 +88,18 @@ const RegistrationPage = () => {
         if(customerType == "Professional"){
           console.log(userDetails);
           dispatch(setData(userDetails))
+          handleNavigation();
+          // navigate('/registration-success', { state: { userType: 'Professional' } });
+
+        } else {
+          postRequest("employerRegister", userDetails)
+          navigate('/registration-success', { state: { userType: 'Employer' } });
+
         }
         setUserDetails(details);
-        alert("Registration success!"); 
-        handleNavigation();
+      
+        // alert("Registration success!");
+        
       }
     } catch (error) {
       console.log(error);

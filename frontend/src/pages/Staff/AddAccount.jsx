@@ -9,6 +9,9 @@ import {
 } from "../../validations/standardValidations";
 import ErrorMsgComponent from "../../components/shared/ErrorMsgComponent";
 import { postRequest } from "../../API/config";
+import { useNavigate } from 'react-router-dom';
+// import RegistrationSuccessPage from "../common/RegistrationSuccessPage";
+
 const intialDetails = {
   firstname: "",
   lastname: "",
@@ -26,6 +29,8 @@ const error = {
 const AddAccount = () => {
   const [staffDetails, setStaffDetails] = useState(intialDetails);
   const [staffErrors, setStaffErrors] = useState(error);
+  const navigate = useNavigate();
+
   const handleChange = (e) => {
     try {
       setStaffDetails({ ...staffDetails, [e.target.name]: e.target.value });
@@ -45,11 +50,12 @@ const AddAccount = () => {
       };
       setStaffErrors(errorObj);
       if (!checkKeysEmpty(errorObj)) {
-        alert("Account Added successfully!");
+        // alert("Account Added successfully!");
         const data = await postRequest("createStaff",staffDetails);
         console.log(data);
         setStaffDetails(intialDetails);
         setStaffErrors(error);
+        navigate('/registration-success', { state: { userType: 'Staff' } }); // Navigate to success page
       }
     } catch (error) {
       console.log(error);

@@ -24,7 +24,7 @@ import CategoryPage from "./pages/common/CategoryPage";
 import { useDispatch } from "react-redux";
 import { checkAuthenticationAsync } from "./redux/authSlice";
 import LoadingSpinner from "./components/LoadingSpinner";
-
+import RegistrationSuccessPage from "./pages/common/RegistrationSuccessPage";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -44,6 +44,7 @@ const App = () => {
       <Route path="/RegistrationPage" element={<RegistrationPage />} />
       <Route path="/education" element={<Education />} />
       <Route path="/category" element={<CategoryPage />} />
+      <Route path="/registration-success" element={<RegistrationSuccessPage/>}/>
 
       <Route path="/home" element={<Home />}>
         {/* childrens */}
