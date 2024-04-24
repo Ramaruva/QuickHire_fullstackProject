@@ -5,9 +5,12 @@ import com.example.quickhirebackend.dao.MatchRepository;
 import com.example.quickhirebackend.dao.ProfessionalDetailsRepository;
 import com.example.quickhirebackend.dao.QualificationRepository;
 import com.example.quickhirebackend.dto.JobMatchRequestRecord;
+import com.example.quickhirebackend.model.AllTypesEnums;
 import com.example.quickhirebackend.model.Matches;
 import com.example.quickhirebackend.model.ProfessionalDetails;
 import com.example.quickhirebackend.model.Qualification;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
@@ -19,6 +22,8 @@ import java.util.Optional;
 @Service
 public class MatchService {
 
+    @PersistenceContext
+    private EntityManager entityManager;
     private final MatchRepository matchRepository;
 
     private  final QualificationRepository qualificationRepository;
@@ -37,7 +42,8 @@ public class MatchService {
             return matchRepository.save(match);
         }
         catch (DataIntegrityViolationException e){
-            return matchRepository.findByProfessionalidAndJobid(match.getProfessionalId(),match.getJobId()).stream().findFirst().orElse(null);
+            throw new RuntimeException(e.getMessage());
+           // return matchRepository.findByProfessionalidAndJobid(match.getProfessionalId(),match.getJobId()).stream().findFirst().orElse(null);
         }
 
     }
@@ -70,6 +76,26 @@ public class MatchService {
         matchRepository.deleteById(id);
     }
 
+    public boolean professionalJobRequest(JobMatchRequestRecord jobRequest){
+        try{
+            entityManager.clear();
+            Matches matches = new Matches();
+            //matches.setMatchType(AllTypesEnums.MatchType.PROFESSIONAL_REQUEST);
+            matches.setJobId(jobRequest.jobId());
+            matches.setMatchPercentage(0);
+            Integer profid = professionalDetailsRepository.findByProfid(jobRequest.userProfileID()).stream().findFirst().orElseThrow().getProfessionalId();
+            matches.setProfessionalId(profid);
+            matches.setStatus(AllTypesEnums.MatchType.PROFESSIONAL_REQUEST);
+            System.out.println(matches);
+            matchRepository.save(matches);
+             return true;
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+            throw  new RuntimeException(e.getMessage());
+        }
+    }
+
     public  JobMatchRequestRecord  professionalJobMatch(JobMatchRequestRecord jobMatchData) throws Exception {
         //need to bring the qualifications of job and professional from table
         List<Qualification> jobQualifications =  qualificationRepository.findByJobid(jobMatchData.jobId());
@@ -88,7 +114,7 @@ public class MatchService {
                    matchData.setStaffId(jobMatchData.staffId());
                }
                Matches savedMatch= saveMatch(matchData);
-              return   new JobMatchRequestRecord(savedMatch.getMatchId(), savedMatch.getProfessionalId(), savedMatch.getJobId(), savedMatch.getStaffId(), jobQualifications,professionalQualifications);
+              return   new JobMatchRequestRecord(savedMatch.getMatchId(), savedMatch.getProfessionalId(), savedMatch.getJobId(), savedMatch.getStaffId(), userProfilId,jobQualifications,professionalQualifications);
            }
         }
         catch (Exception e){

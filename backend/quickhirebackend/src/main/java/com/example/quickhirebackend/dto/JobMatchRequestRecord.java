@@ -4,6 +4,6 @@ import com.example.quickhirebackend.model.Qualification;
 
 import java.util.List;
 
-public record JobMatchRequestRecord(Integer matchId, Integer professionalId, Integer jobId, Integer staffId, List<Qualification> jobQualifications, List<Qualification> professionalQualifications) {
+public record JobMatchRequestRecord(Integer matchId, Integer professionalId, Integer jobId, Integer staffId,Integer userProfileID, List<Qualification> jobQualifications, List<Qualification> professionalQualifications) {
 
 }

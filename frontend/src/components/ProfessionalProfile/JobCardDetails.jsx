@@ -1,7 +1,12 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import { requestMatch } from "../../redux/jobSlice";
+import { postRequest } from "../../API/config";
 
-const JobCardDetails = ({jobData}) => {
+const JobCardDetails = ({handleMatch,jobData}) => {
+  const user = useSelector((state) => state.auth.user);
+  const disPatch = useDispatch();
   const job = {
     companyName: "Google ",
     positionName: "Software engineer 11",
@@ -14,6 +19,21 @@ const JobCardDetails = ({jobData}) => {
     return new Date(dateString).toLocaleDateString("en-US", options);
   };
 
+  const manageRequest =async (item)=>{
+    try {
+      console.log(item);
+      let obj ={
+        jobId: item.jobdescId,
+        userProfileID: user.profileID,
+      }
+      console.log(obj);
+      const  {res} = await postRequest("professionalJobMatchRequest",obj);
+      console.log(res);
+       //disPatch(requestMatch(obj.jobId,obj.userProfileID));
+    } catch (error) {
+       console.log(error);
+    }
+  }
   const navigation = useNavigate();
   return (
     <div>
@@ -34,7 +54,7 @@ const JobCardDetails = ({jobData}) => {
           </span>
         </div>
         <div className="px-6 pt-4 pb-2 flex justify-between">
-          <button className="bg-accept w-32 text-white px-4 py-2 hover:bg-green-600">
+          <button onClick={()=>{manageRequest(jobData)}} className="bg-accept w-32 text-white px-4 py-2 hover:bg-green-600">
             Request Match
           </button>
           <button

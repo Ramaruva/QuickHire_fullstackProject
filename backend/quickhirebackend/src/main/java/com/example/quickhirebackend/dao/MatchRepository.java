@@ -11,10 +11,10 @@ import java.util.Optional;
 @Repository
 public interface MatchRepository extends JpaRepository<Matches, Integer> {
     // Custom query methods can be added here
-    Optional<Matches> findByProfessionalidAndJobid(Integer professionalid, Integer jobid);
+//    Optional<Matches> findByProfessionalidAndJobid(Integer professionalId, Integer jobid);
 
     @Transactional
     @Modifying
-    @Query("DELETE FROM Matches m WHERE m.jobid = ?1")
-    void deleteByJobId(Integer jobid);
+    @Query("DELETE FROM Matches m WHERE m.jobId = ?1")
+    void deleteByJobId(Integer jobId);
 }
