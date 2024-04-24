@@ -12,6 +12,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,14 +27,16 @@ public class MatchService {
     private  final ProfessionalDetailsRepository professionalDetailsRepository;
     private  final JobDescriptionRepository jobDescriptionRepository;
     private final UserProfileRepository userProfileRepository;
+    private final StaffDetailsRepository staffDetailsRepository;
 
     @Autowired
-    public MatchService(MatchRepository matchRepository, QualificationRepository qualificationRepository, ProfessionalDetailsRepository professionalDetailsRepository, JobDescriptionRepository jobDescriptionRepository, UserProfileRepository userProfileRepository) {
+    public MatchService(MatchRepository matchRepository, QualificationRepository qualificationRepository, ProfessionalDetailsRepository professionalDetailsRepository, JobDescriptionRepository jobDescriptionRepository, UserProfileRepository userProfileRepository, StaffDetailsRepository staffDetailsRepository) {
         this.matchRepository = matchRepository;
         this.qualificationRepository = qualificationRepository;
         this.professionalDetailsRepository = professionalDetailsRepository;
         this.jobDescriptionRepository = jobDescriptionRepository;
         this.userProfileRepository = userProfileRepository;
+        this.staffDetailsRepository = staffDetailsRepository;
     }
 
     // Create or Update a Match record
@@ -123,6 +126,32 @@ public class MatchService {
         return jobMatchData;
     }
 
+    public String matchMechanism(Integer staffId, Integer matchId, AllTypesEnums.MatchType status){
+         try{
+             Matches matches = findMatchById(matchId).stream().findFirst().orElseThrow();
+             Integer stafID = staffDetailsRepository.findByStaffUserProfileId(staffId).stream().findFirst().orElseThrow().getStaffId();
+              if(status== AllTypesEnums.MatchType.STAFF_ACCEPTED){
+                  //need to get jobqualifictions
+                  List<Qualification> jobQualifications = qualificationRepository.findByJobid(matches.getJobId());
+                  Integer userProfileid = professionalDetailsRepository.findById(matches.getProfessionalId()).stream().findFirst().orElseThrow().getProfId();
+                  List<Qualification> profQualifications = qualificationRepository.findByProfid(userProfileid);
+                  double matchPercentage = matchMechanism(jobQualifications,profQualifications);
+                  matches.setStatus(status);
+                  System.out.println(matchPercentage);
+                  matches.setMatchPercentage((int) matchPercentage);
+              }
+              else {
+                  matches.setStatus(status);
+              }
+              matches.setStaffId(stafID);
+              saveMatch(matches);
+              return  "Matched saved"+matches.getMatchPercentage();
+         }
+         catch (Exception e){
+             System.out.println(e.getMessage());
+            throw new RuntimeException();
+         }
+    }
     public  List<MatchResponse> getAllJobMatch(){
         try{
             List<Matches> matches = findAllMatches();
@@ -143,5 +172,91 @@ public class MatchService {
         }
     }
 
+  public Double matchMechanism(List<Qualification> jobQualifications, List<Qualification> profQualifications){
+        try{
+            double totalMatchPercentage =0.0;
+            double categoryMatch= (double) 100 /jobQualifications.size();
+            for(Qualification jbqualification: jobQualifications){
+                for(Qualification prqualification:profQualifications){
+                    String jbcategory = jbqualification.getType();
+                    String prcategory = prqualification.getType();
+                    boolean exactMatch = jbcategory.equalsIgnoreCase(prcategory);
+                    boolean partialSubstring = isSubstring(jbcategory,prcategory);
+                    boolean partialMatch = false;
+                    if(!exactMatch||!partialSubstring){
+                        partialMatch = minDistance(prcategory,jbcategory)<((jbcategory.length())/2);
+                    }
+                    if(exactMatch||partialSubstring||partialMatch){
+                        String[] jbkey = jbqualification.getKeywords().split(",");
+                        String[] prKey = prqualification.getKeywords().split(",");
+                        int numofMatch =0;
+                        int keywords = jbkey.length;
+                        for (String string : jbkey) {
+                            for (String s : prKey) {
+                                if (string.equalsIgnoreCase(s) || isSubstring(string,s) || (minDistance(s,string)<string.length()/2)) {
+                                    numofMatch++;
+                                }
 
+                            }
+                        }
+                        totalMatchPercentage= (totalMatchPercentage)+ (categoryMatch) * ((double) numofMatch /(double) keywords);
+                    }
+                }
+            }
+            return totalMatchPercentage;
+        }
+        catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
+  }
+
+    public boolean isSubstring(String w1, String w2){
+        if(w1.length()>w2.length()){
+            return w1.contains(w2);
+        }
+        return w2.contains(w1);
+    }
+    public int minDistance(String profword, String jobWord){
+        int m = profword.length() - 1;
+        int n = jobWord.length()-1;
+        int [][] dp = new int[m+2][n+2];
+        for (int[]d:dp){
+            Arrays.fill(d,-1);
+        }
+        return helper(profword,jobWord,m,n,dp);
+    }
+
+    public int helper(String word1, String word2, int m, int n, int[][] dp){
+        //the strings are null
+        if(m+1==0&&n+1==0){
+            return  0;
+        }
+        //one of the strings are null
+        if(m+1==0||n+1==0){
+            return Math.max(m+1,n+1);
+        }
+
+        //both values at the index are equal
+        if(dp[m][n]!=-1){
+            return dp[m][n];
+        }
+        if(word1.charAt(m)==word2.charAt(n)){
+            dp[m][n]=helper(word1,word2,m-1,n-1,dp);
+            return dp[m][n];
+        }
+        else {
+            // try deletion
+            int delete = 1+helper(word1,word2,m-1,n,dp);
+            // try insertion
+            int insert = 1+helper(word1,word2,m,n-1,dp);
+            // try replacing
+            int replace = 1+helper(word1,word2,m-1,n-1,dp);
+            //now choosing min out of these 3 things and add 1 for operation
+            dp[m][n] = Math.min(Math.min(delete,insert),replace);
+            return  dp[m][n];
+        }
+    }
 }
+
+
+
