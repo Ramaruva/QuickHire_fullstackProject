@@ -15,6 +15,15 @@ public class JobDescription {
     private java.util.Date enddate; // Corresponds to "enddate" column
     private LocalTime endtime; // Corresponds to "endtime" column
     private String firstname; // Corresponds to "firstname" column
+
+    public int getJobdescriptionid() {
+        return jobdescriptionid;
+    }
+
+    public void setJobdescriptionid(int jobdescriptionid) {
+        this.jobdescriptionid = jobdescriptionid;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int jobdescriptionid; // Corresponds to "jobdescriptionid" column, auto-incremented

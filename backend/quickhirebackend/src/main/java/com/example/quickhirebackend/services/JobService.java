@@ -86,20 +86,8 @@ public class JobService {
             //need to create a job details table
             //get employ id
              Integer empid = employerDetailsRepository.findByProfid(jobData.getEmpid()).stream().findFirst().orElseThrow().getEmployerId();
-            JobDescription newJobDesc = new JobDescription();
-            newJobDesc.setJobId(jobData.getJobId());
-            newJobDesc.setPositionName(jobData.getPositionName());
-            newJobDesc.setFirstname(jobData.getFirstname());
-            newJobDesc.setLastname(jobData.getLastname());
-            newJobDesc.setEmail(jobData.getEmail());
-            newJobDesc.setPhone(jobData.getPhone());
-            newJobDesc.setStartDate(jobData.getStartDate());
-            newJobDesc.setEndDate(jobData.getEndDate());
-            newJobDesc.setStartTime(jobData.getStartTime());
-            newJobDesc.setEndTime(jobData.getEndTime());
-            newJobDesc.setEmpid(empid);
-            newJobDesc.setPayPerHour(jobData.getPayPerHour());
-           int jobdescriptionId= createJobDescription(newJobDesc).getJobdescriptionId();
+            JobDescription newJobDesc = getJobDescription(jobData, empid);
+            int jobdescriptionId= createJobDescription(newJobDesc).getJobdescriptionId();
 
            //need to assign qualifications with jobdescid;
             for (QualificationRecord qualificationRecord:jobData.getQualifications()){
@@ -114,6 +102,52 @@ public class JobService {
         }
         catch (Exception e){
              throw  new Exception(e.getMessage());
+        }
+    }
+
+    private static JobDescription getJobDescription(JobPostRequest jobData, Integer empid) {
+        JobDescription newJobDesc = new JobDescription();
+        newJobDesc.setJobId(jobData.getJobId());
+        newJobDesc.setPositionName(jobData.getPositionName());
+        newJobDesc.setFirstname(jobData.getFirstname());
+        newJobDesc.setLastname(jobData.getLastname());
+        newJobDesc.setEmail(jobData.getEmail());
+        newJobDesc.setPhone(jobData.getPhone());
+        newJobDesc.setStartDate(jobData.getStartDate());
+        newJobDesc.setEndDate(jobData.getEndDate());
+        newJobDesc.setStartTime(jobData.getStartTime());
+        newJobDesc.setEndTime(jobData.getEndTime());
+        newJobDesc.setEmpid(empid);
+        newJobDesc.setPayPerHour(jobData.getPayPerHour());
+        return newJobDesc;
+    }
+
+    public boolean editJob(JobPostRequest editJobData){
+        try{
+             JobDescription jobDescription = jobDescriptionRepository.findById(editJobData.getJobdescId()).stream().findFirst().orElseThrow();
+             int id = jobDescription.getJobdescriptionid();
+            JobDescription newjobDescription = getJobDescription(editJobData, jobDescription.getEmpId());
+             newjobDescription.setJobdescriptionid(id);
+
+             jobDescriptionRepository.save(newjobDescription);
+             //edit or delete qualifications
+            for(QualificationRecord qualificationRecord:editJobData.getQualifications()){
+                Qualification jobQualification = new Qualification();
+                jobQualification.setJobId(jobDescription.getJobdescriptionId());
+                jobQualification.setType(qualificationRecord.type());
+                jobQualification.setKeywords(qualificationRecord.keywords());
+                jobQualification.setQualificationId(qualificationRecord.qualificationId());
+                System.out.println(jobQualification);
+                  if(qualificationRecord.delete()){
+                      qualificationRepository.delete(jobQualification);
+                  }else {
+                      qualificationRepository.save(jobQualification);
+                  }
+            }
+            return true;
+        }
+        catch (Exception e){
+            throw  new RuntimeException();
         }
     }
 
