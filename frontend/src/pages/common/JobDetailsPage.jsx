@@ -1,14 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import CategoryList from "../../components/CategoryList";
 import { useQuery } from "../../customHooks/useQuery";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllJobs } from "../../redux/jobSlice";
+import { USERTYPE } from "../../types";
+import JobPosting from "../../components/Employer/JobPosting";
 
 const JobDetailsPage = () => {
   const query = useQuery();
   const id = query.get("id");
-  const jobData = useSelector((state)=>state.jobSlice.jobs);
-  let jobSpecific = jobData &&jobData.find((ele)=>ele.jobdescId==id);
-  
+  const jobData = useSelector((state) => state.jobSlice.jobs);
+  const user = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
+  let jobSpecific = jobData && jobData.find((ele) => ele.jobdescId == id);
+  const [isEditable, setIsEditable] = useState(false);
+
+  useEffect(() => {
+    dispatch(getAllJobs(user.profileID));
+    console.log(jobData);
+    console.log(jobSpecific);
+    jobSpecific = jobData && jobData.find((ele) => ele.jobdescId == id);
+  }, [dispatch]);
+  console.log(jobSpecific, "ja");
 
   const jobDetails = {
     positionName: "Software Engineer",
@@ -36,7 +49,16 @@ const JobDetailsPage = () => {
       keywords: "must have 2 years exp in webdev",
     },
   ];
-  return (
+  const handleEdit = () => {
+    console.log("edit");
+    console.log(jobSpecific.qualification);
+    jobSpecific ={...jobSpecific ,qualifications:jobSpecific.qualification};
+    console.log(jobSpecific);
+    setIsEditable((state) => !state);
+  };
+  return isEditable ? (
+    <JobPosting isedit={true} editData={jobSpecific} handleEdit={handleEdit} />
+  ) : (
     <div className="max-w-6xl mx-auto my-10 p-5 bg-white rounded-xl shadow-lg">
       <div className="mb-6 border-b-2 border-gray-100">
         <h3 className="text-3xl text-gray-800 font-bold mb-3">Job Details</h3>
@@ -45,12 +67,12 @@ const JobDetailsPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div className="flex items-center">
           <span className="ml-2 text-gray-700">
-            {jobSpecific.positionName} 
+            {jobSpecific?.positionName}
           </span>
         </div>
         <div className="flex items-center">
           <span className="ml-2 text-gray-700">
-            {new Date(jobSpecific.startTime)} to {jobDetails.endTime}
+            {} to {jobDetails.endTime}
           </span>
         </div>
         <div className="flex items-center">
@@ -87,6 +109,9 @@ const JobDetailsPage = () => {
         <button className="bg-accept w-fit text-white px-4 py-2 mt-2 hover:bg-green-600">
           Request Match
         </button>
+        {user.userType == USERTYPE.employer && (
+          <button onClick={handleEdit} className="bg-accept w-fit px-4 py-2 mt-2 ml-5">Edit</button>
+        )}
       </div>
     </div>
   );

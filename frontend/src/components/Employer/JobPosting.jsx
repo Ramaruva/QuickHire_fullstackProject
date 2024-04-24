@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Category from "../Category";
 import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
@@ -13,7 +13,7 @@ import {
   validatePhone,
 } from "../../validations/standardValidations";
 import ErrorMsgComponent from "../shared/ErrorMsgComponent";
-import {  useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { postRequest } from "../../API/config";
 
 const details = {
@@ -27,9 +27,10 @@ const details = {
   endDate: "",
   startTime: "",
   endTime: "",
-  phone:"",
+  phone: "",
   qualifications: [],
-  empid:0
+  empid: 0,
+  qualification: [],
 };
 
 const error = {
@@ -44,18 +45,23 @@ const error = {
   startTimeError: "",
   endTimeError: "",
   categoryrError: "",
-  phoneError:""
+  phoneError: "",
 };
 
-const JobPosting = ({ isView = false }) => {
-  const [jobDetails, setJobDetails] = useState(details);
+const JobPosting = ({ isedit = false, editData = details, handleEdit }) => {
+  const [jobDetails, setJobDetails] = useState({
+    ...editData,
+    qualifications: editData?.qualification,
+    startDate: editData.startDate ? editData.startDate.split("T")[0] : "",
+    endDate: editData.startDate ? editData.endDate.split("T")[0] : "",
+  });
   const [jobError, setJobError] = useState(error);
-  const [isEditable, setIsEditable] = useState(!isView);
-  const user  =  useSelector((state) => state.auth.user);
+  const [isEditable, setIsEditable] = useState(isedit);
+  const user = useSelector((state) => state.auth.user);
   const handleChange = (e) => {
     setJobDetails({ ...jobDetails, [e.target.name]: e.target.value });
   };
-  const handleJobSave = async(e) => {
+  const handleJobSave = async (e) => {
     try {
       e.preventDefault();
       const errorObj = {
@@ -84,22 +90,30 @@ const JobPosting = ({ isView = false }) => {
           jobDetails.endTime,
           "End Time is empty"
         ),
-        phoneError:validatePhone(jobDetails.phone),
+        phoneError: validatePhone(jobDetails.phone),
         categoryrError:
           jobDetails?.qualifications?.length >= 2
             ? ""
             : "Need atleast two categories",
       };
-      
+
       setJobError(errorObj);
       if (!checkKeysEmpty(errorObj)) {
-        jobDetails.empid=user.profileID;
+        jobDetails.empid = user.profileID;
         console.log(jobDetails);
-        const data = await postRequest("jobPosting",jobDetails);
-        console.log(jobDetails,data);
-       // alert("Job saved successfully");
+        if (isEditable) {
+          const iedit = await postRequest("editJob", jobDetails);
+          if (iedit.data) {
+            handleEdit();
+          }
+        } else {
+          const data = await postRequest("jobPosting", jobDetails);
+          console.log(jobDetails, data);
+        }
+
+        // alert("Job saved successfully");
         setJobError(error);
-        setJobDetails(details);
+        setJobDetails(editData);
       }
     } catch (error) {
       console.log(error);
@@ -116,14 +130,21 @@ const JobPosting = ({ isView = false }) => {
   };
   const handleCategoryDelete = (id) => {
     try {
-      if (id) {
-        const array = jobDetails.categoryLists.filter((item) => item.ID != id);
-        setJobDetails({ ...jobDetails, categoryLists: array });
-      }
+      const array = jobDetails.qualifications.filter((item) => item.ID != id);
+      setJobDetails({ ...jobDetails, qualifications: array });
+      console.log(array);
+      const latestData = array.map((value) => {
+        if (value?.qualificationId && id == value?.qualificationId) {
+          value = { ...value, delete: true };
+        }
+        return value;
+      });
+      setJobDetails({ ...jobDetails, qualifications: latestData });
     } catch (error) {
       console.log(error);
     }
   };
+
   return (
     <div className="bg-gray-50 min-h-screen flex justify-center w-full">
       <div className="bg-white rounded-lg shadow-lg p-8 m-4 max-w-2xl w-full">
@@ -131,12 +152,6 @@ const JobPosting = ({ isView = false }) => {
           <div className="flex justify-center">
             <h1 className="text-md font-semibold mb-4">Job Posting</h1>
           </div>
-          {isView && (
-            <div className="flex justify-end ml-20">
-              <MdEdit className="mr-3" />
-              <MdDelete />
-            </div>
-          )}
         </div>
         <h1 className="text-xs font-semibold mb-2">Position</h1>
         <input
@@ -146,7 +161,6 @@ const JobPosting = ({ isView = false }) => {
               : "border-gray-300"
           }`}
           type="text"
-          readOnly={!isEditable}
           value={jobDetails.positionName}
           name="positionName"
           onChange={handleChange}
@@ -164,7 +178,6 @@ const JobPosting = ({ isView = false }) => {
               }`}
               type="text"
               placeholder="First Name"
-              readOnly={!isEditable}
               value={jobDetails.jobId}
               name="jobId"
               onChange={handleChange}
@@ -182,7 +195,6 @@ const JobPosting = ({ isView = false }) => {
               }`}
               type="text"
               placeholder="First Name"
-              readOnly={!isEditable}
               value={jobDetails.firstname}
               name="firstname"
               onChange={handleChange}
@@ -200,7 +212,6 @@ const JobPosting = ({ isView = false }) => {
               }`}
               type="text"
               placeholder="Last Name"
-              readOnly={!isEditable}
               value={jobDetails.lastname}
               name="lastname"
               onChange={handleChange}
@@ -217,7 +228,6 @@ const JobPosting = ({ isView = false }) => {
               }`}
               type="text"
               placeholder="phone"
-              readOnly={!isEditable}
               value={jobDetails.phone}
               name="phone"
               onChange={handleChange}
@@ -236,7 +246,6 @@ const JobPosting = ({ isView = false }) => {
               }`}
               type="email"
               placeholder="Email"
-              readOnly={!isEditable}
               value={jobDetails.email}
               name="email"
               onChange={handleChange}
@@ -257,7 +266,6 @@ const JobPosting = ({ isView = false }) => {
                 }`}
                 type="text"
                 placeholder="Enter pay per hour in $"
-                readOnly={!isEditable}
                 value={jobDetails.payPerHour}
                 name="payPerHour"
                 onChange={handleChange}
@@ -284,7 +292,6 @@ const JobPosting = ({ isView = false }) => {
                       ? "border-red-500"
                       : "border-gray-300"
                   }`}
-                  readOnly={!isEditable}
                   value={jobDetails.startDate}
                   name="startDate"
                   onChange={handleChange}
@@ -306,7 +313,6 @@ const JobPosting = ({ isView = false }) => {
                       : "border-gray-300"
                   }
                   `}
-                  readOnly={!isEditable}
                   value={jobDetails.endDate}
                   name="endDate"
                   onChange={handleChange}
@@ -334,7 +340,6 @@ const JobPosting = ({ isView = false }) => {
                       ? "border-red-500"
                       : "border-gray-300"
                   }`}
-                  readOnly={!isEditable}
                   value={jobDetails.startTime}
                   name="startTime"
                   onChange={handleChange}
@@ -353,7 +358,6 @@ const JobPosting = ({ isView = false }) => {
                       ? "border-red-500"
                       : "border-gray-300"
                   }`}
-                  readOnly={!isEditable}
                   value={jobDetails.endTime}
                   name="endTime"
                   onChange={handleChange}
@@ -382,6 +386,15 @@ const JobPosting = ({ isView = false }) => {
             >
               Save & Finish
             </button>
+            {isEditable && (
+              <button
+                type="button"
+                onClick={() => handleEdit()}
+                className=" mt-8 flex w-full justify-center rounded-md bg-fbblue px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+              >
+                Cancel Edit
+              </button>
+            )}
           </div>
         </div>
       </div>

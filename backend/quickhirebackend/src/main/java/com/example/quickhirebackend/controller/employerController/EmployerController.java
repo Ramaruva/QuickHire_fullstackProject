@@ -52,6 +52,18 @@ public class EmployerController {
         }
     }
 
+    @PostMapping("/editJob")
+    public ResponseEntity<?> jobEdit(@RequestBody JobPostRequest editData){
+        try{
+            boolean val = jobService.editJob(editData);
+            return ResponseEntity.ok(val);
+        }
+        catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error occurred while Posting job"+e.getMessage());
+        }
+    }
+
+
     record PaymentReturnDataRecord(Double intialBalance, Double updatedBalance, Payments paymentsDetails){}
     @PostMapping("/employer/payment")
     public ResponseEntity<?> employPayment(@RequestBody PaymentDTO paymentDTO){
