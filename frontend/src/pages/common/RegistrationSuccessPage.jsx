@@ -1,6 +1,6 @@
 import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import successAnimation from '../../../public/assets/success-animation.gif' // Path to a success animation GIF
+import successAnimation from '/assets/success-animation.gif' // Path to a success animation GIF
 
 const RegistrationSuccessPage = () => {
   const navigate = useNavigate();

@@ -1,60 +1,27 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { MdDelete } from "react-icons/md";
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllJobs } from '../../redux/jobSlice';
+import {  useNavigate } from "react-router-dom";
 
 const JobList = () => {
+  const jobData = useSelector((state)=>state.jobSlice.jobs);
+  const user = useSelector((state)=>state.auth.user);
+  const disPatch = useDispatch();
+  const navigate = useNavigate();
+  useEffect(()=>{
+       disPatch(getAllJobs(user.profileID));
+       console.log(jobData);
+  },[disPatch])
+   
+  const navigateJobSpecific =(id)=>{
+      try {
+         navigate("/home/jobdetails"+"?"+"id="+id);
+      } catch (error) {
+        
+      }
+  }
 
-    const jobs = [
-        {
-          position: "Software Developer",
-          id: "49345081",
-          startDate: "Feb-01-2024",
-          endDate: "Feb-01-2024",
-          pay: "35 $/hr",
-        },
-        {
-          position: "Software Developer",
-          id: "49345081",
-          startDate: "Feb-01-2024",
-          endDate: "Feb-01-2024",
-          pay: "35 $/hr",
-        },
-        {
-          position: "Software Developer",
-          id: "49345081",
-          startDate: "Feb-01-2024",
-          endDate: "Feb-01-2024",
-          pay: "35 $/hr",
-        },
-        {
-          position: "Software Developer",
-          id: "49345081",
-          startDate: "Feb-01-2024",
-          endDate: "Feb-01-2024",
-          pay: "35 $/hr",
-        },
-        {
-          position: "Software Developer",
-          id: "49345081",
-          startDate: "Feb-01-2024",
-          endDate: "Feb-01-2024",
-          pay: "35 $/hr",
-        },
-        {
-          position: "Software Developer",
-          id: "49345081",
-          startDate: "Feb-01-2024",
-          endDate: "Feb-01-2024",
-          pay: "35 $/hr",
-        },
-        {
-          position: "Software Developer",
-          id: "49345081",
-          startDate: "Feb-01-2024",
-          endDate: "Feb-01-2024",
-          pay: "35 $/hr",
-        },
-      ];
-    
   return (
     <div   className="bg-gray-100 min-h-screen p-8 ">
     <div className="flex items-center justify-center">
@@ -65,7 +32,7 @@ const JobList = () => {
         <thead>
           <tr className="w-full h-16 border-gray-300 border-b py-8">
             <th className="text-left px-6">Position</th>
-            <th className="text-left px-6">Unique Id</th>
+            <th className="text-left px-6">Job Id</th>
             <th className="text-left px-6">Start Date</th>
             <th className="text-left px-6">End Date</th>
             <th className="text-left px-6">Pay</th>
@@ -75,13 +42,13 @@ const JobList = () => {
           </tr>
         </thead>
         <tbody>
-          {jobs.map((job, index) => (
+          {jobData &&jobData.map((job, index) => (
             <tr   key={index} className="h-12 border-gray-300 border-b cursor-pointer">
-              <td className="px-6">{job.position}</td>
-              <td className="px-6">{job.id}</td>
-              <td className="px-6">{job.startDate}</td>
-              <td className="px-6">{job.endDate}</td>
-              <td className="px-6">{job.pay}</td>
+              <td onClick={()=>navigateJobSpecific(job?.jobdescId)} className="px-6">{job?.positionName}</td>
+              <td className="px-6">{job?.jobId}</td>
+              <td className="px-6">{job?.startDate}</td>
+              <td className="px-6">{job?.endDate}</td>
+              <td className="px-6">{job?.payPerHour}</td>
               <td className="px-6 text-center">
                   <MdDelete />
               </td>

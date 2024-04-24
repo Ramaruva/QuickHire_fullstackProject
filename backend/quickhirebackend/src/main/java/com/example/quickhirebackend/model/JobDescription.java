@@ -18,7 +18,7 @@ public class JobDescription {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int jobdescriptionid; // Corresponds to "jobdescriptionid" column, auto-incremented
-    private int jobid; // Corresponds to "jobid" column
+    private String jobid; // Corresponds to "jobid" column
     private String lastname; // Corresponds to "lastname" column
     private String payperhour; // Corresponds to "payperhour" column
     private String phone; // Corresponds to "phone" column
@@ -81,11 +81,11 @@ public class JobDescription {
     //     this.jobdescriptionId = jobdescriptionId;
     // }
 
-    public int getJobId() {
+    public String getJobId() {
         return jobid;
     }
 
-    public void setJobId(int jobId) {
+    public void setJobId(String jobId) {
         this.jobid = jobId;
     }
 

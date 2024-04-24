@@ -86,6 +86,7 @@ const RegistrationPage = () => {
       if (!checkKeysEmpty(errorObj)) {
         setUserErrors(erroMsg);
         if(customerType == "Professional"){
+          console.log(userDetails);
           dispatch(setData(userDetails))
           handleNavigation();
           // navigate('/registration-success', { state: { userType: 'Professional' } });
@@ -96,8 +97,13 @@ const RegistrationPage = () => {
 
         }
         setUserDetails(details);
+<<<<<<< HEAD
         // alert("Registration success!");
         
+=======
+        alert("Registration success!"); 
+        handleNavigation();
+>>>>>>> 7bec3350260701a229e9135fa771e2a8137b8dee
       }
     } catch (error) {
       console.log(error);
@@ -327,7 +333,11 @@ const RegistrationPage = () => {
                   : "border-gray-300"
               }`}
               type="text"
+<<<<<<< HEAD
               placeholder="Zipcode"
+=======
+              placeholder="pincode"
+>>>>>>> 7bec3350260701a229e9135fa771e2a8137b8dee
               value={userDetails.pincode}
               onChange={handleChange}
               name="pincode"

@@ -40,6 +40,7 @@ public class ProfessionalRegisterService {
            professionalUserProfile.setState(registrationRequest.getState());
            professionalUserProfile.setPincode(registrationRequest.getPincode());
            professionalUserProfile.setUsername(registrationRequest.getUsername());
+           System.out.println(registrationRequest);
             UserProfile savedUserProfile = userProfileRepository.save(professionalUserProfile);
 
            //create qualification table

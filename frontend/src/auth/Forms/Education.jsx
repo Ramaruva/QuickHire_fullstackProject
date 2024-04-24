@@ -12,7 +12,7 @@ import { useDispatch } from "react-redux";
 import { setData, setEducationList } from "../../redux/professionalRegisterSlice";
 
 const details = {
-  schoolName: "",
+  schoolname: "",
   major: "",
   completiontime: "",
 };
@@ -61,7 +61,7 @@ const Education = () => {
     try {
       console.log(educationDetails);
       const errorObj = {
-        schoolNameError: validateSchoolName(educationDetails.schoolName),
+        schoolNameError: validateSchoolName(educationDetails.schoolname),
         majorNameError: validateMajorName(educationDetails.major),
         endTimeError: validateDate(educationDetails.completiontime),
       };
@@ -107,8 +107,8 @@ const Education = () => {
               <label>School Name:</label>
               <br></br>
               <input
-                value={educationDetails.schoolName}
-                onChange={(e) => handleChange("schoolName", e.target.value)}
+                value={educationDetails.schoolname}
+                onChange={(e) => handleChange("schoolname", e.target.value)}
                 placeholder="Enter your school name"
                 type="text"
                 className={`${

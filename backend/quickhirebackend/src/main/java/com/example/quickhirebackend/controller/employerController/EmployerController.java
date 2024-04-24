@@ -10,10 +10,9 @@ import com.example.quickhirebackend.services.JobService;
 import com.example.quickhirebackend.services.PaymentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 public class EmployerController {
@@ -46,7 +45,7 @@ public class EmployerController {
     public  ResponseEntity<?> jobCreation(@RequestBody JobPostRequest jobData){
         try{
             int jobid = jobService.newJobPost(jobData);
-            return new ResponseEntity<>("Registration is successfully done! and request id is "+jobid, HttpStatus.OK);
+            return new ResponseEntity<>("Job has been saved successfully! "+jobid, HttpStatus.OK);
         }
         catch (Exception e){
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error occurred while Posting job"+e.getMessage());
@@ -99,6 +98,16 @@ public class EmployerController {
         }
         catch (CustomDuplicateUsernameException e){
             return  ResponseEntity.status(HttpStatus.OK).body(e.getMessage());
+        }
+        catch (Exception e){
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/getAllJobsForAEmployer/{userProfileId}")
+    public ResponseEntity<?> getAllJobsForAEmployer(@PathVariable("userProfileId") Integer userProfileId){
+        try{
+           return ResponseEntity.ok(jobService.employerSpecificJobs(userProfileId));
         }
         catch (Exception e){
             return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

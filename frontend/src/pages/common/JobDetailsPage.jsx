@@ -1,7 +1,15 @@
 import React from "react";
 import CategoryList from "../../components/CategoryList";
+import { useQuery } from "../../customHooks/useQuery";
+import { useSelector } from "react-redux";
 
 const JobDetailsPage = () => {
+  const query = useQuery();
+  const id = query.get("id");
+  const jobData = useSelector((state)=>state.jobSlice.jobs);
+  let jobSpecific = jobData &&jobData.find((ele)=>ele.jobdescId==id);
+  
+
   const jobDetails = {
     positionName: "Software Engineer",
     companyName: "Innovatech Solutions",
@@ -37,12 +45,12 @@ const JobDetailsPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div className="flex items-center">
           <span className="ml-2 text-gray-700">
-            {jobDetails.positionName} at {jobDetails.companyName}
+            {jobSpecific.positionName} 
           </span>
         </div>
         <div className="flex items-center">
           <span className="ml-2 text-gray-700">
-            {jobDetails.startTime} to {jobDetails.endTime}
+            {new Date(jobSpecific.startTime)} to {jobDetails.endTime}
           </span>
         </div>
         <div className="flex items-center">
@@ -54,7 +62,7 @@ const JobDetailsPage = () => {
           <span className="ml-2 text-gray-700">{jobDetails.payPerHour}</span>
         </div>
         <div className="w-[600px] h-fit mt-6">
-          <CategoryList categoryList={categoryList} />
+          <CategoryList Lists={categoryList} />
         </div>
       </div>
 

@@ -32,6 +32,7 @@ public class SecurityConfig {
                                 .permitAll()
                                 .requestMatchers("/createStaff").hasAuthority(String.valueOf(AllTypesEnums.UserType.ROOT))
                                 .requestMatchers("/getAllProfessionalRequests/**","/professionalRequestReview/**","/getAllEmployerRequests/**","/employerRequestReview/**").hasAuthority(String.valueOf(AllTypesEnums.UserType.STAFF))
+                                .requestMatchers("/jobPosting/**").hasAuthority(String.valueOf(AllTypesEnums.UserType.EMPLOYER))
                                 .anyRequest()
                                 .authenticated()
                 ).userDetailsService(loginService)
