@@ -96,7 +96,6 @@ public class ProfessionalController {
     @GetMapping("/getUserData/{id}")
     public ResponseEntity<?> getUserData(@PathVariable("id") Integer id){
         try{
-            System.out.println(id);
             ProfessionalRegistrationRequest professionalRegistrationRequest = professionalRegisterService.getProfessionalData(id);
             return ResponseEntity.ok(professionalRegistrationRequest);
         }
@@ -105,4 +104,13 @@ public class ProfessionalController {
         }
     }
 
+    @GetMapping("/getMatchedJobs/{id}")
+    public ResponseEntity<?> getAllJobs(@PathVariable("id") Integer profileId){
+        try{
+                 return ResponseEntity.ok(matchService.getAllMatchedJobs(profileId));
+        }
+        catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 }
