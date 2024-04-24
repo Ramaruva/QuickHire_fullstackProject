@@ -2,6 +2,15 @@ import React from "react";
 import { MdDelete } from "react-icons/md";
 
 const EducationList = ({ educationDetails, handleDelete }) => {
+  const manageDelete = (item) => {
+    try {
+      console.log(item);
+      let id = item?.educationId || item?.ID;
+      handleDelete(id);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   return (
     <div>
       {educationDetails.length > 0 && (
@@ -20,28 +29,32 @@ const EducationList = ({ educationDetails, handleDelete }) => {
             <tbody>
               {educationDetails &&
                 educationDetails.map((item, index) => (
-                  <tr
-                    key={index}
-                    className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
-                  >
-                    <td className="border border-gray-800 px-4 py-2">
-                      {item?.schoolname}
-                    </td>
-                    <td className="border border-gray-800 px-4 py-2">
-                      {item?.major}
-                    </td>
-                    <td className="border border-gray-800 px-4 py-2">
-                      {item?.completiontime}
-                    </td>
-                    {handleDelete && (
-                      <td
-                        className="border border-gray-800 px-4 py-2"
-                        onClick={() => handleDelete(item.ID)}
+                  <>
+                    {item &&!item?.delete && (
+                      <tr
+                        key={index}
+                        className={index % 2 === 0 ? "bg-gray-100" : "bg-white"}
                       >
-                        <MdDelete />
-                      </td>
+                        <td className="border border-gray-800 px-4 py-2">
+                          {item?.schoolName}
+                        </td>
+                        <td className="border border-gray-800 px-4 py-2">
+                          {item?.major}
+                        </td>
+                        <td className="border border-gray-800 px-4 py-2">
+                          {item?.completionTime}
+                        </td>
+                        {handleDelete && (
+                          <td
+                            className="border border-gray-800 px-4 py-2"
+                            onClick={() => manageDelete(item)}
+                          >
+                            <MdDelete />
+                          </td>
+                        )}
+                      </tr>
                     )}
-                  </tr>
+                  </>
                 ))}
             </tbody>
           </table>
