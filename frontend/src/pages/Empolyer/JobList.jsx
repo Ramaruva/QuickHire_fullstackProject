@@ -3,6 +3,7 @@ import { MdDelete } from "react-icons/md";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllJobs } from "../../redux/jobSlice";
 import { useNavigate } from "react-router-dom";
+import { deleteRequest, postRequest } from "../../API/config";
 
 const JobList = () => {
   const jobData = useSelector((state) => state.jobSlice.jobs);
@@ -24,6 +25,18 @@ const JobList = () => {
       navigate("/home/jobdetails" + "?" + "id=" + id);
     } catch (error) {}
   };
+  const handleDelete =async (id)=>{
+    try {
+      const payload ={
+        jobDescId:id
+      }
+       const data = await postRequest("jobDelete",payload);
+       console.log(data);
+       disPatch(getAllJobs(user.profileID));
+    } catch (error) {
+      console.log(error); 
+    }
+  }
 
   return (
     <div className="bg-gray-100 min-h-screen p-8 ">
@@ -59,7 +72,7 @@ const JobList = () => {
                   <td className="px-6">{formatDate(job.startDate)}</td>
                   <td className="px-6">{formatDate(job.endDate)}</td>
                   <td className="px-6">{job?.payPerHour}</td>
-                  <td className="px-6 text-center">
+                  <td className="px-6 text-center" onClick={()=>handleDelete(job?.jobdescId)}>
                     <MdDelete />
                   </td>
                 </tr>
