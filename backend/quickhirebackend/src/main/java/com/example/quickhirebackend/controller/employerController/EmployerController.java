@@ -116,6 +116,19 @@ public class EmployerController {
             return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+    record DeleteJobRecord(Integer jobDescId){};
+    @PostMapping("/jobDelete")
+    public ResponseEntity<?> deleteJob(@RequestBody DeleteJobRecord deleteJobData){
+        try{
+           Integer id = jobService.deleteEntireJob(deleteJobData.jobDescId());
+           return ResponseEntity.ok(id);
+        }
+        catch (Exception e){
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+
 
     @GetMapping("/getAllJobsForAEmployer/{userProfileId}")
     public ResponseEntity<?> getAllJobsForAEmployer(@PathVariable("userProfileId") Integer userProfileId){

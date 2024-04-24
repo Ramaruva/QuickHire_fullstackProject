@@ -6,15 +6,13 @@ import com.example.quickhirebackend.dto.JobMatchRequestRecord;
 import com.example.quickhirebackend.dto.PaymentDTO;
 import com.example.quickhirebackend.dto.ProfessionalRegistrationRequest;
 import com.example.quickhirebackend.model.Payments;
+import com.example.quickhirebackend.services.JobService;
 import com.example.quickhirebackend.services.MatchService;
 import com.example.quickhirebackend.services.PaymentService;
 import com.example.quickhirebackend.services.ProfessionalRegisterService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class ProfessionalController {
@@ -22,11 +20,13 @@ public class ProfessionalController {
      private  final ProfessionalRegisterService professionalRegisterService;
      private  final MatchService matchService;
      private  final PaymentService paymentService;
+     private final JobService jobService;
 
-    public ProfessionalController(ProfessionalRegisterService professionalRegisterService, MatchService matchService, PaymentService paymentService) {
+    public ProfessionalController(ProfessionalRegisterService professionalRegisterService, MatchService matchService, PaymentService paymentService, JobService jobService) {
         this.professionalRegisterService = professionalRegisterService;
         this.matchService = matchService;
         this.paymentService = paymentService;
+        this.jobService = jobService;
     }
 
     @PostMapping("/professionalRegister")
@@ -105,4 +105,15 @@ public class ProfessionalController {
            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
        }
     }
+
+    @GetMapping("/getJobs")
+    public ResponseEntity<?> getAllJobs(){
+        try {
+            return  ResponseEntity.ok(jobService.getAllJobs());
+        }
+        catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
 }

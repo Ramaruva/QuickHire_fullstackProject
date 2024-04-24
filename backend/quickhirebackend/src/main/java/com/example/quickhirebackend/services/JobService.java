@@ -1,6 +1,7 @@
 package com.example.quickhirebackend.services;
 import com.example.quickhirebackend.dao.EmployerDetailsRepository;
 import com.example.quickhirebackend.dao.JobDescriptionRepository;
+import com.example.quickhirebackend.dao.MatchRepository;
 import com.example.quickhirebackend.dao.QualificationRepository;
 import com.example.quickhirebackend.dto.JobPostRequest;
 import com.example.quickhirebackend.dto.QualificationRecord;
@@ -22,12 +23,14 @@ public class JobService {
     private final JobDescriptionRepository jobDescriptionRepository;
     private  final QualificationRepository qualificationRepository;
     private final EmployerDetailsRepository employerDetailsRepository;
+    private final MatchRepository matchRepository;
 
     @Autowired
-    public JobService(JobDescriptionRepository jobDescriptionRepository, QualificationRepository qualificationRepository, EmployerDetailsRepository employerDetailsRepository) {
+    public JobService(JobDescriptionRepository jobDescriptionRepository, QualificationRepository qualificationRepository, EmployerDetailsRepository employerDetailsRepository, MatchRepository matchRepository) {
         this.jobDescriptionRepository = jobDescriptionRepository;
         this.qualificationRepository = qualificationRepository;
         this.employerDetailsRepository = employerDetailsRepository;
+        this.matchRepository = matchRepository;
     }
 
     @Transactional
@@ -168,6 +171,26 @@ public class JobService {
         }
     }
 
+    public List<JobPostRequest> getAllJobs(){
+        try{
+             List<JobDescription> jobDescriptions = findAllJobDescriptions();
+             List<JobPostRequest> jobPostRequests = new ArrayList<>();
+             for(JobDescription jobDescription:jobDescriptions){
+                  //get company name
+                 String companyName = employerDetailsRepository.findById(jobDescription.getEmpId()).stream().findFirst().orElseThrow().getCompanyName();
+                  //qualifications
+                 List<Qualification> qualifications = qualificationRepository.findByJobid(jobDescription.getJobdescriptionId());
+                 JobPostRequest jobPostRequest = getJobPostRequest(jobDescription,qualifications);
+                 jobPostRequest.setCompanyName(companyName);
+                 jobPostRequests.add(jobPostRequest);
+             }
+             return jobPostRequests;
+        }
+        catch (Exception e){
+            throw new RuntimeException();
+        }
+    }
+
     private static JobPostRequest getJobPostRequest(JobDescription jobDescription, List<Qualification> qualifications) {
         JobPostRequest jobPostRequest = new JobPostRequest();
 
@@ -185,6 +208,20 @@ public class JobService {
         jobPostRequest.setJobId(jobDescription.getJobId());
         jobPostRequest.setJobdescId(jobDescription.getJobdescriptionId());
         return jobPostRequest;
+    }
+
+    public  Integer deleteEntireJob(Integer id){
+         try {
+             //delete the qualifications of job
+              qualificationRepository.deleteByJobId(id);
+              //delete any match requests
+              matchRepository.deleteByJobId(id);
+              deleteJobDescription(id);
+              return id;
+         }
+         catch (Exception e){
+             throw  new RuntimeException(e.getMessage());
+         }
     }
 
 }
