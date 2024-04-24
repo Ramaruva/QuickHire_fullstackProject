@@ -1,16 +1,40 @@
 import React, { useState } from "react";
 import PaymentHistory from "../../components/Payments/PaymentHistory";
+import axios from 'axios';
 
-const PaymentPage = () => {
+const PaymentPage = ({ profileId }) => {
   const [selectedOption, setSelectedOption] = useState("monthly");
+  const [loading, setLoading] = useState(false);
+
   const handleSubscriptionChange = (e) => {
     setSelectedOption(e.target.value);
   };
 
+   const createPayment = async (amount) => {
+    try {
+      setLoading(true);
+      // Replace with your actual endpoint and add necessary headers or credentials
+      const { data } = await axios.post('/api/payments', {
+        profileId,
+        status: 'Pending', // Initial status, assuming you will process the payment and then update
+        startDate: new Date().toISOString(), // Current date, formatted
+        endDate: null, // To be set when payment period ends or upon another action
+        amount,
+      });
+      setLoading(false);
+      alert('Payment successful');
+      // Handle further actions after payment success here
+    } catch (error) {
+      setLoading(false);
+      console.error('Payment error', error);
+      alert('Payment failed'); // Show a proper error message to the user
+    }
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    console.log("Selected Subscription:", selectedOption);
-    // Here, implement your logic to handle the subscription choice, like processing the payment.
+    const amount = selectedOption === "monthly" ? 5 : 50; // Monthly or yearly rate
+    createPayment(amount);
   };
   return (
     <div>
@@ -48,16 +72,17 @@ const PaymentPage = () => {
             </label>
           </div>
           <div className="text-center mt-6">
-            <button
+          <button
               type="submit"
-              className="px-6 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              className={`px-6 py-2 ${loading ? 'bg-gray-500' : 'bg-blue-500 hover:bg-blue-600'} text-white rounded`}
+              disabled={loading}
             >
-              Pay
+              {loading ? 'Processing...' : 'Pay'}
             </button>
           </div>
         </form>
       </div>
-      <PaymentHistory />
+      <PaymentHistory profileId={profileId} />
     </div>
   );
 };
