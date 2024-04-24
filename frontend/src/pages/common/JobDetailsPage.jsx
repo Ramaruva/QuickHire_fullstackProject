@@ -83,25 +83,23 @@ const JobDetailsPage = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div className="flex items-center">
+        <div className="flex items-center">Position:
           <span className="ml-2 text-gray-700">
             {jobSpecific?.positionName} at {jobSpecific?.companyName}
           </span>
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center">Duration:
           <span className="ml-2 text-gray-700">
             {formattedStartDate} to {formattedEndDate}
           </span>
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center">StartTime & EndTime:
           <span className="ml-2 text-gray-700">
             {jobSpecific?.startTime} to {jobSpecific?.endTime}
           </span>
         </div>
-        <div className="flex items-center">
-          <span className="ml-2 text-gray-700">
-            {jobSpecific?.payPerHour} $ Pay Per Hour
-          </span>
+        <div className="flex items-center">Payment:
+          <span className="ml-2 text-gray-700">{jobSpecific?.payPerHour} $ Pay Per Hour</span>
         </div>
         <div className="w-[600px] h-fit mt-6">
           {jobSpecific?.qualification && (
@@ -117,10 +115,10 @@ const JobDetailsPage = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="flex items-center">
+        <div className="flex items-center">Email:
           <span className="ml-2 text-gray-700">{jobSpecific?.email}</span>
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center">Phone:
           <span className="ml-2 text-gray-700">{jobSpecific?.phone}</span>
         </div>
         <div className="flex items-center">
@@ -132,12 +130,7 @@ const JobDetailsPage = () => {
           Request Match
         </button>
         {user.userType == USERTYPE.employer && (
-          <button
-            onClick={handleEdit}
-            className="bg-accept w-fit px-4 py-2 mt-2 ml-5"
-          >
-            Edit
-          </button>
+          <button onClick={handleEdit} className="bg-accept w-fit text-white px-4 py-2 mt-2 hover:bg-blue-600 ml-5">Edit</button>
         )}
       </div>
     </div>

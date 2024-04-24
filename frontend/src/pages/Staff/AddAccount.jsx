@@ -65,7 +65,7 @@ const AddAccount = () => {
     <div className="bg-gray-50 min-h-screen flex justify-center w-full">
       <div className="bg-white rounded-lg shadow-lg p-8 m-4 max-w-2xl w-full">
         <div className="flex justify-center">
-          <h1 className="text-md font-semibold mb-4">New Applicant</h1>
+          <h1 className="text-md font-semibold mb-4">New Staff Account </h1>
         </div>
         <div className="flex flex-wrap -mx-2 mb-2">
           <div className="w-full md:w-1/2 px-2 mb-2 md:mb-0">

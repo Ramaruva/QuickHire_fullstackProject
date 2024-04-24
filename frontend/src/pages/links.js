@@ -9,15 +9,15 @@ export const routelinks = {
       link: "/home/employerReviews",
     },
     {
-      title: "Professional lists",
+      title: "Professional Delete Request",
       link: "/home/ProfessionalLists",
     },
     {
-      title: "Empolyer Lists",
+      title: "Empolyer Delete Request",
       link: "/home/empolyerLists",
     },
     {
-      title: "Notifications",
+      title: "Match Requests",
       link: "/home/notifications",
     },
     {
