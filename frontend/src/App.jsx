@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import SignIn from "./auth/SignIn";
-import SignUp from "./auth/signUp";
+// import SignUp from "./auth/signUp";
 import LandingPage from "./auth/LandingPage";
 import Home from "./pages/Home";
 import "./globals.css";
@@ -40,7 +40,7 @@ const App = () => {
       <Route index element={<LandingPage />} />
 
       <Route path="/SignIn" element={<SignIn />} />
-      <Route path="/SignUp" element={<SignUp />} />
+      {/* <Route path="/SignUp" element={<SignUp />} /> */}
       <Route path="/RegistrationPage" element={<RegistrationPage />} />
       <Route path="/education" element={<Education />} />
       <Route path="/category" element={<CategoryPage />} />
