@@ -21,4 +21,6 @@ public interface MatchRepository extends JpaRepository<Matches, Integer> {
     void deleteByJobId(Integer jobId);
 
     List<Matches> findBystatus(AllTypesEnums.MatchType status);
+
+    List<Matches> findByStatusAndProfessionalId(AllTypesEnums.MatchType status, Integer professionalId);
 }

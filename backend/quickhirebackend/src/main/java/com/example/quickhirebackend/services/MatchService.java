@@ -4,6 +4,7 @@ import com.example.quickhirebackend.customExceptions.CustomMatchException;
 import com.example.quickhirebackend.dao.*;
 import com.example.quickhirebackend.dto.JobMatchRequestRecord;
 import com.example.quickhirebackend.dto.MatchResponse;
+import com.example.quickhirebackend.dto.ProfessionalMatchResponse;
 import com.example.quickhirebackend.model.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -99,6 +100,23 @@ public class MatchService {
         }
     }
 
+
+    public  List<ProfessionalMatchResponse> getAllMatchedJobs(Integer profid){
+        try{
+              // need to get profid
+            Integer professionalID = professionalDetailsRepository.findByProfid(profid).stream().findFirst().orElseThrow().getProfessionalId();
+             List<Matches> matches = matchRepository.findByStatusAndProfessionalId(AllTypesEnums.MatchType.STAFF_ACCEPTED,professionalID);
+             List<ProfessionalMatchResponse> matchResponses = new ArrayList<>();
+             for(Matches matche:matches){
+                  JobDescription jobDescription =  jobDescriptionRepository.findById(matche.getJobId()).stream().findFirst().orElseThrow();
+                  matchResponses.add(new ProfessionalMatchResponse(matche,jobDescription));
+             }
+             return matchResponses;
+        }
+        catch (Exception e){
+            throw  new RuntimeException();
+        }
+    }
     public  JobMatchRequestRecord  professionalJobMatch(JobMatchRequestRecord jobMatchData) throws Exception {
         //need to bring the qualifications of job and professional from table
         List<Qualification> jobQualifications =  qualificationRepository.findByJobid(jobMatchData.jobId());
