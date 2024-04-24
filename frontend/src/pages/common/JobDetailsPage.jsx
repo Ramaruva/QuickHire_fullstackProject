@@ -14,6 +14,16 @@ const JobDetailsPage = () => {
   const dispatch = useDispatch();
   let jobSpecific = jobData && jobData.find((ele) => ele.jobdescId == id);
   const [isEditable, setIsEditable] = useState(false);
+  const formattedStartDate = jobSpecific && new Date(jobSpecific?.startDate).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+  const formattedEndDate = jobSpecific && new Date(jobSpecific?.endDate).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
 
   useEffect(() => {
     dispatch(getAllJobs(user.profileID));
@@ -67,21 +77,21 @@ const JobDetailsPage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div className="flex items-center">
           <span className="ml-2 text-gray-700">
-            {jobSpecific?.positionName}
+            {jobSpecific?.positionName} 
           </span>
         </div>
         <div className="flex items-center">
           <span className="ml-2 text-gray-700">
-            {} to {jobDetails.endTime}
+          {formattedStartDate} to {formattedEndDate}
           </span>
         </div>
         <div className="flex items-center">
           <span className="ml-2 text-gray-700">
-            {jobDetails.startTime} to {jobDetails.endTime}
+            {jobSpecific?.startTime} to {jobSpecific?.endTime}
           </span>
         </div>
         <div className="flex items-center">
-          <span className="ml-2 text-gray-700">{jobDetails.payPerHour}</span>
+          <span className="ml-2 text-gray-700">{jobSpecific?.payPerHour} $ Pay Per Hour</span>
         </div>
         <div className="w-[600px] h-fit mt-6">
           <CategoryList Lists={categoryList} />
@@ -96,13 +106,13 @@ const JobDetailsPage = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="flex items-center">
-          <span className="ml-2 text-gray-700">{employerDetails.email}</span>
+          <span className="ml-2 text-gray-700">{jobSpecific?.email}</span>
         </div>
         <div className="flex items-center">
-          <span className="ml-2 text-gray-700">{employerDetails.phone}</span>
+          <span className="ml-2 text-gray-700">{jobSpecific?.phone}</span>
         </div>
         <div className="flex items-center">
-          <span className="ml-2 text-gray-700">{employerDetails.address}</span>
+          <span className="ml-2 text-gray-700">{jobSpecific?.address}</span>
         </div>
       </div>
       <div className="mt-4">

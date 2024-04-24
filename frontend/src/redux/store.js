@@ -13,7 +13,7 @@ import jobReducer from './jobSlice';
 const persistConfig = {
   key: 'root',
   storage,
-  whitelist: ['auth', 'professionalRegister'] // Add reducers you want to persist here
+  whitelist: ['auth', 'professionalRegister', 'jobSlice'] // Add reducers you want to persist here
 };
 
 // Combine reducers
