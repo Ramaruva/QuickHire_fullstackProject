@@ -106,8 +106,8 @@ public class ProfessionalRegisterService {
 
         for(QualificationRecord q:professionalEditData.getQualifications()){
              Qualification qualification = new Qualification();
-             if(q.qualificationid()!=null){
-                 qualification.setQualificationId(q.qualificationid());
+             if(q.qualificationId()!=null){
+                 qualification.setQualificationId(q.qualificationId());
              }
              qualification.setType(q.type());
              qualification.setKeywords(q.keywords());

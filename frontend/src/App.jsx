@@ -74,6 +74,7 @@ const App = () => {
         {/* Employer routes start here */}
         <Route path="/home/CreateJobs" element={<CreateJob />} />
         <Route path="/home/JobLists" element={<JobList />} />
+        
         {/* Employer routes end here */}
 
         {/* Professional routes start here */}
