@@ -46,7 +46,7 @@ public class ProfessionalController {
     @PostMapping("/professionalJobMatchRequest")
     public  ResponseEntity<?> professionalJobMatch(@RequestBody JobMatchRequestRecord jobMatchData){
         try{
-            JobMatchRequestRecord jobMatch = matchService.professionalJobMatch(jobMatchData);
+            boolean jobMatch = matchService.professionalJobRequest(jobMatchData);
             return new ResponseEntity<>(jobMatch,HttpStatus.OK);
         } catch(CustomMatchException e){
             return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
@@ -104,4 +104,5 @@ public class ProfessionalController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
 }

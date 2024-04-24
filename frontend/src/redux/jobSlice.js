@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { getRequest } from "../API/config";
+import { getRequest, postRequest } from "../API/config";
 
 const initialState = {
   jobs: null,
@@ -20,6 +20,23 @@ export const getAllJobs = createAsyncThunk("jobAllJobs", async (id) => {
 
   throw new Error("No Data!");
 });
+
+export const requestMatch = createAsyncThunk(
+  "requestAMatch",
+  async (jobid, userProfileID) => {
+    console.log(jobid,userProfileID);
+    let obj = {
+      jobId: jobid,
+      userProfileID: userProfileID,
+    };
+    const response = await postRequest("professionalJobMatchRequest", obj);
+    if (response && response.data) {
+      return response.data;
+    }
+    throw new Error("No Match");
+  }
+);
+
 export const jobSlice = createSlice({
   name: "jobSlice",
   initialState,

@@ -1,8 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { IoIosNotifications } from "react-icons/io";
 import { BsLightningCharge } from "react-icons/bs";
+import { getRequest } from "../../API/config";
  
 const StaffNotifications = () => {
+  const getData = async() =>{
+    try {
+       const {data} = await getRequest("getAllMatchRequets");
+       console.log(data);
+    } catch (error) {
+       console.log(error);
+    }
+  }
   const notifications = [
     {
       userName: "professional",
@@ -41,6 +50,9 @@ const StaffNotifications = () => {
       companyName: " Apple",
     },
   ];
+  useEffect(()=>{
+    getData();
+  },[])
   return (
     <div>
       <h1 className="text-3xl font-bold mb-4">Notifcations</h1>
