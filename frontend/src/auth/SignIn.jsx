@@ -7,7 +7,7 @@ import {
 import { postRequest } from "../API/config";
 import { useDispatch, useSelector } from "react-redux";
 import { getLocalItem, setLocalItem } from "../localStrorage";
-import {  checkAuthenticationAsync } from "../redux/authSlice";
+import { checkAuthenticationAsync } from "../redux/authSlice";
 import { USERTYPE } from "../types";
 import { jwtDecode } from "jwt-decode";
 
@@ -19,6 +19,7 @@ const userDetails = {
 const errorMsg = {
   userError: "",
   passwordError: "",
+  apiError: "",
 };
 const SignIn = () => {
   const [loginDetails, setLoginDetails] = useState(userDetails);
@@ -33,21 +34,33 @@ const SignIn = () => {
     }
   };
   const navigate = useNavigate();
+  const errorObj = {
+    userError: validateUsername(loginDetails.username),
+    passwordError: validatePassword(loginDetails.password),
+    apiError: "",
+  };
 
   const handleSubmit = async (e) => {
+    e.preventDefault();
+    // Set the new state for any possible previous API error message to clear it out.
+    setLoginErrorMsgs({
+      ...loginErrorMsgs,
+      apiError: "",
+    });
+
+    console.log(errorObj);
+    setLoginErrorMsgs(errorObj);
+
+    if (errorObj.userError.length <= 0 && errorObj.passwordError.length <= 0) {
+      // Set the new state for any possible previous API error message to clear it out.
+      setLoginErrorMsgs({
+        ...loginErrorMsgs,
+        apiError: "",
+      });
+    }
     try {
-      e.preventDefault();
-      const errorObj = {
-        userError: validateUsername(loginDetails.username),
-        passwordError: validatePassword(loginDetails.password),
-      };
-      console.log(errorObj);
-      setLoginErrorMsgs(errorObj);
-      if (
-        errorObj.userError.length <= 0 &&
-        errorObj.passwordError.length <= 0
-      ) {
-        const data = await postRequest("login", loginDetails);
+      const data = await postRequest("login", loginDetails);
+      if (data.status === 200) {
         console.log(data?.data?.token);
         setLocalItem("token", data?.data?.token);
         await disPatch(checkAuthenticationAsync());
@@ -55,14 +68,26 @@ const SignIn = () => {
         let decode = jwtDecode(token);
         console.log(decode);
         redirect(decode.userType);
+      } else {
+        // Handle any other non-successful status codes here.
+        setLoginErrorMsgs({
+          ...loginErrorMsgs,
+          apiError: "Invalid username or password",
+        });
       }
     } catch (error) {
-      console.log(error);
+      // This will handle network errors and any other errors thrown by postRequest.
+      setLoginErrorMsgs({
+        ...loginErrorMsgs,
+        apiError:
+          error.response?.data?.message ||
+          "Invalid username or password. Please enter valid credentials.",
+      });
     }
   };
 
   const redirect = (userType) => {
-    console.log(userType,USERTYPE.root);
+    console.log(userType, USERTYPE.root);
     switch (userType) {
       case USERTYPE.professional:
         navigate("/home/BrowseJobs");
@@ -190,6 +215,11 @@ const SignIn = () => {
                   >
                     Login
                   </button>
+                  {loginErrorMsgs.apiError && (
+                    <p className="text-sm text-red-600 text-center mt-2">
+                      {loginErrorMsgs.apiError}
+                    </p>
+                  )}
                 </div>
                 <div className="text-sm text-center">
                   <a
