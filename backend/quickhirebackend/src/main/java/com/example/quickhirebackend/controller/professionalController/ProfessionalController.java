@@ -56,29 +56,6 @@ public class ProfessionalController {
         }
     }
 
-    record PaymentReturnDataRecord(Double intialBalance, Double updatedBalance, Payments paymentsDetails){}
-    @PostMapping("/professional/payment")
-    public ResponseEntity<?> employPayment(@RequestBody PaymentDTO paymentDTO){
-        try{
-            Double intialAmount = paymentService.balanceChecker(paymentDTO.getProfId());
-            Payments payments = new Payments();
-            payments.setProfId(paymentDTO.getProfId());
-            payments.setAmount(paymentDTO.getAmount());
-            payments.setStartDate(paymentDTO.getStartDate());
-            payments.setEndDate(paymentDTO.getEndDate());
-            Payments payedDetails= paymentService.createPayment(payments);
-            Double updatedAmount = paymentService.balanceChecker(paymentDTO.getProfId());
-
-            PaymentReturnDataRecord paymentReturnData = new PaymentReturnDataRecord(intialAmount,updatedAmount,payedDetails);
-
-            return new ResponseEntity<>(paymentReturnData,HttpStatus.CREATED);
-
-        }
-        catch (Exception e){
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Server error occurred while Posting job"+e.getMessage());
-        }
-    }
-
     record EditResponse(boolean isEdited, String message){}
     @PutMapping("/professional/editAccount")
     public ResponseEntity<?> professionalAccountEdit(@RequestBody ProfessionalRegistrationRequest professionalEditData){

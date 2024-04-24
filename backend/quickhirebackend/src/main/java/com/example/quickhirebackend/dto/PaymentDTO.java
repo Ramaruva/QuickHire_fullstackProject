@@ -1,5 +1,6 @@
 package com.example.quickhirebackend.dto;
-import java.sql.Date;
+
+import java.util.Date;
 
 public class PaymentDTO {
     private Integer profid;
@@ -8,7 +9,17 @@ public class PaymentDTO {
     private Date enddate;
     private String status;
 
-    // Constructor, getters, and setters
+    @Override
+    public String toString() {
+        return "PaymentDTO{" +
+                "profid=" + profid +
+                ", amount=" + amount +
+                ", startdate=" + startdate +
+                ", enddate=" + enddate +
+                ", status='" + status + '\'' +
+                '}';
+    }
+// Constructor, getters, and setters
 
     public PaymentDTO() {
         // Default constructor

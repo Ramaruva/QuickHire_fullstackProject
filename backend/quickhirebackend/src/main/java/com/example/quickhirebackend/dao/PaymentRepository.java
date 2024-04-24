@@ -13,6 +13,7 @@ public interface PaymentRepository extends JpaRepository<Payments, Integer> {
     // Additional query methods can be defined here
 //    @Query("SELECT SUM(p.amount) FROM Payment p WHERE p.profid = :profid")
 //    Double sumAmountByProfid(@Param("profid") Integer profid);
-
+    @Query("SELECT p FROM Payments p WHERE p.profid = ?1")
+    List<Payments> findAllByProfId(Integer profid);
 }
 
