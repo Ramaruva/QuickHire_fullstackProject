@@ -22,6 +22,16 @@ public class JobPostRequest {
     private String qualificationKeywords;
     private List<QualificationRecord> qualifications;
 
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    private String companyName;
+
     public Integer getJobdescId() {
         return jobdescId;
     }

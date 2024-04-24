@@ -25,7 +25,7 @@ const CategoryList = ({ Lists, handleDelete }) => {
           </tr>
         </thead>
         <tbody>
-          {Lists.map((item, index) => (
+          {Lists && Lists?.map((item, index) => (
             <>
               {!item?.delete && (
                 <tr

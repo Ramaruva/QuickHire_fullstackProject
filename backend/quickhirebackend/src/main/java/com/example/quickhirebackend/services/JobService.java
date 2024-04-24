@@ -171,6 +171,26 @@ public class JobService {
         }
     }
 
+    public List<JobPostRequest> getAllJobs(){
+        try{
+             List<JobDescription> jobDescriptions = findAllJobDescriptions();
+             List<JobPostRequest> jobPostRequests = new ArrayList<>();
+             for(JobDescription jobDescription:jobDescriptions){
+                  //get company name
+                 String companyName = employerDetailsRepository.findById(jobDescription.getEmpId()).stream().findFirst().orElseThrow().getCompanyName();
+                  //qualifications
+                 List<Qualification> qualifications = qualificationRepository.findByJobid(jobDescription.getJobdescriptionId());
+                 JobPostRequest jobPostRequest = getJobPostRequest(jobDescription,qualifications);
+                 jobPostRequest.setCompanyName(companyName);
+                 jobPostRequests.add(jobPostRequest);
+             }
+             return jobPostRequests;
+        }
+        catch (Exception e){
+            throw new RuntimeException();
+        }
+    }
+
     private static JobPostRequest getJobPostRequest(JobDescription jobDescription, List<Qualification> qualifications) {
         JobPostRequest jobPostRequest = new JobPostRequest();
 
