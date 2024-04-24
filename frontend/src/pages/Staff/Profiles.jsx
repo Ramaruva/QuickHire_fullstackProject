@@ -40,7 +40,7 @@ const Profiles = ({ customerType, viewType }) => {
   }, [dispatch]);
   return (
     <div className="grid grid-cols-3 gap-3">
-      {professionalReviews &&
+      {customerType=="Professional"&&professionalReviews &&
         professionalReviews.map((item, index) => {
           return (
             <SingleProfileBox
@@ -51,7 +51,7 @@ const Profiles = ({ customerType, viewType }) => {
             />
           );
         })}
-      {employerReviews &&
+      {customerType!="Professional"&&employerReviews &&
         employerReviews.map((item, index) => {
           return (
             <SingleProfileBox
