@@ -39,6 +39,18 @@ const EmpAccountSettings = () => {
   const [accountErrors, setAccountErrors] = useState(errorDetails);
   const user = useSelector((state) => state.auth.user);
   const [isEditable, setIsEditable] = useState(false);
+
+  const handleDeleteRequest =async ()=>{
+    try {
+       const payLoad ={
+        userProfileId:user.profileID
+       }
+       const {data} = await putRequest("employer/deleteRequest");
+       console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  }
   const handleChange = (e) => {
     try {
       setAccountDetails({ ...accountDetails, [e.target.name]: e.target.value });
