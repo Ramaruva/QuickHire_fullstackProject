@@ -20,8 +20,7 @@ import java.util.Optional;
 @Service
 public class MatchService {
 
-    @PersistenceContext
-    private EntityManager entityManager;
+
     private final MatchRepository matchRepository;
 
     private  final QualificationRepository qualificationRepository;
@@ -82,13 +81,12 @@ public class MatchService {
 
     public boolean professionalJobRequest(JobMatchRequestRecord jobRequest){
         try{
-            entityManager.clear();
-            Matches matches = new Matches();
+            Integer professionalId = professionalDetailsRepository.findByProfid(jobRequest.userProfileID()).stream().findFirst().orElseThrow().getProfessionalId();
+            Matches matches = matchRepository.findByProfessionalIdAndJobId(professionalId, jobRequest.jobId()).stream().findFirst().orElse(new Matches());
             //matches.setMatchType(AllTypesEnums.MatchType.PROFESSIONAL_REQUEST);
             matches.setJobId(jobRequest.jobId());
             matches.setMatchPercentage(0);
-            Integer profid = professionalDetailsRepository.findByProfid(jobRequest.userProfileID()).stream().findFirst().orElseThrow().getProfessionalId();
-            matches.setProfessionalId(profid);
+            matches.setProfessionalId(professionalId);
             matches.setStatus(AllTypesEnums.MatchType.PROFESSIONAL_REQUEST);
             System.out.println(matches);
             matchRepository.save(matches);
@@ -144,10 +142,89 @@ public class MatchService {
         return jobMatchData;
     }
 
+    public  List<JobDescription> staffProfessionalJobMatch(Integer profId){
+        try{
+            //first get professional qualifications
+            List<Qualification> professionalQualifications = qualificationRepository.findByProfid(profId);
+            //now get all jobs
+            List<JobDescription> jobDescriptions = jobDescriptionRepository.findAll();
+            List<JobDescription> matchedJobs = new ArrayList<>();
+            for(JobDescription jobDescription:jobDescriptions){
+                List<Qualification> jbQualifications = qualificationRepository.findByJobid(jobDescription.getJobdescriptionId());
+                double matchPercentage = matchAlgorithm(jbQualifications,professionalQualifications);
+                if(matchPercentage>50){
+                    matchedJobs.add(jobDescription);
+                }
+            }
+            return matchedJobs;
+        }
+        catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public boolean staffJobMatchAcceptance(Integer userProfileId, Integer jobId,double percentage,Integer staffUserProfileId){
+        try{
+            //get match data
+            Integer professionalID = professionalDetailsRepository.findByProfid(userProfileId).stream().findFirst().orElseThrow().getProfessionalId();
+            Matches matches = matchRepository.findByProfessionalIdAndJobId(professionalID,jobId).stream().findFirst().orElse(new Matches());
+            Integer staffId = staffDetailsRepository.findByStaffUserProfileId(staffUserProfileId).stream().findFirst().orElseThrow().getStaffId();
+            matches.setStaffId(staffId);
+            int per = (int) percentage;
+            matches.setMatchPercentage(per);
+            matches.setJobId(jobId);
+            matches.setProfessionalId(professionalID);
+            matches.setStatus(AllTypesEnums.MatchType.STAFF_ACCEPTED);
+            //matches.setNotification("YES");
+            saveMatch(matches);
+            return  true;
+        }
+        catch (Exception e){
+            throw  new RuntimeException(e.getMessage());
+        }
+    }
+
+    public List<MatchResponse> getMatchedJobsForEmployer(Integer jobId){
+        try{
+           //get all matches
+            List<Matches> matches = matchRepository.findByStatusAndJobId(AllTypesEnums.MatchType.STAFF_ACCEPTED,jobId);
+                    //matchRepository.findByJobIdAndNotification(jobId,"YES");
+            List<MatchResponse> jobMatchRequestRecords = new ArrayList<>();
+            for(Matches match:matches){
+                Integer professionalId = match.getProfessionalId();
+                Integer userProfileId = professionalDetailsRepository.findById(professionalId).stream().findFirst().orElse(new ProfessionalDetails()).getProfId();
+                if(userProfileId==null){
+                    continue;
+                }
+                UserProfile userProfile = userProfileRepository.findById(userProfileId).stream().findFirst().orElse(null);
+                if(userProfile==null){
+                    continue;
+                }
+                MatchResponse jobMatchRequestRecord = new MatchResponse(match.getMatchId(), match.getStatus(),userProfile,null);
+                jobMatchRequestRecords.add(jobMatchRequestRecord);
+            }
+            return  jobMatchRequestRecords;
+        }
+        catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+    public double getJobMatchPercentageForSingleJob(Integer userProfileId, Integer jobId){
+        try{
+            //get job qualifications
+            List<Qualification> jobQualifications = qualificationRepository.findByJobid(jobId);
+            List<Qualification> professionalQualifications = qualificationRepository.findByProfid(userProfileId);
+            return matchAlgorithm(jobQualifications,professionalQualifications);
+        }
+        catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
     public String matchMechanism(Integer staffId, Integer matchId, AllTypesEnums.MatchType status){
          try{
              Matches matches = findMatchById(matchId).stream().findFirst().orElseThrow();
-             Integer stafID = staffDetailsRepository.findByStaffUserProfileId(staffId).stream().findFirst().orElseThrow().getStaffId();
+             Integer staffID = staffDetailsRepository.findByStaffUserProfileId(staffId).stream().findFirst().orElseThrow().getStaffId();
               if(status== AllTypesEnums.MatchType.STAFF_ACCEPTED){
                   //need to get jobqualifictions
                   List<Qualification> jobQualifications = qualificationRepository.findByJobid(matches.getJobId());
@@ -157,11 +234,12 @@ public class MatchService {
                   matches.setStatus(status);
                   System.out.println(matchPercentage);
                   matches.setMatchPercentage((int) matchPercentage);
+                 // matches.setNotification("YES");
               }
               else {
                   matches.setStatus(status);
               }
-              matches.setStaffId(stafID);
+              matches.setStaffId(staffID);
               saveMatch(matches);
               return  "Matched saved"+matches.getMatchPercentage();
          }
