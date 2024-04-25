@@ -17,14 +17,14 @@ const AllProfiles = () => {
   return (
     <div className="grid grid-cols-3 gap-3">
       {professionalDetails &&
-        professionalDetails?.map((item, index) => {
+        professionalDetails.map((item, index) => (
           <SingleProfileBox
             key={index}
             customerType={"Professional"}
             viewType={"view"}
             userData={item}
-          />;
-        })}
+          />
+        ))}
     </div>
   );
 };
