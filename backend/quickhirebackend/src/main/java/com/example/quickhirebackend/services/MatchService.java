@@ -5,6 +5,7 @@ import com.example.quickhirebackend.dao.*;
 import com.example.quickhirebackend.dto.JobMatchRequestRecord;
 import com.example.quickhirebackend.dto.MatchResponse;
 import com.example.quickhirebackend.dto.ProfessionalMatchResponse;
+import com.example.quickhirebackend.dto.StaffMatchProcessing;
 import com.example.quickhirebackend.model.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -142,18 +143,19 @@ public class MatchService {
         return jobMatchData;
     }
 
-    public  List<JobDescription> staffProfessionalJobMatch(Integer profId){
+    public  List<StaffMatchProcessing> staffProfessionalJobMatch(Integer profId){
         try{
             //first get professional qualifications
             List<Qualification> professionalQualifications = qualificationRepository.findByProfid(profId);
             //now get all jobs
             List<JobDescription> jobDescriptions = jobDescriptionRepository.findAll();
-            List<JobDescription> matchedJobs = new ArrayList<>();
+            List<StaffMatchProcessing> matchedJobs = new ArrayList<>();
             for(JobDescription jobDescription:jobDescriptions){
                 List<Qualification> jbQualifications = qualificationRepository.findByJobid(jobDescription.getJobdescriptionId());
                 double matchPercentage = matchAlgorithm(jbQualifications,professionalQualifications);
                 if(matchPercentage>50){
-                    matchedJobs.add(jobDescription);
+                    StaffMatchProcessing staffMatchProcessing = new StaffMatchProcessing(matchPercentage,jobDescription);
+                    matchedJobs.add(staffMatchProcessing);
                 }
             }
             return matchedJobs;
