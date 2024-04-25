@@ -17,6 +17,10 @@ export const routelinks = {
       link: "/home/empolyerLists",
     },
     {
+      title:"Customers",
+      link:"/home/AllCustomer"
+    },
+    {
       title: "Match Requests",
       link: "/home/notifications",
     },

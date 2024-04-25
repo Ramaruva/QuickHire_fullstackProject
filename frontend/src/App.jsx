@@ -25,6 +25,7 @@ import { useDispatch } from "react-redux";
 import { checkAuthenticationAsync } from "./redux/authSlice";
 import LoadingSpinner from "./components/LoadingSpinner";
 import RegistrationSuccessPage from "./pages/common/RegistrationSuccessPage";
+import AllProfiles from "./pages/Staff/AllProfiles";
 
 const App = () => {
   const dispatch = useDispatch();
@@ -68,6 +69,10 @@ const App = () => {
           path="/home/employerLists"
           element={<Profiles customerType={"Employer"} viewType={"list"} />}
         />
+        <Route
+          path="/home/AllCustomer" 
+          element={<AllProfiles />}
+          />
         <Route path="/home/individual" element={<IndividualPage />} />
 
         {/* Staff routes end here */}
