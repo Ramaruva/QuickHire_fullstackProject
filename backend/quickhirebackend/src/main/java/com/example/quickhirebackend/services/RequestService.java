@@ -316,6 +316,42 @@ public class RequestService {
             throw new RuntimeException(e.getMessage());
         }
     }
+
+    public List<EmployerRegistrationRequest> getEmployerDetails(){
+        try{
+            //get all employer details
+            List<EmployerDetails> employerDetails = employerDetailsRepository.findAll();
+            List<EmployerRegistrationRequest> employerRegistrationRequests = new ArrayList<>();
+            for(EmployerDetails employerDetail:employerDetails){
+                //get userprofile
+                UserProfile userProfile = userProfileRepository.findById(employerDetail.getProfId()).stream().findFirst().orElse(null);
+                if(userProfile==null){
+                    continue;
+                }
+                //get his payment details
+                List<Payments> payments = paymentRepository.findAllByProfId(userProfile.getUserprofileid());
+                EmployerRegistrationRequest employerRegistrationRequest = new EmployerRegistrationRequest();
+                employerRegistrationRequest.setFirstname(userProfile.getFirstname());
+                employerRegistrationRequest.setLastname(userProfile.getLastname());
+                employerRegistrationRequest.setUsername(userProfile.getUsername());
+                employerRegistrationRequest.setAddress(userProfile.getAddress());
+                employerRegistrationRequest.setState(userProfile.getState());
+                employerRegistrationRequest.setCity(userProfile.getCity());
+                employerRegistrationRequest.setAddress(userProfile.getAddress());
+                employerRegistrationRequest.setPincode(userProfile.getPincode());
+                employerRegistrationRequest.setEmail(userProfile.getEmail());
+                employerRegistrationRequest.setCompanyName(employerDetail.getCompanyName());
+                employerRegistrationRequest.setPhone(userProfile.getPhone());
+                employerRegistrationRequest.setPayments(payments);
+                employerRegistrationRequests.add(employerRegistrationRequest);
+
+            }
+            return employerRegistrationRequests;
+        }
+        catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
+    }
     private static EmployerRegistrationRequest getEmployerRegistrationRequest(EmployerRequest employerRequest, UserProfile userProfile) {
         EmployerRegistrationRequest employerRegistrationRequest = new EmployerRegistrationRequest();
         employerRegistrationRequest.setFirstname(userProfile.getFirstname());
