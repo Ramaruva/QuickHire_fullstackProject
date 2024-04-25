@@ -4,6 +4,8 @@ import { getRequest, postRequest } from "../API/config";
 const initialState = {
   professionalReviews: null,
   employerReviews: null,
+  professionalDetails:[],
+  employerDetails:[]
 };
 export const asyncProfessionalDataReviews = createAsyncThunk(
   "/professionalReviews",
@@ -27,6 +29,28 @@ export const asyncEmployerDataReviews = createAsyncThunk(
   }
 );
 
+export  const asyncProfessionalDetails = createAsyncThunk(
+  "/employerDetails",
+  async ()=>{
+    const data = await getRequest("getProfessional");
+    if(data&&data.data){
+      console.log(data.data);
+      return data.data;
+    }
+    throw new Error("No data!");
+  }
+)
+
+export const asyncEmployerDetails = createAsyncThunk(
+  "/professionalDetails",
+  async ()=>{
+    const data = await getRequest("getEmployers");
+    if(data&&data.data){
+      return data.data;
+    }
+    throw new Error("No data!");
+  }
+)
 export const asyncProfessionalReviewOperation = createAsyncThunk(
   "/professionalAccept",
   async (reviewData, thunkAPI) => {
@@ -73,7 +97,24 @@ export const staffSlice = createSlice({
       .addCase(asyncEmployerDataReviews.rejected, (state, action) => {
         state.employerReviews = [];
         return state;
-      });
+      })
+      .addCase(asyncProfessionalDetails.fulfilled,(state,action)=>{
+          state.professionalDetails=action.payload;
+          console.log(state,action.payload);
+          return state;
+      })
+      .addCase(asyncProfessionalDetails.rejected,(state,action)=>{
+        state.professionalDetails=[];
+        return state;
+      })
+      .addCase(asyncEmployerDetails.fulfilled,(state,action)=>{
+        state.employerDetails=action.payload;
+        return state;
+      })
+      .addCase(asyncEmployerDetails.rejected,(state,action)=>{
+        state.employerDetails=[];
+        return state;
+      })
   },
 });
 
