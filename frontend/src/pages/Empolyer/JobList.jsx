@@ -1,15 +1,19 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState} from "react";
 import { MdDelete } from "react-icons/md";
+import { FaTrash } from 'react-icons/fa';
 import { useDispatch, useSelector } from "react-redux";
 import { getAllJobs } from "../../redux/jobSlice";
 import { useNavigate } from "react-router-dom";
 import { deleteRequest, postRequest } from "../../API/config";
+import ConfirmationModal from "../common/ConfirmationModal"
 
 const JobList = () => {
   const jobData = useSelector((state) => state.jobSlice.jobs);
   const user = useSelector((state) => state.auth.user);
   const disPatch = useDispatch();
   const navigate = useNavigate();
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const [selectedJobId, setSelectedJobId] = useState(null);
   const formatDate = (dateString) => {
     const options = { year: "numeric", month: "long", day: "numeric" };
     return new Date(dateString).toLocaleDateString("en-US", options);
@@ -25,18 +29,27 @@ const JobList = () => {
       navigate("/home/jobdetails" + "?" + "id=" + id);
     } catch (error) {}
   };
-  const handleDelete =async (id)=>{
-    try {
-      const payload ={
-        jobDescId:id
+  const handleOpenModal = (jobId) => {
+    setSelectedJobId(jobId);
+    setModalIsOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (selectedJobId) {
+      try {
+        const payload = { jobDescId: selectedJobId };
+        const data = await postRequest("jobDelete", payload);
+        console.log(data);
+        dispatch(getAllJobs(user.profileID));
+        setModalIsOpen(false); // Close modal after operation
+      } catch (error) {
+        console.log(error);
       }
-       const data = await postRequest("jobDelete",payload);
-       console.log(data);
-       disPatch(getAllJobs(user.profileID));
-    } catch (error) {
-      console.log(error); 
     }
-  }
+  };
+  const handleCloseModal = () => {
+    setModalIsOpen(false);
+  };
 
   return (
     <div className="bg-gray-100 min-h-screen p-8 ">
@@ -72,16 +85,25 @@ const JobList = () => {
                   <td className="px-6">{formatDate(job.startDate)}</td>
                   <td className="px-6">{formatDate(job.endDate)}</td>
                   <td className="px-6">{job?.payPerHour}</td>
-                  <td className="px-6 text-center" onClick={()=>handleDelete(job?.jobdescId)}>
-                    <MdDelete />
+                  <td className="px-6 text-center">
+                    <FaTrash className="w-5 h-5" onClick={() => handleOpenModal(job?.jobdescId)} />
                   </td>
                 </tr>
               ))}
           </tbody>
         </table>
       </div>
+      <ConfirmationModal
+        isOpen={modalIsOpen}
+        onClose={handleCloseModal}
+        onConfirm={handleConfirmDelete}
+        title="Confirm Deletion"
+        confirmText="Delete"
+        cancelText="Cancel"
+      >
+        Are you sure you want to delete this job?
+      </ConfirmationModal>
     </div>
   );
 };
-
 export default JobList;
