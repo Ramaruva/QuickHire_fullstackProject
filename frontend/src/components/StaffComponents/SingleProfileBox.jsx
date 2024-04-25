@@ -49,7 +49,7 @@ const SingleProfileBox = ({ customerType, viewType, userData }) => {
         viewType +
         "&" +
         "reqId=" +
-        userData.prequestid
+        userData.userprofileid
     );
   };
 

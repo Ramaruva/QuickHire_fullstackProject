@@ -18,7 +18,19 @@ axiosClient.defaults.headers = {
 //setting interceptors for requests
 axiosClient.interceptors.request.use(
   (config) => {
-    store.dispatch(setLoading(true)); // Start loading
+   
+    let url = config.url;
+    console.log(store.getState());
+    let profdetails=store.getState().staffStates.professionalDetails;
+    let empdetails = store.getState().staffStates.employerDetails;
+    console.log(profdetails,empdetails,url);
+    if((url=="/getProfessional"&&profdetails.length>0) || (url=="/getEmployers"&&empdetails.length>0)){
+      store.dispatch(setLoading(false));
+    }
+    else{
+      store.dispatch(setLoading(true));
+    }
+    console.log(config.url); // Start loading
     const token = getLocalItem("token");
     console.log(token);  // Optionally, remove console logs for production
     if (token) {

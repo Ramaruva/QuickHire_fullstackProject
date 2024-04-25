@@ -10,11 +10,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { USERREQUESTTYPE, USERTYPE } from "../../types";
 import {
   asyncEmployerDataReviews,
+  asyncEmployerDetails,
   asyncEmployerReviewOperation,
   asyncProfessionalDataReviews,
+  asyncProfessionalDetails,
   asyncProfessionalReviewOperation,
 } from "../../redux/staffSlicer";
-import { useNavigate } from "react-router-dom";
+import { getRequest } from "../../API/config";
 
 const FullProfileDetails = ({ customerType, operationType, requestID }) => {
   const professionalReviews = useSelector(
@@ -23,10 +25,26 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
   const employerReviews = useSelector(
     (state) => state.staffStates.employerReviews
   );
+
+  const professionalDetails = useSelector(
+    (state) => state.staffStates.professionalDetails
+  );
+  const employerDetails = useSelector(
+    (state) => state.staffStates.employerDetails
+  );
+  const initateMatch = async () => {
+    try {
+      const { data } = await getRequest(
+        "initateProfessionalMatches/" + requestID
+      );
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const dispatch = useDispatch();
   const [userData, setUserData] = useState();
   const [rejectMsg, setRejectMsg] = useState("");
-  let history = useNavigate();
 
   useEffect(() => {
     try {
@@ -36,7 +54,7 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
         prom.then((res) => {
           console.log(res.payload);
           setUserData(
-            res.payload.find((element) => element.prequestid == requestID)
+            res.payload.find((element) => element.userprofileid == requestID)
           );
         });
       }
@@ -44,17 +62,67 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
         const prom = dispatch(asyncEmployerDataReviews());
         prom.then((res) => {
           setUserData(
-            res.payload.find((element) => element.prequestid == requestID)
+            res.payload.find((element) => element.userprofileid == requestID)
           );
         });
+      }
+      if (
+        employerReviews &&
+        customerType == "Employer" &&
+        operationType == "review"
+      ) {
+        setUserData(
+          employerReviews.find((element) => element.userprofileid == requestID)
+        );
+      }
+      if (
+        professionalReviews &&
+        customerType == "Professional" &&
+        operationType == "review"
+      ) {
+        setUserData(
+          professionalReviews.find(
+            (element) => element.userprofileid == requestID
+          )
+        );
+      }
+      if (operationType == "view" && customerType == "Professional") {
+        if (professionalDetails == null || professionalDetails.length == 0) {
+          let prom = dispatch(asyncProfessionalDetails());
+          prom.then((res) => {
+            setUserData(
+              res.payload.find((element) => element.userprofileid == requestID)
+            );
+          });
+        } else {
+          setUserData(
+            professionalDetails.find(
+              (element) => element.userprofileid == requestID
+            )
+          );
+        }
       }
       if (employerReviews && customerType == "Employer") {
         setUserData(employerReviews.find((element) => element.prequestid));
       }
-      if (professionalReviews && customerType == "Professional") {
-        setUserData(
-          professionalReviews.find((element) => element.prequestid == requestID)
-        );
+      if (employerReviews && customerType == "Employer") {
+        setUserData(employerReviews.find((element) => element.prequestid));
+      }
+      if (operationType == "view" && customerType == "Employer") {
+        if (employerDetails == null || employerDetails.length == 0) {
+          let prom = dispatch(asyncEmployerDetails());
+          prom.then((res) => {
+            setUserData(
+              res.payload.find((element) => element.userprofileid == requestID)
+            );
+          });
+        } else {
+          setUserData(
+            employerDetails.find(
+              (element) => element.userprofileid == requestID
+            )
+          );
+        }
       }
     } catch (error) {
       console.log(error);
@@ -70,9 +138,8 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
       };
       if (customerType == "Professional") {
         const data = dispatch(asyncProfessionalReviewOperation(postData));
-      }
-      else{
-          const data = dispatch(asyncEmployerReviewOperation(postData));
+      } else {
+        const data = dispatch(asyncEmployerReviewOperation(postData));
       }
       // history("-1");
     } catch (error) {
@@ -166,6 +233,13 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
           </div>
         </div>
       )}
+      <button
+        type="button"
+        className="bg-accept w-32 text-white px-4 py-2 text-sm rounded hover:bg-green-600"
+        onClick={initateMatch}
+      >
+        match
+      </button>
       {operationType == "list" && (
         <div className="w-fit mt-4">
           PaymentHistory:

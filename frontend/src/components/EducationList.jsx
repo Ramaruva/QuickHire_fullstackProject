@@ -7,6 +7,7 @@ const formatDate = (isoDateString) => {
 };
 
 const EducationList = ({ educationDetails, handleDelete }) => {
+  console.log(educationDetails)
   const manageDelete = (item) => {
     try {
       console.log(item);

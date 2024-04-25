@@ -181,5 +181,14 @@ public class StaffController {
           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
       }
     }
+    @GetMapping("/initateProfessionalMatches/{userProfileId}")
+    public ResponseEntity<?> initiateProfessionalMatch(@PathVariable("userProfileId") Integer userprofileId){
+        try{
+            return ResponseEntity.ok(matchService.staffProfessionalJobMatch(userprofileId));
+        }
+        catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 }
  
