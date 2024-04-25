@@ -250,6 +250,7 @@ public class RequestService {
                   professionalRequest1.setState(userProfile.getState());
                   professionalRequest1.setPincode(userProfile.getPincode());
                   professionalRequest1.setUsername(userProfile.getUsername());
+                  professionalRequest1.setUserprofileid(userProfile.getUserprofileid());
                   professionalRequest1.setQualification(qualification);
                   professionalRequest1.setEducation(educations);
                   professionalRegistrationRequests.add(professionalRequest1);
@@ -270,6 +271,7 @@ public class RequestService {
              for(EmployerRequest employerRequest: employerRequests){
                  UserProfile userProfile = userProfileRepository.findById(employerRequest.getProfId()).stream().findFirst().orElseThrow();
                  EmployerRegistrationRequest employerRegistrationRequest = getEmployerRegistrationRequest(employerRequest, userProfile);
+                 employerRegistrationRequest.setUserprofileid(userProfile.getUserprofileid());
                  employerRegistrationRequests.add(employerRegistrationRequest);
              }
              return  employerRegistrationRequests;
@@ -415,6 +417,7 @@ public class RequestService {
         employerRegistrationRequest.setEmail(userProfile.getEmail());
         employerRegistrationRequest.setCompanyName(employerDetail.getCompanyName());
         employerRegistrationRequest.setPhone(userProfile.getPhone());
+        employerRegistrationRequest.setUserprofileid(userProfile.getUserprofileid());
         employerRegistrationRequest.setPayments(payments);
         return employerRegistrationRequest;
     }
