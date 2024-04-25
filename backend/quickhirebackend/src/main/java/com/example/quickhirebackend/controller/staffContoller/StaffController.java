@@ -144,5 +144,15 @@ public class StaffController {
             return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+    @GetMapping("/getProfessional")
+    public  ResponseEntity<?> getProfessional(){
+        try{
+            System.out.println("hii");
+            return ResponseEntity.ok(requestService.getAllProfessionalDetails());
+        }
+        catch (Exception e){
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 }
  
