@@ -24,4 +24,10 @@ public interface MatchRepository extends JpaRepository<Matches, Integer> {
 
     List<Matches> findByStatusAndProfessionalId(AllTypesEnums.MatchType status, Integer professionalId);
 
+    List<Matches> findByStatusAndJobId(AllTypesEnums.MatchType status,Integer jobId);
+    Optional<Matches> findByProfessionalIdAndJobId(Integer professionalId, Integer jobId);
+
+   // List<Matches> findByJobIdAndNotification(Integer jobId, String notification);
+
+
 }
