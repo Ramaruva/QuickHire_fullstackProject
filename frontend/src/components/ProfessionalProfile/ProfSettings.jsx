@@ -88,6 +88,18 @@ const ProfSettings = () => {
   const [educationError, setEducationError] = useState(Error);
   const user = useSelector((state) => state.auth.user);
 
+  const deleteRequests = async () => {
+    try {
+      let payLoad = {
+        userProfileID: user.profileID,
+      };
+      const { data } = await putRequest("professional/DeleteRequest", payLoad);
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const handleEducationAdd = (e) => {
     e.preventDefault();
     const error = {
@@ -134,15 +146,13 @@ const ProfSettings = () => {
 
   const handleEducationDelete = (id) => {
     try {
-      const education = accountDetails.education.map((item)=>{
-         if(item.educationId==id){
-            item={...item,delete:true};
-         }
-         return item;
-      })
-      const array = education.filter(
-        (item) => id != item.ID
-      );
+      const education = accountDetails.education.map((item) => {
+        if (item.educationId == id) {
+          item = { ...item, delete: true };
+        }
+        return item;
+      });
+      const array = education.filter((item) => id != item.ID);
       setAccountDetails({ ...accountDetails, education: array });
     } catch (error) {
       console.log(error);
@@ -150,12 +160,12 @@ const ProfSettings = () => {
   };
   const handleCategoryDelete = (id) => {
     try {
-      const qualification = accountDetails.qualification.map((item)=>{
-          if(item.qualificationId==id){
-            item={...item,delete:true};
-          }
-          return item;
-      })
+      const qualification = accountDetails.qualification.map((item) => {
+        if (item.qualificationId == id) {
+          item = { ...item, delete: true };
+        }
+        return item;
+      });
       const array = qualification.filter((item) => id != item.ID);
       setAccountDetails({ ...accountDetails, qualification: array });
     } catch (error) {
@@ -190,22 +200,26 @@ const ProfSettings = () => {
       };
       setAccountErrors(errorObj);
       if (!checkKeysEmpty(errorObj)) {
-        let updatedEducation = []
-        accountDetails.education.map((item)=>{
-            let obj ={
-              schoolname:item.schoolName,
-              major:item.major,
-              completiontime:item.completionTime,
-              delete:item?.delete
-            }
-            if(item?.educationId){
-              obj ={...obj,education_id:item.educationId}
-            }
-            updatedEducation.push(obj);
-        })
-        let obj ={...accountDetails,qualifications:accountDetails.qualification,educationList:updatedEducation};
+        let updatedEducation = [];
+        accountDetails.education.map((item) => {
+          let obj = {
+            schoolname: item.schoolName,
+            major: item.major,
+            completiontime: item.completionTime,
+            delete: item?.delete,
+          };
+          if (item?.educationId) {
+            obj = { ...obj, education_id: item.educationId };
+          }
+          updatedEducation.push(obj);
+        });
+        let obj = {
+          ...accountDetails,
+          qualifications: accountDetails.qualification,
+          educationList: updatedEducation,
+        };
         console.log(obj);
-        const data = await putRequest("professional/editAccount",obj);
+        const data = await putRequest("professional/editAccount", obj);
         console.log(data);
         setIsEditable(false);
         setAccountErrors(errorDetails);
