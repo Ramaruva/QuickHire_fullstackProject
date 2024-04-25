@@ -5,6 +5,7 @@ import {
   asyncEmployerDataReviews,
   asyncProfessionalDataReviews,
 } from "../../redux/staffSlicer";
+import NoDataAvailable from "../common/NoDataAvailable";
 
 const Profiles = ({ customerType, viewType }) => {
   const professionalReviews = useSelector(
@@ -38,30 +39,36 @@ const Profiles = ({ customerType, viewType }) => {
   useEffect(() => {
     getData();
   }, [dispatch]);
+
+  const isEmpty = (data) => data === null || data.length === 0;
+
   return (
     <div className="grid grid-cols-3 gap-3">
-      {customerType=="Professional"&&professionalReviews &&
-        professionalReviews.map((item, index) => {
-          return (
+      {customerType === "Professional" ? (
+        isEmpty(professionalReviews) ? (
+          <NoDataAvailable userType={customerType} viewType={viewType} />
+        ) : (
+          professionalReviews.map((item, index) => (
             <SingleProfileBox
               key={index}
               customerType={customerType}
               viewType={viewType}
               userData={item}
             />
-          );
-        })}
-      {customerType!="Professional"&&employerReviews &&
-        employerReviews.map((item, index) => {
-          return (
-            <SingleProfileBox
-              key={index}
-              customerType={customerType}
-              viewType={viewType}
-              userData={item}
-            />
-          );
-        })}
+          ))
+        )
+      ) : isEmpty(employerReviews) ? (
+        <NoDataAvailable userType={customerType} viewType={viewType} />
+      ) : (
+        employerReviews.map((item, index) => (
+          <SingleProfileBox
+            key={index}
+            customerType={customerType}
+            viewType={viewType}
+            userData={item}
+          />
+        ))
+      )}
     </div>
   );
 };
