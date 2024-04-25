@@ -13,6 +13,7 @@ import {
 import ErrorMsgComponent from "../shared/ErrorMsgComponent";
 import { getRequest, postRequest, putRequest } from "../../API/config";
 import { useSelector } from "react-redux";
+import ConfirmationModal from "../../pages/common/ConfirmationModal";
 
 let intialDetails = {
   firstname: "Gowtham",
@@ -39,18 +40,26 @@ const EmpAccountSettings = () => {
   const [accountErrors, setAccountErrors] = useState(errorDetails);
   const user = useSelector((state) => state.auth.user);
   const [isEditable, setIsEditable] = useState(false);
+  const [showModal, setShowModal] = useState(false);
 
-  const handleDeleteRequest =async ()=>{
+  const handleDeleteRequest = async () => {
     try {
-       const payLoad ={
-        userProfileId:user.profileID
-       }
-       const {data} = await putRequest("employer/deleteRequest");
-       console.log(data);
+      const payLoad = {
+        userProfileId: user.profileID,
+      };
+      const { data } = await putRequest("employer/deleteRequest",payLoad);
+      console.log(data);
     } catch (error) {
       console.log(error);
     }
-  }
+  };
+  const handleShowModal = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
   const handleChange = (e) => {
     try {
       setAccountDetails({ ...accountDetails, [e.target.name]: e.target.value });
@@ -70,10 +79,9 @@ const EmpAccountSettings = () => {
   };
 
   useEffect(() => {
-    console.log("hi");
     getData();
   }, []);
-  const handleSave = async(e) => {
+  const handleSave = async (e) => {
     try {
       e.preventDefault();
       const errorObj = {
@@ -98,8 +106,7 @@ const EmpAccountSettings = () => {
       setAccountErrors(errorObj);
       if (!checkKeysEmpty(errorObj)) {
         delete accountDetails.username;
-        console.log(accountDetails);
-        const data = await putRequest("employer/editAccount",accountDetails);
+        const data = await putRequest("employer/editAccount", accountDetails);
         console.log(data);
         setAccountErrors(errorDetails);
         setIsEditable(false);
@@ -120,7 +127,7 @@ const EmpAccountSettings = () => {
               <div onClick={() => setIsEditable(true)}>
                 <MdEdit />
               </div>
-              <MdDelete />
+              <MdDelete onClick={handleShowModal} />
             </div>
           </div>
           <div className="flex flex-wrap -mx-2 mb-2">
@@ -293,6 +300,17 @@ const EmpAccountSettings = () => {
           )}
         </div>
       </div>
+      <ConfirmationModal
+        isOpen={showModal}
+        onClose={handleCloseModal}
+        onConfirm={handleDeleteRequest}
+        confirmText={"Yes!Request for Delete"}
+        cancelText={"No!"}
+      >
+        <p className="my-4 text-gray-600 text-lg leading-relaxed">
+          Are you sure wanted To Delete Your Account!
+        </p>
+      </ConfirmationModal>
     </div>
   );
 };

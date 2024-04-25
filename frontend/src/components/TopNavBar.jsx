@@ -34,7 +34,7 @@ const TopNavBar = ({ isLandingPage = false, isSignin = false }) => {
 
   const handleLogout = async () => {
     try {
-      await dispatch(logout()).unwrap(); // Ensure logout is completed before navigating
+       dispatch(logout()); // Ensure logout is completed before navigating
       navigate("/SignIn");
     } catch (error) {
       console.error('Failed to logout:', error);
