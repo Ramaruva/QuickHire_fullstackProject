@@ -19,6 +19,7 @@ import {
   validateZipcode,
 } from "../../validations/standardValidations";
 import { getRequest, putRequest } from "../../API/config";
+import ConfirmationModal from "../../pages/common/ConfirmationModal";
 
 const education = [
   {
@@ -87,7 +88,7 @@ const ProfSettings = () => {
   const [educationDetails, setEducationDetails] = useState(details);
   const [educationError, setEducationError] = useState(Error);
   const user = useSelector((state) => state.auth.user);
-
+  const [showModal, setShowModal] = useState(false);
   const deleteRequests = async () => {
     try {
       let payLoad = {
@@ -95,11 +96,19 @@ const ProfSettings = () => {
       };
       const { data } = await putRequest("professional/DeleteRequest", payLoad);
       console.log(data);
+      handleCloseModal();
     } catch (error) {
       console.log(error);
     }
   };
 
+  const handleShowModal = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
   const handleEducationAdd = (e) => {
     e.preventDefault();
     const error = {
@@ -251,7 +260,7 @@ const ProfSettings = () => {
             <div onClick={() => setIsEditable(true)}>
               <MdEdit />
             </div>
-            <MdDelete />
+            <MdDelete onClick={handleShowModal} />
           </div>
         </div>
         <div className="flex flex-wrap -mx-2 mb-2">
@@ -505,6 +514,17 @@ const ProfSettings = () => {
           )}
         </div>
       </div>
+      <ConfirmationModal
+       isOpen={showModal}
+       onClose={handleCloseModal}
+       onConfirm={deleteRequests}
+       confirmText={"Yes!Request for Delete"}
+       cancelText={"No!"}
+      >
+      <p className="my-4 text-gray-600 text-lg leading-relaxed">
+          Are you sure wanted To Delete Your Account! 
+      </p>
+      </ConfirmationModal>
     </div>
   );
 };
