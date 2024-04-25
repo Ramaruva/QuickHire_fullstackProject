@@ -190,5 +190,15 @@ public class StaffController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+    record jobMatchRecord(Integer customerId , Integer jobId){}
+    @PostMapping("/singleJobMatchPercentage")
+    public ResponseEntity<?> singleJobPercentage(@RequestBody jobMatchRecord matchData){
+        try{
+             return  ResponseEntity.ok(matchService.getJobMatchPercentageForSingleJob(matchData.customerId(), matchData.jobId()));
+        }
+        catch (Exception e){
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
 }
  

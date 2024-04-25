@@ -28,19 +28,35 @@ const StaffNotifications = () => {
       };
       const response = await postRequest("matchStatus", data);
       console.log(response);
+      getData();
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleProgressBarClick = (id) => {
-    const updatedNotifications = apiNotifications.map((notification) => {
-      if (notification.matchID === id) {
-        return { ...notification, loadedProgress: notification.progress }; // Load the actual progress from the API
-      }
-      return notification;
-    });
-    setApiNotifications(updatedNotifications);
+  
+  const handleProgressBarClick =  async (item) => {
+    try {
+      const updatedNotifications = await Promise.all(apiNotifications.map(async  (notification) => {
+        if (notification.matchID === item.matchID) {
+          let payload ={
+            customerId:item.userProfile.userprofileid,
+            jobId:item.jobDescription.jobdescriptionid
+          }
+          let data = await postRequest("singleJobMatchPercentage",payload)
+          console.log(data.data);
+          if(data.data>85){
+            data.data = data.data-5;
+          }
+          return { ...notification, loadedProgress: data.data }; // Load the actual progress from the API
+        }
+        return notification;
+      }));
+      console.log(updatedNotifications);
+      setApiNotifications(updatedNotifications);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
@@ -77,18 +93,18 @@ const StaffNotifications = () => {
               </p>
               <div className="flex justify-between items-center">
                 <button
-                  onClick={() => console.log("Progress bar clicked")}
+                  onClick={() => handleProgressBarClick(notification)}
                   className="flex ml-7 items-center"
                 >
                   <div className="relative pt-1 w-32">
                     <div className="overflow-hidden h-4 text-xs flex rounded bg-gray-200">
                       <div
-                        style={{ width: `${notification.loadedProgress}%` }}
+                        style={{ width: `${notification?.loadedProgress}%` }}
                         className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-blue-500"
                       ></div>
                     </div>
                     <span className="text-sm font-semibold inline-block text-blue-600">
-                      Total {notification.loadedProgress}%
+                      Total {notification?.loadedProgress}%
                     </span>
                   </div>
                 </button>
