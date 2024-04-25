@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { getRequest } from "../../API/config";
-// import { TrashIcon } from '@heroicons/react/outline'; // Import the trash icon
 import { FaTrash } from 'react-icons/fa';
 import ConfirmationModal from "../common/ConfirmationModal"
 
