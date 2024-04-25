@@ -172,7 +172,7 @@ public class MatchService {
     }
     public  List<MatchResponse> getAllJobMatch(){
         try{
-            List<Matches> matches = findAllMatches();
+            List<Matches> matches = matchRepository.findBystatus(AllTypesEnums.MatchType.PROFESSIONAL_REQUEST);
             List<MatchResponse> matchResponses = new ArrayList<>();
             for(Matches match: matches){
                 //need to find jobdetails
