@@ -153,7 +153,7 @@ public class MatchService {
                   List<Qualification> jobQualifications = qualificationRepository.findByJobid(matches.getJobId());
                   Integer userProfileid = professionalDetailsRepository.findById(matches.getProfessionalId()).stream().findFirst().orElseThrow().getProfId();
                   List<Qualification> profQualifications = qualificationRepository.findByProfid(userProfileid);
-                  double matchPercentage = matchMechanism(jobQualifications,profQualifications);
+                  double matchPercentage = matchAlgorithm(jobQualifications,profQualifications);
                   matches.setStatus(status);
                   System.out.println(matchPercentage);
                   matches.setMatchPercentage((int) matchPercentage);
@@ -190,7 +190,7 @@ public class MatchService {
         }
     }
 
-  public Double matchMechanism(List<Qualification> jobQualifications, List<Qualification> profQualifications){
+  public Double matchAlgorithm(List<Qualification> jobQualifications, List<Qualification> profQualifications){
         try{
             double totalMatchPercentage =0.0;
             double categoryMatch= (double) 100 /jobQualifications.size();
