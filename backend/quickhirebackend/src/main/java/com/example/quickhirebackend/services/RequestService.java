@@ -27,8 +27,9 @@ public class RequestService {
     private  final  StaffDetailsRepository staffDetailsRepository;
     private  final  EducationRepository educationRepository;
     private  final  QualificationRepository qualificationRepository;
+    private final PaymentRepository paymentRepository;
 
-    public RequestService(EmployerRequestRepository employerRequestRepository, EmployerDetailsRepository employerDetailsRepository, UserProfileRepository userProfileRepository, UserRepository userRepository, ProfessionalRequestRepository professionalRequestRepository, ProfessionalDetailsRepository professionalDetailsRepository, LoginService loginService, EmailService emailService, StaffDetailsRepository staffDetailsRepository, EducationRepository educationRepository, QualificationRepository qualificationRepository) {
+    public RequestService(EmployerRequestRepository employerRequestRepository, EmployerDetailsRepository employerDetailsRepository, UserProfileRepository userProfileRepository, UserRepository userRepository, ProfessionalRequestRepository professionalRequestRepository, ProfessionalDetailsRepository professionalDetailsRepository, LoginService loginService, EmailService emailService, StaffDetailsRepository staffDetailsRepository, EducationRepository educationRepository, QualificationRepository qualificationRepository, PaymentRepository paymentRepository) {
         this.employerRequestRepository = employerRequestRepository;
         this.employerDetailsRepository = employerDetailsRepository;
         this.userProfileRepository = userProfileRepository;
@@ -40,6 +41,7 @@ public class RequestService {
         this.staffDetailsRepository = staffDetailsRepository;
         this.educationRepository = educationRepository;
         this.qualificationRepository = qualificationRepository;
+        this.paymentRepository = paymentRepository;
     }
  
     public String employerRequest(ReviewRecord employerRequest) throws Exception {
@@ -181,18 +183,7 @@ public class RequestService {
     public String staffAccountCreation(StaffAccountCreationDTO staffData){
         //creating userprofile
         try {
-            UserProfile newStaffMember = new UserProfile();
-            newStaffMember.setFirstname(staffData.getFirstname());
-            newStaffMember.setLastname(staffData.getLastname());
-            newStaffMember.setStatus(AllTypesEnums.UserProfileStatus.ACTIVATED);
-            newStaffMember.setCity(staffData.getCity());
-            newStaffMember.setState(staffData.getState());
-            newStaffMember.setPincode(staffData.getPincode());
-            newStaffMember.setAddress(staffData.getAddress());
-            newStaffMember.setPincode(staffData.getPincode());
-            newStaffMember.setUsername(staffData.getUsername());
-            newStaffMember.setEmail(staffData.getEmail());
-            newStaffMember.setPhone(staffData.getPhone());
+            UserProfile newStaffMember = getUserProfile(staffData);
             UserProfile savedStaffUserProfile = userProfileRepository.save(newStaffMember);
  
             createNewUser(savedStaffUserProfile.getUserprofileid(), AllTypesEnums.UserType.STAFF, AllTypesEnums.UserStatus.ACTIVE, savedStaffUserProfile.getUsername(), savedStaffUserProfile.getEmail());
@@ -207,7 +198,23 @@ public class RequestService {
         }
  
     }
- 
+
+    private static UserProfile getUserProfile(StaffAccountCreationDTO staffData) {
+        UserProfile newStaffMember = new UserProfile();
+        newStaffMember.setFirstname(staffData.getFirstname());
+        newStaffMember.setLastname(staffData.getLastname());
+        newStaffMember.setStatus(AllTypesEnums.UserProfileStatus.ACTIVATED);
+        newStaffMember.setCity(staffData.getCity());
+        newStaffMember.setState(staffData.getState());
+        newStaffMember.setPincode(staffData.getPincode());
+        newStaffMember.setAddress(staffData.getAddress());
+        newStaffMember.setPincode(staffData.getPincode());
+        newStaffMember.setUsername(staffData.getUsername());
+        newStaffMember.setEmail(staffData.getEmail());
+        newStaffMember.setPhone(staffData.getPhone());
+        return newStaffMember;
+    }
+
     public List<UserProfile> allStaffAccounts(){
         try{
           //  List<UserActiveInfo> staffUsers = userRepository.findActiveStaffWithoutPassword();
@@ -273,6 +280,78 @@ public class RequestService {
         }
     }
 
+    public  List<ProfessionalRegistrationRequest> getAllProfessionalDetails(){
+        try{
+            //get all professionaldetails from profdetails table
+            List<ProfessionalDetails> professionalDetails = professionalDetailsRepository.findAll();
+            List<ProfessionalRegistrationRequest> professionalRegistrationRequests = new ArrayList<>();
+            for(ProfessionalDetails professionalDetail: professionalDetails){
+                //now get userprofiles
+                UserProfile userProfile = userProfileRepository.findById(professionalDetail.getProfId()).stream().findFirst().orElseThrow();
+                //now get his education and qualifications details
+                List<Education> educations = educationRepository.findByProfId(userProfile.getUserprofileid());
+                List<Qualification> qualifications = qualificationRepository.findByProfid(userProfile.getUserprofileid());
+                //now get his payment details
+                List<Payments> payments =  paymentRepository.findAllByProfId(userProfile.getUserprofileid());
+                ProfessionalRegistrationRequest professionalRegistrationRequest = new ProfessionalRegistrationRequest();
+                professionalRegistrationRequest.setFirstname(userProfile.getFirstname());
+                professionalRegistrationRequest.setLastname(userProfile.getLastname());
+                professionalRegistrationRequest.setEmail(userProfile.getEmail());
+                professionalRegistrationRequest.setAddress(userProfile.getAddress());
+                professionalRegistrationRequest.setState(userProfile.getState());
+                professionalRegistrationRequest.setPhone(userProfile.getPhone());
+                professionalRegistrationRequest.setPincode(userProfile.getPincode());
+                professionalRegistrationRequest.setCity(userProfile.getCity());
+                professionalRegistrationRequest.setPaymentHistory(payments);
+                professionalRegistrationRequest.setEducation(educations);
+                professionalRegistrationRequest.setQualification(qualifications);
+                professionalRegistrationRequest.setUsername(userProfile.getUsername());
+                professionalRegistrationRequest.setUserprofileid(userProfile.getUserprofileid());
+                professionalRegistrationRequests.add(professionalRegistrationRequest);
+            }
+            return  professionalRegistrationRequests;
+        }
+        catch (Exception e){
+            System.out.println(e.getMessage());
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+
+    public List<EmployerRegistrationRequest> getEmployerDetails(){
+        try{
+            //get all employer details
+            List<EmployerDetails> employerDetails = employerDetailsRepository.findAll();
+            List<EmployerRegistrationRequest> employerRegistrationRequests = new ArrayList<>();
+            for(EmployerDetails employerDetail:employerDetails){
+                //get userprofile
+                UserProfile userProfile = userProfileRepository.findById(employerDetail.getProfId()).stream().findFirst().orElse(null);
+                if(userProfile==null){
+                    continue;
+                }
+                //get his payment details
+                List<Payments> payments = paymentRepository.findAllByProfId(userProfile.getUserprofileid());
+                EmployerRegistrationRequest employerRegistrationRequest = new EmployerRegistrationRequest();
+                employerRegistrationRequest.setFirstname(userProfile.getFirstname());
+                employerRegistrationRequest.setLastname(userProfile.getLastname());
+                employerRegistrationRequest.setUsername(userProfile.getUsername());
+                employerRegistrationRequest.setAddress(userProfile.getAddress());
+                employerRegistrationRequest.setState(userProfile.getState());
+                employerRegistrationRequest.setCity(userProfile.getCity());
+                employerRegistrationRequest.setAddress(userProfile.getAddress());
+                employerRegistrationRequest.setPincode(userProfile.getPincode());
+                employerRegistrationRequest.setEmail(userProfile.getEmail());
+                employerRegistrationRequest.setCompanyName(employerDetail.getCompanyName());
+                employerRegistrationRequest.setPhone(userProfile.getPhone());
+                employerRegistrationRequest.setPayments(payments);
+                employerRegistrationRequests.add(employerRegistrationRequest);
+
+            }
+            return employerRegistrationRequests;
+        }
+        catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
+    }
     private static EmployerRegistrationRequest getEmployerRegistrationRequest(EmployerRequest employerRequest, UserProfile userProfile) {
         EmployerRegistrationRequest employerRegistrationRequest = new EmployerRegistrationRequest();
         employerRegistrationRequest.setFirstname(userProfile.getFirstname());

@@ -1,6 +1,7 @@
 package com.example.quickhirebackend.controller.staffContoller;
 import com.example.quickhirebackend.customExceptions.CustomDuplicateUsernameException;
 import com.example.quickhirebackend.dto.*;
+import com.example.quickhirebackend.model.AllTypesEnums;
 import com.example.quickhirebackend.services.MatchService;
 import com.example.quickhirebackend.services.RequestService;
 import org.springframework.http.HttpStatus;
@@ -124,6 +125,38 @@ public class StaffController {
         try{
             List<MatchResponse> matchResponses = matchService.getAllJobMatch();
           return ResponseEntity.ok(matchResponses);
+        }
+        catch (Exception e){
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    record matchRequestResponse(Integer profid,Integer matchId, AllTypesEnums.MatchType status){
+
+    }
+    @PostMapping("/matchStatus")
+    public ResponseEntity<?> matchStatus(@RequestBody matchRequestResponse matchData){
+        try{
+            String ans=  matchService.matchMechanism(matchData.profid(),matchData.matchId(),matchData.status());
+            return ResponseEntity.ok(ans);
+        }
+        catch (Exception e){
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    @GetMapping("/getProfessional")
+    public  ResponseEntity<?> getProfessional(){
+        try{
+            return ResponseEntity.ok(requestService.getAllProfessionalDetails());
+        }
+        catch (Exception e){
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    @GetMapping("/getEmployers")
+    public ResponseEntity<?> geEmployers(){
+        try{
+            return ResponseEntity.ok(requestService.getEmployerDetails());
         }
         catch (Exception e){
             return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());

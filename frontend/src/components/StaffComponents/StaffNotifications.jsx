@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { IoIosNotifications } from "react-icons/io";
 import { BsLightningCharge } from "react-icons/bs";
-import { getRequest } from "../../API/config";
+import { getRequest, postRequest } from "../../API/config";
+  import { useSelector } from "react-redux";
+import { MATCHTYPE } from "../../types";
 
 const StaffNotifications = () => {
   // State to hold notifications from API
   const [apiNotifications, setApiNotifications] = useState([]);
-
+  const user = useSelector((state) => state.auth.user);
   const getData = async () => {
     try {
       const { data } = await getRequest("getAllMatchRequets");
@@ -17,44 +19,19 @@ const StaffNotifications = () => {
     }
   };
 
-  // const notifications = [
-  //   {
-  //     userName: "professional",
-  //     type: "jobRequest",
-  //     companyName: " Google",
-
-  //   },
-  //   {
-  //     userName: "professional2",
-  //     type: "jobRequest",
-  //     companyName: " Facebook",
-  //   },
-  //   {
-  //     userName: "professional",
-  //     type: "deleteRequest",
-  //     companyName: null,
-  //   },
-  //   {
-  //     userName: "empolyee",
-  //     type: "deleteRequest",
-  //     companyName: null,
-  //   },
-  //   {
-  //     job: "FrontEnd Engineer",
-  //     type: "jobNotification",
-  //     companyName: " Facebook",
-  //   },
-  //   {
-  //     job: "BackendEnd Engineer",
-  //     type: "jobNotification",
-  //     companyName: " Linkedin",
-  //   },
-  //   {
-  //     job: "ML Engineer",
-  //     type: "jobNotification",
-  //     companyName: " Apple",
-  //   },
-  // ];
+  const acceptMethod =async(id,status)=>{
+    try {
+       let data ={
+        profid:user.profileID,
+        matchId:id,
+        status:status
+       }
+       const response = await postRequest("matchStatus",data);
+        console.log(response);
+    } catch (error) {
+       console.log(error);
+    }
+  }
 
   useEffect(() => {
     getData();
@@ -92,10 +69,10 @@ const StaffNotifications = () => {
                 </p>
               </div>
               <div className="flex items-center justify-end">
-                <button className="bg-accept mr-5 hover:bg-blue-700 text-white text-xs h-5 w-24 rounded focus:outline-none">
+                <button onClick={()=>{acceptMethod(notification.matchID,MATCHTYPE.STAFF_ACCEPTED)}} className="bg-accept mr-5 hover:bg-blue-700 text-white text-xs h-5 w-24 rounded focus:outline-none">
                   Match
                 </button>
-                <button className="bg-red-500 hover:bg-red-700 text-white mr-6 text-xs h-5 w-24 rounded focus:outline-none">
+                <button onClick={()=>{acceptMethod(notification.matchID,MATCHTYPE.STAFF_REJECTED)}} className="bg-red-500 hover:bg-red-700 text-white mr-6 text-xs h-5 w-24 rounded focus:outline-none">
                   Reject
                 </button>
               </div>
