@@ -330,19 +330,7 @@ public class RequestService {
                 }
                 //get his payment details
                 List<Payments> payments = paymentRepository.findAllByProfId(userProfile.getUserprofileid());
-                EmployerRegistrationRequest employerRegistrationRequest = new EmployerRegistrationRequest();
-                employerRegistrationRequest.setFirstname(userProfile.getFirstname());
-                employerRegistrationRequest.setLastname(userProfile.getLastname());
-                employerRegistrationRequest.setUsername(userProfile.getUsername());
-                employerRegistrationRequest.setAddress(userProfile.getAddress());
-                employerRegistrationRequest.setState(userProfile.getState());
-                employerRegistrationRequest.setCity(userProfile.getCity());
-                employerRegistrationRequest.setAddress(userProfile.getAddress());
-                employerRegistrationRequest.setPincode(userProfile.getPincode());
-                employerRegistrationRequest.setEmail(userProfile.getEmail());
-                employerRegistrationRequest.setCompanyName(employerDetail.getCompanyName());
-                employerRegistrationRequest.setPhone(userProfile.getPhone());
-                employerRegistrationRequest.setPayments(payments);
+                EmployerRegistrationRequest employerRegistrationRequest = getEmployerRegistrationRequest(employerDetail, userProfile, payments);
                 employerRegistrationRequests.add(employerRegistrationRequest);
 
             }
@@ -352,6 +340,85 @@ public class RequestService {
             throw new RuntimeException(e.getMessage());
         }
     }
+
+    public List<ProfessionalRegistrationRequest> getAllProfessionalDeleteData(){
+        try{
+            //need to get all delete requests
+            List<ProfessionalRequest> professionalRequests = professionalRequestRepository.findByRequesttype(AllTypesEnums.UserRequestType.DELETE_REQUESTED);
+            //now we need to get all his userdetails
+            List<ProfessionalRegistrationRequest> professionalRegistrationRequests = new ArrayList<>();
+            for(ProfessionalRequest professionalRequest:professionalRequests){
+                UserProfile userProfile = userProfileRepository.findById(professionalRequest.getProfId()).stream().findFirst().orElse(null);
+                if(userProfile==null){
+                    continue;
+                }
+                //now get all his payment details
+                List<Payments> payments = paymentRepository.findAllByProfId(userProfile.getUserprofileid());
+                //now get all his qualifications
+                List<Qualification> qualifications = qualificationRepository.findByProfid(userProfile.getUserprofileid());
+                //now get all his educationdetails
+                List<Education> educations = educationRepository.findByProfId(userProfile.getUserprofileid());
+                ProfessionalRegistrationRequest professionalRegistrationRequest = new ProfessionalRegistrationRequest();
+                professionalRegistrationRequest.setUsername(userProfile.getUsername());
+                professionalRegistrationRequest.setFirstname(userProfile.getFirstname());
+                professionalRegistrationRequest.setLastname(userProfile.getLastname());
+                professionalRegistrationRequest.setEmail(userProfile.getEmail());
+                professionalRegistrationRequest.setPhone(userProfile.getPhone());
+                professionalRegistrationRequest.setAddress(userProfile.getAddress());
+                professionalRegistrationRequest.setCity(userProfile.getCity());
+                professionalRegistrationRequest.setPincode(userProfile.getPincode());
+                professionalRegistrationRequest.setPrequestid(professionalRequest.getRequestId());
+                professionalRegistrationRequest.setQualification(qualifications);
+                professionalRegistrationRequest.setEducation(educations);
+                professionalRegistrationRequest.setPaymentHistory(payments);
+                professionalRegistrationRequests.add(professionalRegistrationRequest);
+            }
+            return professionalRegistrationRequests;
+        }
+        catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
+    }
+    public List<EmployerRegistrationRequest> getAllEmployerDeleteRequests(){
+        try{
+           //need to get all delete req
+           List<EmployerRequest> employerRequests = employerRequestRepository.findByRequesttype(AllTypesEnums.UserRequestType.DELETE_REQUESTED);
+           List<EmployerRegistrationRequest> employerRegistrationRequests = new ArrayList<>();
+           for(EmployerRequest employerRequest:employerRequests){
+               //userprofile
+               UserProfile userProfile = userProfileRepository.findById(employerRequest.getProfId()).stream().findFirst().orElse(null);
+               if(userProfile==null){
+                   continue;
+               }
+               EmployerRegistrationRequest employerRegistrationRequest = getEmployerRegistrationRequest(employerRequest,userProfile);
+               //get all payments details
+               List<Payments> payments = paymentRepository.findAllByProfId(userProfile.getUserprofileid());
+               employerRegistrationRequest.setPayments(payments);
+               employerRegistrationRequests.add(employerRegistrationRequest);
+           }
+           return employerRegistrationRequests;
+        }
+        catch (Exception e){
+            throw  new RuntimeException(e.getMessage());
+        }
+    }
+    private static EmployerRegistrationRequest getEmployerRegistrationRequest(EmployerDetails employerDetail, UserProfile userProfile, List<Payments> payments) {
+        EmployerRegistrationRequest employerRegistrationRequest = new EmployerRegistrationRequest();
+        employerRegistrationRequest.setFirstname(userProfile.getFirstname());
+        employerRegistrationRequest.setLastname(userProfile.getLastname());
+        employerRegistrationRequest.setUsername(userProfile.getUsername());
+        employerRegistrationRequest.setAddress(userProfile.getAddress());
+        employerRegistrationRequest.setState(userProfile.getState());
+        employerRegistrationRequest.setCity(userProfile.getCity());
+        employerRegistrationRequest.setAddress(userProfile.getAddress());
+        employerRegistrationRequest.setPincode(userProfile.getPincode());
+        employerRegistrationRequest.setEmail(userProfile.getEmail());
+        employerRegistrationRequest.setCompanyName(employerDetail.getCompanyName());
+        employerRegistrationRequest.setPhone(userProfile.getPhone());
+        employerRegistrationRequest.setPayments(payments);
+        return employerRegistrationRequest;
+    }
+
     private static EmployerRegistrationRequest getEmployerRegistrationRequest(EmployerRequest employerRequest, UserProfile userProfile) {
         EmployerRegistrationRequest employerRegistrationRequest = new EmployerRegistrationRequest();
         employerRegistrationRequest.setFirstname(userProfile.getFirstname());

@@ -162,5 +162,24 @@ public class StaffController {
             return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
+
+    @GetMapping("/getAllProfessionalDeleteRequests")
+    public ResponseEntity<?> getAllProfessionalRequestDelete(){
+        try{
+            return ResponseEntity.ok(requestService.getAllProfessionalDeleteData());
+        }
+        catch (Exception e){
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+    @GetMapping("/getAllEmployerDeleteRequets")
+    public ResponseEntity<?> getAllEmployerDeleteRequests(){
+      try{
+         return ResponseEntity.ok(requestService.getAllEmployerDeleteRequests());
+      }
+      catch (Exception e){
+          return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+      }
+    }
 }
  

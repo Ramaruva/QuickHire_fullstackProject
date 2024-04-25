@@ -28,7 +28,7 @@ public class SecurityConfig {
         return http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(
-                        req -> req.requestMatchers("/login/**","/professionalRegister/**", "/employerRegister/**","/matchStatus/**")
+                        req -> req.requestMatchers("/login/**","/professionalRegister/**", "/employerRegister/**")
                                 .permitAll()
                                 .requestMatchers("/createStaff").hasAuthority(String.valueOf(AllTypesEnums.UserType.ROOT))
                                 .requestMatchers("/getAllProfessionalRequests/**","/professionalRequestReview/**","/getAllEmployerRequests/**","/employerRequestReview/**").hasAuthority(String.valueOf(AllTypesEnums.UserType.STAFF))
