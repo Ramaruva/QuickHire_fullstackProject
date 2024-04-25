@@ -63,7 +63,7 @@ const ProfessionalJobListingPage = ({ type }) => {
       <div className="flex items-center justify-center">
         <button className="flex items-center m-6 bg-blue-800 hover:bg-blue-900 text-white font-bold py-4 px-6 rounded-md">
           Initiate Matching
-          <FiSearch className="text-2l" />
+          <FiSearch className="text-2l ml-4" />
         </button>
       </div>
       <div className="overflow-x-auto">
@@ -76,7 +76,7 @@ const ProfessionalJobListingPage = ({ type }) => {
               <th className="text-left px-6">End Date</th>
               <th className="text-left px-6">Pay</th>
               <th className="text-right px-6">
-                {type != "empolyerlisting" && <button>Notify All</button>}
+                Match Percent
               </th>
             </tr>
           </thead>
