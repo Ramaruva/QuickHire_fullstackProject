@@ -1,6 +1,9 @@
 package com.example.quickhirebackend.dto;
 
 import com.example.quickhirebackend.model.AllTypesEnums;
+import com.example.quickhirebackend.model.Payments;
+
+import java.util.List;
 
 public class EmployerRegistrationRequest {
     // Fields for UserProfile information
@@ -29,6 +32,16 @@ public class EmployerRegistrationRequest {
     private String companyName;
 
     private  Integer userprofileid;
+
+    public List<Payments> getPayments() {
+        return payments;
+    }
+
+    public void setPayments(List<Payments> payments) {
+        this.payments = payments;
+    }
+
+    private List<Payments> payments;
 
     // Getters and setters for all fields
 
