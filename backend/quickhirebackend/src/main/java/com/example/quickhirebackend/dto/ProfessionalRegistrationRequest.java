@@ -2,6 +2,7 @@ package com.example.quickhirebackend.dto;
 
 import com.example.quickhirebackend.model.AllTypesEnums;
 import com.example.quickhirebackend.model.Education;
+import com.example.quickhirebackend.model.Payments;
 import com.example.quickhirebackend.model.Qualification;
 
 import java.util.Date;
@@ -40,6 +41,16 @@ public class ProfessionalRegistrationRequest {
     private String schoolName;
 
     private  Integer userprofileid;
+
+    public List<Payments> getPaymentHistory() {
+        return paymentHistory;
+    }
+
+    public void setPaymentHistory(List<Payments> paymentHistory) {
+        this.paymentHistory = paymentHistory;
+    }
+
+    private List<Payments> paymentHistory;
 
     private  List<QualificationRecord> qualifications;
 
