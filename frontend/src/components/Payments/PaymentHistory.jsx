@@ -14,7 +14,7 @@ function PaymentHistory({paymentData}) {
  
 
 
-  return paymentData.length>0 ?(
+  return paymentData&&paymentData.length>0 ?(
     <div className="bg-white shadow-md rounded my-6">
       <table className="min-w-full w-full table-auto">
         <thead>
@@ -48,8 +48,8 @@ function PaymentHistory({paymentData}) {
       </table>
     </div>
   ):(
-    <div>
-      No Payments
+    <div className="text-lg font-semibold mt-4 text-center">
+      No Active Payments for this account! <span className="text-red-400"> Please send a request To choose a payment plan.</span>
     </div>
   );
 }

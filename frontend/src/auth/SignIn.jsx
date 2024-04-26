@@ -67,7 +67,7 @@ const SignIn = () => {
         let token = getLocalItem("token");
         let decode = jwtDecode(token);
         console.log(decode);
-        redirect(decode.userType);
+        redirect(decode.userType, decode.isPasswordChanged);
       } else {
         // Handle any other non-successful status codes here.
         setLoginErrorMsgs({
@@ -86,25 +86,31 @@ const SignIn = () => {
     }
   };
 
-  const redirect = (userType) => {
-    console.log(userType, USERTYPE.root);
-    switch (userType) {
-      case USERTYPE.professional:
-        navigate("/home/BrowseJobs");
-        break;
-      case USERTYPE.employer:
-        navigate("/home/CreateJobs");
-        break;
-      case USERTYPE.staff:
-        navigate("/home/professionalReviews");
-        break;
-      case USERTYPE.root:
-        navigate("/home/createAccount");
-        break;
-      default:
-        break;
+  const redirect = (userType, isPasswordChanged) => {
+    console.log(userType, USERTYPE.root, isPasswordChanged);
+    // Check if the password needs to be changed first
+    if (isPasswordChanged === "No") {
+        navigate("/home/PasswordChange");
+    } else {
+        // Proceed with user type specific redirection
+        switch (userType) {
+            case USERTYPE.professional:
+                navigate("/home/BrowseJobs");
+                break;
+            case USERTYPE.employer:
+                navigate("/home/CreateJobs");
+                break;
+            case USERTYPE.staff:
+                navigate("/home/professionalReviews");
+                break;
+            case USERTYPE.root:
+                navigate("/home/createAccount");
+                break;
+            default:
+                break;
+        }
     }
-  };
+};
   return (
     <>
       <div className="max-h-screen flex flex-col">
