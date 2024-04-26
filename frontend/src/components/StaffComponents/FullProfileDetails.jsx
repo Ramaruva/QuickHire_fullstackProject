@@ -19,7 +19,7 @@ import {
   asyncProfessionalDetails,
   asyncProfessionalReviewOperation,
 } from "../../redux/staffSlicer";
-import { getRequest } from "../../API/config";
+import { getRequest, putRequest } from "../../API/config";
 
 const FullProfileDetails = ({ customerType, operationType, requestID }) => {
   const professionalReviews = useSelector(
@@ -48,6 +48,25 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
       setShowJobMatches(false);
     }
   };
+  const handleDeleteRequest =async (status)=>{
+     try {
+         const payload ={
+          requestId:userData.prequestid,
+          requestType:status,
+          message:rejectMsg
+         }
+         if(customerType=="Employer"){
+            const {data} = await putRequest("employerDeleteOperation",payload);
+            console.log(data);
+         }
+         else{
+           const {data} =await putRequest("professionalDeleteOperation",payload);
+           console.log(data);
+         }
+     } catch (error) {
+       console.log(error);
+     }
+  }
   const formatDate = (dateString) => {
     const options = { month: "long", year: "numeric", day: "numeric" };
     return new Date(dateString).toLocaleDateString("en-US", options);
@@ -278,6 +297,36 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
           </div>
         </div>
       )}
+      {
+        operationType =="delete" &&(
+          <div className="w-[500px]  mt-5">
+            This Customer has requested for Account Delete!
+          <textarea
+            rows="4"
+            className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            placeholder="Write the reasons for rejection"
+            value={rejectMsg}
+            onChange={(e) => setRejectMsg(e.target.value)}
+          ></textarea>
+          <div className="flex justify-between flex-row mt-2">
+            <button
+              type="button"
+              className="bg-accept w-34 text-white px-4 py-2 text-sm rounded hover:bg-green-600"
+              onClick={() => handleDeleteRequest(USERREQUESTTYPE.deleteAccepted)}
+            >
+              Delete Account!
+            </button>
+            <button
+              type="button"
+              className=" text-white bg-red-700 w-34 hover:bg-red-800  focus:ring-red-300 rounded text-sm px-4 py-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+              onClick={() => handleDeleteRequest(USERREQUESTTYPE.deleteRejected)}
+            >
+              Reject Request
+            </button>
+          </div>
+        </div>
+        )
+      }
 
       {(operationType == "view" || operationType == "delete") && (
         <div>

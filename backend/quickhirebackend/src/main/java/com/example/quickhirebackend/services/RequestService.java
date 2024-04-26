@@ -201,11 +201,36 @@ public class RequestService {
     public  String employerDeleteRequest(Integer requestID, AllTypesEnums.UserRequestType userRequestType, String message){
         //update employerReq
         EmployerRequest employerRequestData = employerRequestRepository.findById(requestID).stream().findFirst().orElse(new EmployerRequest());
-        employerRequestData.setRequestType(AllTypesEnums.UserRequestType.DELETE_ACCEPTED);
-        employerRequestRepository.save(employerRequestData);
-        //update the userprofile
-        DeleteUserDetails(employerRequestData.getProfId());
-        return  "Account Deleted Successfully!";
+        UserProfile userProfile = userProfileRepository.findById(employerRequestData.getProfId()).stream().findFirst().orElseThrow();
+        if(userRequestType== AllTypesEnums.UserRequestType.DELETE_ACCEPTED) {
+            employerRequestData.setRequestType(AllTypesEnums.UserRequestType.DELETE_ACCEPTED);
+            employerRequestRepository.save(employerRequestData);
+            //update the userprofile
+            DeleteUserDetails(employerRequestData.getProfId());
+            String subject = "QuickHire: Account Deletion Confirmation";
+            String body = "Dear Customer,\n\n" +
+                    "Thank you for being a valued customer of QuickHire.\n" +
+                    "Your account has been successfully deleted.\n" +
+                    "We hope to see you join again soon!\n\n" +
+                    "Best regards,\n" +
+                    "The QuickHire Team";
+            emailService.sendMail(userProfile.getEmail(),subject,body);
+            return "Account Deleted Successfully!";
+        }else {
+            String subject = "QuickHire: Account Deletion Rejection";
+            String body = "<!DOCTYPE html><html><head><title>Account Deletion Rejection</title></head><body>" +
+                    "<p>Dear Customer,</p>" +
+                    "<p>We regret to inform you that your account deletion request has been rejected.</p>" +
+                    "<p>"+ message+"</p>" + // Include your message here, ensure it is properly escaped if it contains HTML
+                    "<p>Please review the provided information and resubmit your request.</p>" +
+                    "<p>Best regards,<br>The QuickHire Team</p>" +
+                    "</body></html>";
+            employerRequestData.setRequestType(AllTypesEnums.UserRequestType.ACCOUNT_REJECTED);
+            employerRequestRepository.save(employerRequestData);
+            emailService.sendMail(userProfile.getEmail(),subject,body);
+            return "Rejected Successfully!";
+
+        }
     }
     public void DeleteUserDetails(Integer userID){
         UserProfile userData = userProfileRepository.findById(userID).stream().findFirst().orElse(new UserProfile());
@@ -473,6 +498,7 @@ public class RequestService {
         employerRegistrationRequest.setState(userProfile.getState());
         employerRegistrationRequest.setUsername(userProfile.getUsername());
         employerRegistrationRequest.setEmail(userProfile.getEmail());
+        employerRegistrationRequest.setUserprofileid(userProfile.getUserprofileid());
         employerRegistrationRequest.setPrequestid(employerRequest.getRequestId());
         return employerRegistrationRequest;
     }

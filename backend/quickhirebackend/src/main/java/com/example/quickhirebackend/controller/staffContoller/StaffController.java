@@ -43,7 +43,7 @@ public class StaffController {
     }
  
     record DeleteRequestID(Integer requestId, AllTypesEnums.UserRequestType requestType, String message){};
-    @PutMapping("/professionalDeleteStatus")
+    @PutMapping("/professionalDeleteOperation")
     public ResponseEntity<?> professionalDeleteRequest(@RequestBody DeleteRequestID deleteID){
         try{
            return ResponseEntity.ok(requestService.professionalDeleteRequest(deleteID.requestId(),deleteID.requestType(),deleteID.message()));
@@ -53,7 +53,7 @@ public class StaffController {
         }
     }
  
-    @PutMapping("/employerDeleteStatus")
+    @PutMapping("/employerDeleteOperation")
     public ResponseEntity<?> employerDeleteRequest(@RequestBody DeleteRequestID deleteId){
         try{
             return ResponseEntity.ok(requestService.employerDeleteRequest(deleteId.requestId(),deleteId.requestType(),deleteId.message()));
