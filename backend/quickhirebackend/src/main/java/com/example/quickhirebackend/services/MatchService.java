@@ -2,10 +2,7 @@ package com.example.quickhirebackend.services;
 import com.example.quickhirebackend.customExceptions.CustomDuplicateUsernameException;
 import com.example.quickhirebackend.customExceptions.CustomMatchException;
 import com.example.quickhirebackend.dao.*;
-import com.example.quickhirebackend.dto.JobMatchRequestRecord;
-import com.example.quickhirebackend.dto.MatchResponse;
-import com.example.quickhirebackend.dto.ProfessionalMatchResponse;
-import com.example.quickhirebackend.dto.StaffMatchProcessing;
+import com.example.quickhirebackend.dto.*;
 import com.example.quickhirebackend.model.*;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -186,12 +183,12 @@ public class MatchService {
         }
     }
 
-    public List<MatchResponse> getMatchedJobsForEmployer(Integer jobId){
+    public List<EmployerMatchResponse> getMatchedJobsForEmployer(Integer jobId){
         try{
            //get all matches
             List<Matches> matches = matchRepository.findByStatusAndJobId(AllTypesEnums.MatchType.STAFF_ACCEPTED,jobId);
                     //matchRepository.findByJobIdAndNotification(jobId,"YES");
-            List<MatchResponse> jobMatchRequestRecords = new ArrayList<>();
+            List<EmployerMatchResponse> jobMatchRequestRecords = new ArrayList<>();
             for(Matches match:matches){
                 Integer professionalId = match.getProfessionalId();
                 Integer userProfileId = professionalDetailsRepository.findById(professionalId).stream().findFirst().orElse(new ProfessionalDetails()).getProfId();
@@ -202,7 +199,8 @@ public class MatchService {
                 if(userProfile==null){
                     continue;
                 }
-                MatchResponse jobMatchRequestRecord = new MatchResponse(match.getMatchId(), match.getStatus(),userProfile,null);
+                List<Qualification> professionalQualifications =qualificationRepository.findByProfid(userProfileId);
+                EmployerMatchResponse jobMatchRequestRecord = new EmployerMatchResponse(match.getMatchId(), userProfile,match.getMatchPercentage(),professionalQualifications);
                 jobMatchRequestRecords.add(jobMatchRequestRecord);
             }
             return  jobMatchRequestRecords;
