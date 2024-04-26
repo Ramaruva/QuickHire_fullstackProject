@@ -5,7 +5,6 @@ import { IoIosMail } from "react-icons/io";
 import EducationList from "../EducationList";
 import CategoryList from "../CategoryList";
 import PaymentHistory from "../Payments/PaymentHistory";
-import ProfessionalJobListingPage from "../ProfessionalProfile/ProfessionalJobListingPage";
 import { BsBank } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
 import { USERREQUESTTYPE, USERTYPE } from "../../types";
@@ -19,7 +18,7 @@ import {
   asyncProfessionalDetails,
   asyncProfessionalReviewOperation,
 } from "../../redux/staffSlicer";
-import { getRequest, putRequest } from "../../API/config";
+import { getRequest, postRequest, putRequest } from "../../API/config";
 
 const FullProfileDetails = ({ customerType, operationType, requestID }) => {
   const professionalReviews = useSelector(
@@ -48,25 +47,27 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
       setShowJobMatches(false);
     }
   };
-  const handleDeleteRequest =async (status)=>{
-     try {
-         const payload ={
-          requestId:userData.prequestid,
-          requestType:status,
-          message:rejectMsg
-         }
-         if(customerType=="Employer"){
-            const {data} = await putRequest("employerDeleteOperation",payload);
-            console.log(data);
-         }
-         else{
-           const {data} =await putRequest("professionalDeleteOperation",payload);
-           console.log(data);
-         }
-     } catch (error) {
-       console.log(error);
-     }
-  }
+  const handleDeleteRequest = async (status) => {
+    try {
+      const payload = {
+        requestId: userData.prequestid,
+        requestType: status,
+        message: rejectMsg,
+      };
+      if (customerType == "Employer") {
+        const { data } = await putRequest("employerDeleteOperation", payload);
+        console.log(data);
+      } else {
+        const { data } = await putRequest(
+          "professionalDeleteOperation",
+          payload
+        );
+        console.log(data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
   const formatDate = (dateString) => {
     const options = { month: "long", year: "numeric", day: "numeric" };
     return new Date(dateString).toLocaleDateString("en-US", options);
@@ -77,6 +78,7 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
   const [jobList, setJobList] = useState([]);
   const [showJobMatches, setShowJobMatches] = useState(false);
   const [rejectMsg, setRejectMsg] = useState("");
+  const user = useSelector((state) => state.auth.user);
 
   const getLatestData = () => {
     try {
@@ -185,9 +187,6 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
       console.log(error);
     }
   };
-  useEffect(() => {
-    getLatestData();
-  }, [dispatch]);
 
   const handleReview = (reviewType) => {
     try {
@@ -206,6 +205,26 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
       console.log(error);
     }
   };
+
+  const handleMatchNotification = async (data) => {
+    try {
+      console.log(data);
+      let payload ={
+        customerId:requestID,
+        jobId:data?.jobDescription?.jobdescriptionId,
+        percentage:data.matchPercentage,
+        staffId:user.profileID
+      }
+      const res = await postRequest("staffJobMatchNotification",payload);
+      console.log(res);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    getLatestData();
+  }, [dispatch]);
+
   return (
     <div>
       <div className="flex justify-center">
@@ -297,10 +316,9 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
           </div>
         </div>
       )}
-      {
-        operationType =="delete" &&(
-          <div className="w-[500px]  mt-5">
-            This Customer has requested for Account Delete!
+      {operationType == "delete" && (
+        <div className="w-[500px]  mt-5">
+          This Customer has requested for Account Delete!
           <textarea
             rows="4"
             className="block p-2.5 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
@@ -312,21 +330,24 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
             <button
               type="button"
               className="bg-accept w-34 text-white px-4 py-2 text-sm rounded hover:bg-green-600"
-              onClick={() => handleDeleteRequest(USERREQUESTTYPE.deleteAccepted)}
+              onClick={() =>
+                handleDeleteRequest(USERREQUESTTYPE.deleteAccepted)
+              }
             >
               Delete Account!
             </button>
             <button
               type="button"
               className=" text-white bg-red-700 w-34 hover:bg-red-800  focus:ring-red-300 rounded text-sm px-4 py-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-              onClick={() => handleDeleteRequest(USERREQUESTTYPE.deleteRejected)}
+              onClick={() =>
+                handleDeleteRequest(USERREQUESTTYPE.deleteRejected)
+              }
             >
               Reject Request
             </button>
           </div>
         </div>
-        )
-      }
+      )}
 
       {(operationType == "view" || operationType == "delete") && (
         <div>
@@ -415,9 +436,7 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
                               <th className="text-left px-6">End Date</th>
                               <th className="text-left px-6">Pay</th>
                               <th className="text-right px-6">Match Percent</th>
-                              <th className="text-right px-6">
-                                notify
-                                </th>
+                              <th className="text-right px-6">notify</th>
                             </tr>
                           </thead>
                           <tbody>
@@ -445,9 +464,12 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
                                   {job.matchPercentage.toFixed(2)}%
                                 </td>
                                 <td className="px-6">
-                                  <button className="bg-fbblue rounded-md w-16 p-1"
-                                  // onClick={}
-                                  >send</button>
+                                  <button
+                                    className="bg-fbblue rounded-md w-16 p-1"
+                                    onClick={() => handleMatchNotification(job)}
+                                  >
+                                    send
+                                  </button>
                                 </td>
                               </tr>
                             ))}
@@ -456,12 +478,19 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
                       </div>
                     </div>
                   ) : (
-                    <div>{showJobMatches && 
-                    <div className="text-lg p-1 text-center font-semibold mt-4">
-                      We are sorry to inform that No Matches Found for your Profile.  
-                      <span className="text-yellow-400 mt-4 p-2"> Update your skills and come back again for suitable matches.</span>
-                      </div>
-                    }</div>
+                    <div>
+                      {showJobMatches && (
+                        <div className="text-lg p-1 text-center font-semibold mt-4">
+                          We are sorry to inform that No Matches Found for your
+                          Profile.
+                          <span className="text-yellow-400 mt-4 p-2">
+                            {" "}
+                            Update your skills and come back again for suitable
+                            matches.
+                          </span>
+                        </div>
+                      )}
+                    </div>
                   )}
                 </div>
               </div>
