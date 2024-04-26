@@ -3,7 +3,9 @@ import SingleProfileBox from "../../components/StaffComponents/SingleProfileBox"
 import { useDispatch, useSelector } from "react-redux";
 import {
   asyncEmployerDataReviews,
+  asyncEmployerDeleteReviews,
   asyncProfessionalDataReviews,
+  asyncProfessionalDeleteReviews,
 } from "../../redux/staffSlicer";
 import NoDataAvailable from "../common/NoDataAvailable";
 
@@ -17,20 +19,29 @@ const Profiles = ({ customerType, viewType }) => {
   const dispatch = useDispatch();
   const getData = async () => {
     try {
-      console.log(customerType);
       if (customerType == "Professional") {
-        const prom = dispatch(asyncProfessionalDataReviews());
-        prom.then((response) => {
-          console.log(response);
-        });
+        if (viewType == "review") {
+          const prom = dispatch(asyncProfessionalDataReviews());
+          prom.then((response) => {
+            console.log(response);
+          });
+        } else if (viewType == "delete") {
+          const pr= dispatch(asyncProfessionalDeleteReviews());
+          pr.then((res)=>{
+            console.log(res.payload);
+          })
+        }
       } else {
-        let prom = dispatch(asyncEmployerDataReviews());
-        console.log(prom);
-        prom.then((response) => {
-          console.log(response);
-        });
+        if (viewType == "review") {
+          let prom = dispatch(asyncEmployerDataReviews());
+          console.log(prom);
+          prom.then((response) => {
+            console.log(response);
+          });
+        } else if (viewType == "delete") {
+          dispatch(asyncEmployerDeleteReviews());
+        }
       }
-      console.log(professionalReviews);
     } catch (error) {
       console.log(error);
     }

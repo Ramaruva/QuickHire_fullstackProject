@@ -172,7 +172,7 @@ public class StaffController {
             return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
-    @GetMapping("/getAllEmployerDeleteRequets")
+        @GetMapping("/getAllEmployerDeleteRequests")
     public ResponseEntity<?> getAllEmployerDeleteRequests(){
       try{
          return ResponseEntity.ok(requestService.getAllEmployerDeleteRequests());

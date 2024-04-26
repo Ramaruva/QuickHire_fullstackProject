@@ -14,7 +14,7 @@ export const routelinks = {
     },
     {
       title: "Empolyer Delete Request",
-      link: "/home/empolyerLists",
+      link: "/home/employerLists",
     },
     {
       title:"Customers",
