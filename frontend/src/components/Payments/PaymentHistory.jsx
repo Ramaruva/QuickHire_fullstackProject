@@ -14,7 +14,7 @@ function PaymentHistory({paymentData}) {
  
 
 
-  return (
+  return paymentData.length>0 ?(
     <div className="bg-white shadow-md rounded my-6">
       <table className="min-w-full w-full table-auto">
         <thead>
@@ -46,6 +46,10 @@ function PaymentHistory({paymentData}) {
           ))}
         </tbody>
       </table>
+    </div>
+  ):(
+    <div>
+      No Payments
     </div>
   );
 }
