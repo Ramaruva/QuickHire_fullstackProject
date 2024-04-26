@@ -63,11 +63,11 @@ const App = () => {
         />
         <Route
           path="/home/ProfessionalLists"
-          element={<Profiles customerType={"Professional"} viewType={"list"} />}
+          element={<Profiles customerType={"Professional"} viewType={"delete"} />}
         />
         <Route
           path="/home/employerLists"
-          element={<Profiles customerType={"Employer"} viewType={"list"} />}
+          element={<Profiles customerType={"Employer"} viewType={"delete"} />}
         />
         <Route
           path="/home/AllCustomer" 

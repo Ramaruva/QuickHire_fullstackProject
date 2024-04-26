@@ -11,9 +11,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { USERREQUESTTYPE, USERTYPE } from "../../types";
 import {
   asyncEmployerDataReviews,
+  asyncEmployerDeleteReviews,
   asyncEmployerDetails,
   asyncEmployerReviewOperation,
   asyncProfessionalDataReviews,
+  asyncProfessionalDeleteReviews,
   asyncProfessionalDetails,
   asyncProfessionalReviewOperation,
 } from "../../redux/staffSlicer";
@@ -57,87 +59,118 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
   const [showJobMatches, setShowJobMatches] = useState(false);
   const [rejectMsg, setRejectMsg] = useState("");
 
-  useEffect(() => {
+  const getLatestData = () => {
     try {
-      if (professionalReviews == null && customerType == "Professional") {
-        console.log(professionalReviews);
-        const prom = dispatch(asyncProfessionalDataReviews());
-        prom.then((res) => {
-          console.log(res.payload);
-          setUserData(
-            res.payload.find((element) => element.userprofileid == requestID)
-          );
-        });
-      }
-      if (employerReviews == null && customerType == "Employer") {
-        const prom = dispatch(asyncEmployerDataReviews());
-        prom.then((res) => {
-          setUserData(
-            res.payload.find((element) => element.userprofileid == requestID)
-          );
-        });
-      }
-      if (
-        employerReviews &&
-        customerType == "Employer" &&
-        operationType == "review"
-      ) {
-        setUserData(
-          employerReviews.find((element) => element.userprofileid == requestID)
-        );
-      }
-      if (
-        professionalReviews &&
-        customerType == "Professional" &&
-        operationType == "review"
-      ) {
-        setUserData(
-          professionalReviews.find(
+      if (customerType == "Professional") {
+        if (operationType == "view") {
+          const obj = professionalDetails.find(
             (element) => element.userprofileid == requestID
-          )
-        );
-      }
-      if (operationType == "view" && customerType == "Professional") {
-        if (professionalDetails == null || professionalDetails.length == 0) {
-          let prom = dispatch(asyncProfessionalDetails());
-          prom.then((res) => {
-            setUserData(
-              res.payload.find((element) => element.userprofileid == requestID)
-            );
-          });
-        } else {
-          setUserData(
-            professionalDetails.find(
-              (element) => element.userprofileid == requestID
-            )
           );
+          if (obj == undefined || obj == null) {
+            const prom = dispatch(asyncProfessionalDetails());
+            setUserData(
+              professionalDetails.find(
+                (element) => element.userprofileid == requestID
+              )
+            );
+            prom.then((res) => {
+              let arr = res.payload;
+              setUserData(
+                arr.find((element) => element.userprofileid == requestID)
+              );
+            });
+          } else {
+            setUserData(obj);
+          }
+        } else {
+          const obj = professionalReviews.find(
+            (element) => element.userprofileid == requestID
+          );
+          console.log(obj);
+          if (obj == undefined || obj == null) {
+            let prom;
+            if (operationType == "delete") {
+              prom = dispatch(asyncProfessionalDeleteReviews());
+              console.log(prom);
+            } else {
+              prom = dispatch(asyncProfessionalDataReviews());
+            }
+            let upobj = professionalReviews.find(
+              (ele) => ele.userprofileid == requestID
+            );
+            if (upobj == undefined) {
+              prom.then((res) => {
+                let resObj = res.payload;
+                setUserData(
+                  resObj.find((element) => element.userprofileid == requestID)
+                );
+              });
+            }
+             else {
+              setUserData(upobj);
+            }
+          }
+          else{
+            setUserData(obj);
+          }
         }
-      }
-      if (employerReviews && customerType == "Employer") {
-        setUserData(employerReviews.find((element) => element.prequestid));
-      }
-      if (employerReviews && customerType == "Employer") {
-        setUserData(employerReviews.find((element) => element.prequestid));
-      }
-      if (operationType == "view" && customerType == "Employer") {
-        if (employerDetails == null || employerDetails.length == 0) {
-          let prom = dispatch(asyncEmployerDetails());
-          prom.then((res) => {
-            setUserData(
-              res.payload.find((element) => element.userprofileid == requestID)
-            );
-          });
-        } else {
-          setUserData(
-            employerDetails.find(
-              (element) => element.userprofileid == requestID
-            )
+      } else {
+        if (operationType == "view") {
+          const obj = employerDetails.find(
+            (element) => element.userprofileid == requestID
           );
+          if (obj == undefined || obj == null) {
+            const prom = dispatch(asyncEmployerDetails());
+            setUserData(
+              employerDetails.find(
+                (element) => element.userprofileid == requestID
+              )
+            );
+            prom.then((res) => {
+              let arr = res.payload;
+              setUserData(
+                arr.find((element) => element.userprofileid == requestID)
+              );
+            });
+          } else {
+            setUserData(obj);
+          }
+        } else {
+          const obj = employerReviews.find(
+            (element) => element.userprofileid == requestID
+          );
+          if (obj == undefined || obj == null) {
+            let prom;
+            if (operationType == "delete") {
+              prom = dispatch(asyncEmployerDeleteReviews());
+            } else {
+              prom = dispatch(asyncEmployerDataReviews());
+            }
+            let upobj = employerReviews.find(
+              (ele) => ele.userprofileid == requestID
+            );
+            if (upobj == undefined) {
+              prom.then((res) => {
+                let resObj = res.payload;
+                setUserData(
+                  resObj.find((element) => element.userprofileid == requestID)
+                );
+              });
+            } else {
+              setUserData(upobj);
+            }
+          }
+          else{
+            setUserData(obj);
+          }
         }
       }
     } catch (error) {
       console.log(error);
     }
+  };
+  useEffect(() => {
+    getLatestData();
   }, [dispatch]);
 
   const handleReview = (reviewType) => {

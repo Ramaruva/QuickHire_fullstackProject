@@ -373,6 +373,7 @@ public class RequestService {
                 professionalRegistrationRequest.setQualification(qualifications);
                 professionalRegistrationRequest.setEducation(educations);
                 professionalRegistrationRequest.setPaymentHistory(payments);
+                professionalRegistrationRequest.setUserprofileid(userProfile.getUserprofileid());
                 professionalRegistrationRequests.add(professionalRegistrationRequest);
             }
             return professionalRegistrationRequests;
