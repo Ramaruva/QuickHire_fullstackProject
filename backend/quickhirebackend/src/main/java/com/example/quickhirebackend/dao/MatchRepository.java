@@ -29,5 +29,10 @@ public interface MatchRepository extends JpaRepository<Matches, Integer> {
 
    // List<Matches> findByJobIdAndNotification(Integer jobId, String notification);
 
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM Matches e WHERE e.professionalId = ?1")
+    void deleteByProfessionalId(Integer professionalid);
+
 
 }

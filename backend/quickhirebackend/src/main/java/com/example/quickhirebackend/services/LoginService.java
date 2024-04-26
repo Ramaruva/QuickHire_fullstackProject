@@ -58,6 +58,7 @@ public class LoginService implements UserDetailsService {
     public boolean changePassword(String username, String password) {
         int val = userRepository.updatePasswordByUsername(username, passwordHasher(password));
         if (val > 0) {
+            userRepository.udpateispasswordchanged(username,"YES");
             return true;
         } else {
             return false;

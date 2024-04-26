@@ -28,8 +28,9 @@ public class RequestService {
     private  final  EducationRepository educationRepository;
     private  final  QualificationRepository qualificationRepository;
     private final PaymentRepository paymentRepository;
+    private  final MatchRepository matchRepository;
 
-    public RequestService(EmployerRequestRepository employerRequestRepository, EmployerDetailsRepository employerDetailsRepository, UserProfileRepository userProfileRepository, UserRepository userRepository, ProfessionalRequestRepository professionalRequestRepository, ProfessionalDetailsRepository professionalDetailsRepository, LoginService loginService, EmailService emailService, StaffDetailsRepository staffDetailsRepository, EducationRepository educationRepository, QualificationRepository qualificationRepository, PaymentRepository paymentRepository) {
+    public RequestService(EmployerRequestRepository employerRequestRepository, EmployerDetailsRepository employerDetailsRepository, UserProfileRepository userProfileRepository, UserRepository userRepository, ProfessionalRequestRepository professionalRequestRepository, ProfessionalDetailsRepository professionalDetailsRepository, LoginService loginService, EmailService emailService, StaffDetailsRepository staffDetailsRepository, EducationRepository educationRepository, QualificationRepository qualificationRepository, PaymentRepository paymentRepository, MatchRepository matchRepository) {
         this.employerRequestRepository = employerRequestRepository;
         this.employerDetailsRepository = employerDetailsRepository;
         this.userProfileRepository = userProfileRepository;
@@ -42,6 +43,7 @@ public class RequestService {
         this.educationRepository = educationRepository;
         this.qualificationRepository = qualificationRepository;
         this.paymentRepository = paymentRepository;
+        this.matchRepository = matchRepository;
     }
  
     public String employerRequest(ReviewRecord employerRequest) throws Exception {
@@ -151,17 +153,52 @@ public class RequestService {
  
     }
  
-    public String professionalDeleteRequest(Integer requestID){
+    public String professionalDeleteRequest(Integer requestID, AllTypesEnums.UserRequestType userRequestType, String message){
         //need to update in professional request data
-        ProfessionalRequest professionalRequest = professionalRequestRepository.findById(requestID).stream().findFirst().orElse(new ProfessionalRequest());
-        professionalRequest.setRequestType(AllTypesEnums.UserRequestType.DELETE_ACCEPTED);
-        professionalRequestRepository.save(professionalRequest);
-        //need to update in userprofile
-        DeleteUserDetails(professionalRequest.getProfId());
-        return "Account Deleted Successfully!";
+        try{
+            //check status
+            ProfessionalRequest professionalRequest = professionalRequestRepository.findById(requestID).stream().findFirst().orElseThrow();
+            UserProfile userProfile = userProfileRepository.findById(professionalRequest.getProfId()).stream().findFirst().orElseThrow();
+            if(userRequestType== AllTypesEnums.UserRequestType.DELETE_ACCEPTED) {
+                professionalRequest.setRequestType(AllTypesEnums.UserRequestType.DELETE_ACCEPTED);
+                professionalRequestRepository.save(professionalRequest);
+                //need to update in userprofile
+                DeleteUserDetails(professionalRequest.getProfId());
+                // need to get all his matches
+                ProfessionalDetails professionalDetails = professionalDetailsRepository.findByProfid(professionalRequest.getProfId()).stream().findFirst().orElseThrow();
+                matchRepository.deleteByProfessionalId(professionalDetails.getProfessionalId());
+                String subject = "QuickHire: Account Deletion Confirmation";
+                String body = "Dear Customer,\n\n" +
+                        "Thank you for being a valued customer of QuickHire.\n" +
+                        "Your account has been successfully deleted.\n" +
+                        "We hope to see you join again soon!\n\n" +
+                        "Best regards,\n" +
+                        "The QuickHire Team";
+                 emailService.sendMail(userProfile.getEmail(),subject,body);
+                return "Account Deleted Successfully!";
+            }
+            else {
+                String subject = "QuickHire: Account Deletion Rejection";
+                String body = "<html><body>" +
+                        "<p>Dear Customer,</p>" +
+                        "<p>We regret to inform you that your account deletion request has been rejected.</p>" +
+                         message +
+                        "<p>Please review the provided information and resubmit your request.</p>" +
+                        "<p>Best regards,<br/>The QuickHire Team</p>" +
+                        "</body></html>";
+                professionalRequest.setRequestType(AllTypesEnums.UserRequestType.DELETE_REJECTED);
+                professionalRequestRepository.save(professionalRequest);
+                emailService.sendMail(userProfile.getEmail(),subject,body);
+                return "Rejected Successfully!";
+            }
+        }
+        catch (Exception e){
+            throw new RuntimeException(e.getMessage());
+        }
+
     }
  
-    public  String employerDeleteRequest(Integer requestID){
+    public  String employerDeleteRequest(Integer requestID, AllTypesEnums.UserRequestType userRequestType, String message){
         //update employerReq
         EmployerRequest employerRequestData = employerRequestRepository.findById(requestID).stream().findFirst().orElse(new EmployerRequest());
         employerRequestData.setRequestType(AllTypesEnums.UserRequestType.DELETE_ACCEPTED);

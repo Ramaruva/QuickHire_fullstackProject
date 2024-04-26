@@ -42,21 +42,21 @@ public class StaffController {
  
     }
  
-    record DeleteRequestID(Integer requestId){};
-    @PutMapping("/professionalDeleteAccept")
+    record DeleteRequestID(Integer requestId, AllTypesEnums.UserRequestType requestType, String message){};
+    @PutMapping("/professionalDeleteStatus")
     public ResponseEntity<?> professionalDeleteRequest(@RequestBody DeleteRequestID deleteID){
         try{
-           return ResponseEntity.ok(requestService.professionalDeleteRequest(deleteID.requestId()));
+           return ResponseEntity.ok(requestService.professionalDeleteRequest(deleteID.requestId(),deleteID.requestType(),deleteID.message()));
         }
         catch (Exception e){
             return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
  
-    @PutMapping("/employerDeleteAccept")
+    @PutMapping("/employerDeleteStatus")
     public ResponseEntity<?> employerDeleteRequest(@RequestBody DeleteRequestID deleteId){
         try{
-            return ResponseEntity.ok(requestService.employerDeleteRequest(deleteId.requestId()));
+            return ResponseEntity.ok(requestService.employerDeleteRequest(deleteId.requestId(),deleteId.requestType(),deleteId.message()));
         }
         catch (Exception e){
             return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
