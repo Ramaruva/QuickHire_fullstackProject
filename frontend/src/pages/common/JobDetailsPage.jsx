@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getAllJobs } from "../../redux/jobSlice";
 import { USERTYPE } from "../../types";
 import JobPosting from "../../components/Employer/JobPosting";
+import { getRequest } from "../../API/config";
 
 const JobDetailsPage = () => {
   const query = useQuery();
@@ -14,6 +15,7 @@ const JobDetailsPage = () => {
   const dispatch = useDispatch();
   let jobSpecific = jobData && jobData.find((ele) => ele.jobdescId == id);
   const [isEditable, setIsEditable] = useState(false);
+  const [matchedProfessionals, setMatchedProfessionals] = useState([]);
   const formattedStartDate =
     jobSpecific &&
     new Date(jobSpecific?.startDate).toLocaleDateString("en-US", {
@@ -29,6 +31,24 @@ const JobDetailsPage = () => {
       day: "numeric",
     });
 
+  const getMatchedData = async () => {
+    try {
+      if (user.userType == USERTYPE.employer) {
+        const response = await getRequest("getEmployerJobMatches/" + id);
+        console.log(response.data);
+        setMatchedProfessionals(response.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const handleEdit = () => {
+    console.log("edit");
+    console.log(jobSpecific.qualification);
+    jobSpecific = { ...jobSpecific, qualifications: jobSpecific.qualification };
+    console.log(jobSpecific);
+    setIsEditable((state) => !state);
+  };
   useEffect(() => {
     if (user.userType != USERTYPE.professional) {
       dispatch(getAllJobs(user.profileID));
@@ -39,41 +59,6 @@ const JobDetailsPage = () => {
     console.log(jobSpecific);
     jobSpecific = jobData && jobData.find((ele) => ele.jobdescId == id);
   }, [dispatch]);
-  console.log(jobSpecific, "ja");
-
-  const jobDetails = {
-    positionName: "Software Engineer",
-    companyName: "Innovatech Solutions",
-    startTime: "08:00 AM",
-    endTime: "04:00 PM",
-    payPerHour: "$40/hr",
-  };
-
-  const employerDetails = {
-    firstName: "Jane",
-    lastName: "Smith",
-    email: "jane.smith@innovatech.com",
-    phone: "(555) 123-4567",
-    address: "123 Innovation Way, Techville, TX",
-  };
-
-  const categoryList = [
-    {
-      type: "skills",
-      keywords: "java",
-    },
-    {
-      type: "Exp",
-      keywords: "must have 2 years exp in webdev",
-    },
-  ];
-  const handleEdit = () => {
-    console.log("edit");
-    console.log(jobSpecific.qualification);
-    jobSpecific = { ...jobSpecific, qualifications: jobSpecific.qualification };
-    console.log(jobSpecific);
-    setIsEditable((state) => !state);
-  };
   return isEditable ? (
     <JobPosting isedit={true} editData={jobSpecific} handleEdit={handleEdit} />
   ) : (
@@ -83,23 +68,29 @@ const JobDetailsPage = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-        <div className="flex items-center">Position:
+        <div className="flex items-center">
+          Position:
           <span className="ml-2 text-gray-700">
             {jobSpecific?.positionName} at {jobSpecific?.companyName}
           </span>
         </div>
-        <div className="flex items-center">Duration:
+        <div className="flex items-center">
+          Duration:
           <span className="ml-2 text-gray-700">
             {formattedStartDate} to {formattedEndDate}
           </span>
         </div>
-        <div className="flex items-center">StartTime & EndTime:
+        <div className="flex items-center">
+          StartTime & EndTime:
           <span className="ml-2 text-gray-700">
             {jobSpecific?.startTime} to {jobSpecific?.endTime}
           </span>
         </div>
-        <div className="flex items-center">Payment:
-          <span className="ml-2 text-gray-700">{jobSpecific?.payPerHour} $ Pay Per Hour</span>
+        <div className="flex items-center">
+          Payment:
+          <span className="ml-2 text-gray-700">
+            {jobSpecific?.payPerHour} $ Pay Per Hour
+          </span>
         </div>
         <div className="w-[600px] h-fit mt-6">
           {jobSpecific?.qualification && (
@@ -115,10 +106,12 @@ const JobDetailsPage = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="flex items-center">Email:
+        <div className="flex items-center">
+          Email:
           <span className="ml-2 text-gray-700">{jobSpecific?.email}</span>
         </div>
-        <div className="flex items-center">Phone:
+        <div className="flex items-center">
+          Phone:
           <span className="ml-2 text-gray-700">{jobSpecific?.phone}</span>
         </div>
         <div className="flex items-center">
@@ -126,11 +119,24 @@ const JobDetailsPage = () => {
         </div>
       </div>
       <div className="mt-4">
-        <button className="bg-accept w-fit text-white px-4 py-2 mt-2 hover:bg-green-600">
-          Request Match
+        <renderMatchedProfessionals />
+      </div>
+      <div className="mt-4">
+        <button
+          onClick={getMatchedData}
+          className="bg-accept w-fit text-white px-4 py-2 mt-2 hover:bg-green-600"
+        >
+          {user.userType == USERTYPE.employer
+            ? "Show Matched Professionals "
+            : "Request Match"}
         </button>
         {user.userType == USERTYPE.employer && (
-          <button onClick={handleEdit} className="bg-accept w-fit text-white px-4 py-2 mt-2 hover:bg-blue-600 ml-5">Edit</button>
+          <button
+            onClick={handleEdit}
+            className="bg-accept w-fit text-white px-4 py-2 mt-2 hover:bg-blue-600 ml-5"
+          >
+            Edit
+          </button>
         )}
       </div>
     </div>
@@ -138,6 +144,22 @@ const JobDetailsPage = () => {
 };
 
 export default JobDetailsPage;
+
+const renderMatchedProfessionals = (matchedProfessionals) => {
+  return matchedProfessionals.map((match) => (
+    <div key={match.matchId} className="my-2 p-2 border rounded">
+      <div className="font-bold">
+        Match Percentage: {match.matchPercentage}%
+      </div>
+      <div>
+        Name: {match.userProfile.firstname} {match.userProfile.lastname}
+      </div>
+      <div>Email: {match.userProfile.email}</div>
+      <div>Phone: {match.userProfile.phone}</div>
+      {/* Render more details as needed */}
+    </div>
+  ));
+};
 
 {
   /* <div>

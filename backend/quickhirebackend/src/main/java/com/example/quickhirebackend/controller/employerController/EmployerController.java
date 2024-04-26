@@ -1,13 +1,12 @@
 package com.example.quickhirebackend.controller.employerController;
 
 import com.example.quickhirebackend.customExceptions.CustomDuplicateUsernameException;
-import com.example.quickhirebackend.dto.EmployerRegistrationRequest;
-import com.example.quickhirebackend.dto.JobPostRequest;
-import com.example.quickhirebackend.dto.PaymentDTO;
+import com.example.quickhirebackend.dto.*;
 import com.example.quickhirebackend.model.Payments;
 import com.example.quickhirebackend.model.UserProfile;
 import com.example.quickhirebackend.services.EmployerRegisterService;
 import com.example.quickhirebackend.services.JobService;
+import com.example.quickhirebackend.services.MatchService;
 import com.example.quickhirebackend.services.PaymentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,11 +20,13 @@ public class EmployerController {
     private final EmployerRegisterService employerRegisterService;
     private  final JobService jobService;
     private final PaymentService paymentService;
+    private final MatchService matchService;
 
-    public EmployerController(EmployerRegisterService employerRegisterService, JobService jobService, PaymentService paymentService) {
+    public EmployerController(EmployerRegisterService employerRegisterService, JobService jobService, PaymentService paymentService, MatchService matchService) {
         this.employerRegisterService = employerRegisterService;
         this.jobService = jobService;
         this.paymentService = paymentService;
+        this.matchService = matchService;
     }
 
     @PostMapping("/employerRegister")
@@ -130,6 +131,15 @@ public class EmployerController {
         }
    }
 
-
+   @GetMapping("/getEmployerJobMatches/{jobId}")
+    public ResponseEntity<?> getEmployersMatches(@PathVariable("jobId") Integer jobId){
+        try{
+            List<EmployerMatchResponse> matchResponses = matchService.getMatchedJobsForEmployer(jobId);
+            return ResponseEntity.ok(matchResponses);
+        }
+        catch (Exception e){
+            return  ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+   }
 
 }

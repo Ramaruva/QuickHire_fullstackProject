@@ -64,6 +64,7 @@ const PasswordChange = () => {
   };
   // Listen to state changes for notifications
   React.useEffect(() => {
+  
     if (notification) {
       setShowNotification(true);
       setTimeout(() => {
