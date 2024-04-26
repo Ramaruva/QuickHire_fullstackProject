@@ -81,4 +81,16 @@ public class PaymentService {
             throw new RuntimeException(e.getMessage());
         }
     }
+
+    public boolean changePayment(Integer matchId){
+        try{
+             Payments payments = paymentRepository.findById(matchId).stream().findFirst().orElseThrow();
+              payments.setStatus("PAID");
+              paymentRepository.save(payments);
+              return true;
+        }
+        catch (Exception e){
+            throw  new RuntimeException(e.getMessage());
+        }
+    }
 }

@@ -65,6 +65,17 @@ public class CommonController {
             return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+    record paymentPaidRecord(Integer matchId){}
+    @PostMapping("/changePayments")
+    public ResponseEntity<?>  changePayment(@RequestBody paymentPaidRecord paydata){
+        try{
+           return ResponseEntity.ok(paymentService.changePayment(paydata.matchId()));
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
     @GetMapping("/getAllPayments/{id}")
     public ResponseEntity<?> getAllPayments(@PathVariable("id") Integer id){
         try{

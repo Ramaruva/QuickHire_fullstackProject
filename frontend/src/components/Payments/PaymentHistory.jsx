@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from 'axios';
+import { postRequest } from "../../API/config";
 
 function PaymentHistory({paymentData}) {
   const [payments, setPayments] = useState([]);
@@ -11,7 +12,18 @@ function PaymentHistory({paymentData}) {
   //   { date: "2024-01-25", amount: 60, status: "Paid" },
   // ];
 
- 
+   const changePay =async(payment)=>{
+      try {
+            if(payment.status=="Unpaid"){
+              let payload = {
+                matchId:payment.paymentId
+              }
+               const data = await postRequest("changePayments",payment);
+            }
+      } catch (error) {
+         console.log(error);
+      }
+   }
 
 
   return paymentData&&paymentData.length>0 ?(
@@ -38,7 +50,7 @@ function PaymentHistory({paymentData}) {
                 ${payment?.amount}
               </td>
               <td className="py-3 px-6 text-center">
-                <span className={`inline-block rounded-full px-3 py-1 ${payment.status === "PAID" ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}`}>
+                <span onClick={()=>changePay(payment)} className={`inline-block rounded-full px-3 py-1 ${payment.status === "PAID" ? "bg-green-200 text-green-800" : "bg-red-200 text-red-800"}`}>
                   {payment?.status}
                 </span>
               </td>

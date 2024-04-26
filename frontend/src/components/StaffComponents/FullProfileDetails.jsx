@@ -19,6 +19,7 @@ import {
   asyncProfessionalReviewOperation,
 } from "../../redux/staffSlicer";
 import { getRequest, postRequest, putRequest } from "../../API/config";
+import PaymentPage from "../../pages/common/PaymentPage";
 
 const FullProfileDetails = ({ customerType, operationType, requestID }) => {
   const professionalReviews = useSelector(
@@ -351,6 +352,7 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
 
       {(operationType == "view" || operationType == "delete") && (
         <div>
+          <PaymentPage viewer="staff" customerData={userData}/>
           {/* <div className="container mx-auto p-4">
             <form onSubmit={initateMatch} className="max-w-md mx-auto">
               <div className="text-center mb-6">
@@ -405,10 +407,10 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
             </form>
           </div> */}
           <div className="w-full mt-4">
-            PaymentHistory:
+            {/* PaymentHistory:
             <div className="w-9/12 ml-12">
               <PaymentHistory paymentData={userData?.paymentHistory} />
-            </div>
+            </div> */}
             {customerType == "Professional" && (
               // <ProfessionalJobListingPage />
               <div>

@@ -3,7 +3,7 @@ import CategoryList from "../../components/CategoryList";
 import { useQuery } from "../../customHooks/useQuery";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllJobs } from "../../redux/jobSlice";
-import { USERTYPE } from "../../types";
+import { USERTYPE, reduceMatch } from "../../types";
 import JobPosting from "../../components/Employer/JobPosting";
 import { getRequest } from "../../API/config";
 
@@ -118,9 +118,7 @@ const JobDetailsPage = () => {
           <span className="ml-2 text-gray-700">{jobSpecific?.address}</span>
         </div>
       </div>
-      <div className="mt-4">
-        <renderMatchedProfessionals />
-      </div>
+      
       <div className="mt-4">
         <button
           onClick={getMatchedData}
@@ -139,24 +137,44 @@ const JobDetailsPage = () => {
           </button>
         )}
       </div>
+      <div className="mt-4">
+        {(user.userType == USERTYPE.employer&&matchedProfessionals.length > 0 )? (
+          renderMatchedProfessionals({ matchedProfessionals })
+        ) : (
+          <p className="text-gray-600 mt-4 p-2">
+            No matches found!! <span className="text-red-400 font-semibold">Click Show Matched Professionals to refresh. </span>
+          </p>
+        )}
+      </div>
     </div>
   );
 };
 
 export default JobDetailsPage;
 
-const renderMatchedProfessionals = (matchedProfessionals) => {
+const renderMatchedProfessionals = ({ matchedProfessionals }) => {
   return matchedProfessionals.map((match) => (
-    <div key={match.matchId} className="my-2 p-2 border rounded">
-      <div className="font-bold">
-        Match Percentage: {match.matchPercentage}%
+    <div key={match.matchId} className="my-2 p-2 border rounded shadow-lg">
+      <div className="font-bold text-lg mb-4">
+        Match Percentage: { reduceMatch(match.matchPercentage)}%
       </div>
-      <div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div className="text-gray-800 flex items-center">
+        Username: {match.userProfile.username}
+      </div>
+      <div className=" flex items-center">
         Name: {match.userProfile.firstname} {match.userProfile.lastname}
       </div>
-      <div>Email: {match.userProfile.email}</div>
-      <div>Phone: {match.userProfile.phone}</div>
-      {/* Render more details as needed */}
+      {/* <div className="mt-2 mb-6 ml-6 mr-6"> */}
+      <div className="flex items-center ">Email: {match.userProfile.email}</div>
+      <div className="flex items-center ">Phone: {match.userProfile.phone}</div>
+      {/* </div> */}
+      </div>
+      <div className="mt-2">
+        <CategoryList
+          Lists={match.professionalQualifications}
+        />
+      </div>
     </div>
   ));
 };

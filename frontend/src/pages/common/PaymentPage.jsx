@@ -9,7 +9,7 @@ const intialDetails = {
   enddate: "",
   status: "",
 };
-const PaymentPage = () => {
+const PaymentPage = ({viewer="customer",customerData=null}) => {
   const [paymentDetails, setPaymentDetails] = useState(intialDetails);
   const [selectedOption, setSelectedOption] = useState("monthly");
   const [paymentHistory,setPaymentHistory] = useState([]);
@@ -31,13 +31,23 @@ const PaymentPage = () => {
   const createPayment = async (amount) => {
     try {
       setLoading(true);
-      // Replace with your actual endpoint and add necessary headers or credentials
-      let payObj ={
-        ...paymentDetails,profid:user?.profileID,status:"PAID"
+      if(viewer=="staff"){
+        let payObj={
+          ...paymentDetails, profid:customerData?.userprofileid, status:"Unpaid"
+        }
+        let data = await postRequest("payments",payObj);
+        console.log(data);
       }
-      console.log(payObj);
-      let data = await postRequest("payments",payObj);
-      console.log(data);
+      else{
+        let payObj ={
+          ...paymentDetails,profid:user?.profileID,status:"PAID"
+        }
+        console.log(payObj);
+        let data = await postRequest("payments",payObj);
+        console.log(data);
+      }
+      // Replace with your actual endpoint and add necessary headers or credentials
+      
       getAllPayments();
       setLoading(false);
       // Handle further actions after payment success here
@@ -50,6 +60,12 @@ const PaymentPage = () => {
 
   const getAllPayments =async ()=>{
     try {
+      if(viewer=="staff"){
+        let data = await getRequest("getAllPayments/"+ customerData?.userprofileid);
+        console.log(data.data);
+        setPaymentHistory(data.data);
+        return;
+      }
        let data = await getRequest("getAllPayments/"+user?.profileID);
        console.log(data);
        setPaymentHistory(data.data);
@@ -70,7 +86,8 @@ useEffect(()=>{
       <div className="container mx-auto p-4">
         <form onSubmit={handleSubmit} className="max-w-md mx-auto">
           <div className="text-center mb-6">
-            <h2 className="text-lg font-semibold">Choose your Payment plan</h2>
+            <h2 className="text-lg font-semibold">{viewer=="staff"
+            ? "Choose customers payment plan":"Choose your Payment plan"}</h2>
           </div>
           <div className="flex justify-between space-x-4">
             <div className="w-full md:w-1/2 px-2 mb-2 md:mb-0">
@@ -139,12 +156,15 @@ useEffect(()=>{
               } text-white rounded`}
               disabled={loading}
             >
-              {loading ? "Processing..." : "Pay"}
+              {loading ? "Processing..." : viewer=="staff"?"RequestPay":"Pay"}
             </button>
           </div>
         </form>
       </div>
-      <PaymentHistory  paymentData ={paymentHistory} />
+      {
+         <PaymentHistory  paymentData ={paymentHistory} />
+      }
+      
     </div>
   );
 };
