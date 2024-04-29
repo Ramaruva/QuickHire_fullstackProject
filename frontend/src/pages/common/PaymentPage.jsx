@@ -162,7 +162,7 @@ useEffect(()=>{
         </form>
       </div>
       {
-         <PaymentHistory  paymentData ={paymentHistory} />
+         <PaymentHistory  paymentData ={paymentHistory}  getAllPayments={getAllPayments}/>
       }
       
     </div>

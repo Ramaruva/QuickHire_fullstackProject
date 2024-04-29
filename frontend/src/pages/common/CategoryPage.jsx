@@ -32,12 +32,14 @@ const mystyle = {
 };
 const CategoryPage = () => {
   const [categoryLists, setCategoryList] = useState([]);
-  const navigation = useNavigate();
   const dispatch = useDispatch();
   const data = useSelector((state)=>state.professionalRegister);
+  const navigate = useNavigate();
   const handleAdd = (category) => {
     try {
+       category={...category,ID: Date.now() + Math.random()}
       if (categoryLists.length > 0) {
+
         setCategoryList([...categoryLists, category]);
       } else {
         setCategoryList([category]);
@@ -49,7 +51,8 @@ const CategoryPage = () => {
   };
   const handleDelete =(index)=>{
     try {
-       const arraycat = categoryLists.splice(index,1);
+       const arraycat = categoryLists.filter((item)=>item.ID!=index);
+       //const arraycat = categoryLists.splice(index,1);
        console.log(arraycat)
        setCategoryList(arraycat);
     } catch (error) {
@@ -68,6 +71,7 @@ const CategoryPage = () => {
         // dispatch(sendData(category));
         console.log(sav);
         let data2 = await postRequest("professionalRegister",sav);
+        navigate('/registration-success', { state: { userType: 'Professional' } });
         console.log(data2);
     } catch (error) {
        console.log(error);

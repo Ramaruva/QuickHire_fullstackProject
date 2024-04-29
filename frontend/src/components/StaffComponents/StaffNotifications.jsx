@@ -3,7 +3,7 @@ import { IoIosNotifications } from "react-icons/io";
 import { BsLightningCharge } from "react-icons/bs";
 import { getRequest, postRequest } from "../../API/config";
 import { useSelector } from "react-redux";
-import { MATCHTYPE } from "../../types";
+import { MATCHTYPE, reduceMatch } from "../../types";
 
 const StaffNotifications = () => {
   // State to hold notifications from API
@@ -46,7 +46,7 @@ const StaffNotifications = () => {
           let data = await postRequest("singleJobMatchPercentage",payload)
           console.log(data.data);
           if(data.data>85){
-            data.data = data.data-5;
+            data.data = reduceMatch(data.data);
           }
           return { ...notification, loadedProgress: data.data }; // Load the actual progress from the API
         }

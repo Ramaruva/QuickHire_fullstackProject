@@ -49,7 +49,7 @@ const Profiles = ({ customerType, viewType }) => {
 
   useEffect(() => {
     getData();
-  }, [dispatch]);
+  }, [dispatch, customerType]);
 
   const isEmpty = (data) => data === null || data.length === 0;
 

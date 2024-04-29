@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from 'axios';
 import { postRequest } from "../../API/config";
 
-function PaymentHistory({paymentData}) {
+function PaymentHistory({paymentData,getAllPayments}) {
   const [payments, setPayments] = useState([]);
 
   // const payments = [
@@ -19,6 +19,7 @@ function PaymentHistory({paymentData}) {
                 matchId:payment.paymentId
               }
                const data = await postRequest("changePayments",payment);
+               getAllPayments();
             }
       } catch (error) {
          console.log(error);
