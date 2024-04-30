@@ -44,7 +44,7 @@ const JobCardDetails = ({handleMatch,jobData}) => {
         </div>
         <div className="px-6 pt-4 pb-2">
           <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
-            {jobData?.payPerHour}
+           PayPerhour: {jobData?.payPerHour} $
           </span>
           <span className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2">
             Start: {formatDate(jobData?.startDate)}

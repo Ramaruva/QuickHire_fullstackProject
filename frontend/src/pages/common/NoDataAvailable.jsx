@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import professional_image from "/assets/professional_image_gif.gif"; // Path to a success animation GIF
-import employer_image from "../../../public/assets/company_employer image.jpeg"; // Corrected path and name
+import employer_image from "/assets/company_employer image.jpeg"; // Corrected path and name
 
 const NoDataAvailable = ({ viewType }) => {
   const navigate = useNavigate();

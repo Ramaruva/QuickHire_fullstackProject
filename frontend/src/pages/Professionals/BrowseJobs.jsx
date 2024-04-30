@@ -2,19 +2,21 @@ import React, { useEffect } from "react";
 import JobCardDetails from "../../components/ProfessionalProfile/JobCardDetails";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllJobs } from "../../redux/jobSlice";
+import { postRequest } from "../../API/config";
 
 const BrowseJobs = () => {
   const jobData = useSelector((state) => state.jobSlice.jobs);
   const user = useSelector((state) => state.auth.user);
   const disPatch = useDispatch();
-  const matchRequest = (item) => {
+  const matchRequest = async(item) => {
     try {
       console.log(item);
       let obj = {
         jobId: item.jobdescId,
         userProfileID: user.profileID,
       };
-      disPatch(matchRequest(obj));
+      const response = await postRequest("professionalJobMatchRequest", obj);
+     // disPatch(matchRequest(obj));
     } catch (error) {
       console.log(error);
     }

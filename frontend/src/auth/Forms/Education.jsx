@@ -12,9 +12,9 @@ import { useDispatch } from "react-redux";
 import { setData, setEducationList } from "../../redux/professionalRegisterSlice";
 
 const details = {
-  schoolname: "",
+  schoolName: "",
   major: "",
-  completiontime: "",
+  completionTime: "",
 };
 const Error = {
   schoolNameError: "",
@@ -61,9 +61,9 @@ const Education = () => {
     try {
       console.log(educationDetails);
       const errorObj = {
-        schoolNameError: validateSchoolName(educationDetails.schoolname),
+        schoolNameError: validateSchoolName(educationDetails.schoolName),
         majorNameError: validateMajorName(educationDetails.major),
-        endTimeError: validateDate(educationDetails.completiontime),
+        endTimeError: validateDate(educationDetails.completionTime),
       };
       setEducationErrors(errorObj);
       console.log(educationErrors);
@@ -107,8 +107,8 @@ const Education = () => {
               <label>School Name:</label>
               <br></br>
               <input
-                value={educationDetails.schoolname}
-                onChange={(e) => handleChange("schoolname", e.target.value)}
+                value={educationDetails.schoolName}
+                onChange={(e) => handleChange("schoolName", e.target.value)}
                 placeholder="Enter your school name"
                 type="text"
                 className={`${
@@ -139,8 +139,8 @@ const Education = () => {
               <label>Completion Time:</label>
               <br></br>
               <input
-                value={educationDetails.completiontime}
-                onChange={(e) => handleChange("completiontime", e.target.value)}
+                value={educationDetails.completionTime}
+                onChange={(e) => handleChange("completionTime", e.target.value)}
                 type="Date"
                 className={`${
                   educationErrors.endTimeError.length > 0

@@ -19,3 +19,14 @@ export const MATCHTYPE={
     STAFF_ACCEPTED:"STAFF_ACCEPTED",
     STAFF_REJECTED:"STAFF_REJECTED"
 }
+
+
+export const reduceMatch =(val)=>{
+      if(val>100){
+        return 100;
+      }
+      if(val>80){
+        return val-4.67;
+      }
+      return val;
+}

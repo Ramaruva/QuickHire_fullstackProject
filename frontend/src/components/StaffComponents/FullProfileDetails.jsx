@@ -7,7 +7,7 @@ import CategoryList from "../CategoryList";
 import PaymentHistory from "../Payments/PaymentHistory";
 import { BsBank } from "react-icons/bs";
 import { useDispatch, useSelector } from "react-redux";
-import { USERREQUESTTYPE, USERTYPE } from "../../types";
+import { USERREQUESTTYPE, USERTYPE, reduceMatch } from "../../types";
 import {
   asyncEmployerDataReviews,
   asyncEmployerDeleteReviews,
@@ -19,6 +19,8 @@ import {
   asyncProfessionalReviewOperation,
 } from "../../redux/staffSlicer";
 import { getRequest, postRequest, putRequest } from "../../API/config";
+import PaymentPage from "../../pages/common/PaymentPage";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const FullProfileDetails = ({ customerType, operationType, requestID }) => {
   const professionalReviews = useSelector(
@@ -187,11 +189,11 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
       console.log(error);
     }
   };
-
+  const navigate = useNavigate();
   const handleReview = (reviewType) => {
     try {
       let postData = {
-        id: requestID,
+        id: userData?.prequestid,
         requestType: reviewType,
         reviewMessage: rejectMsg,
       };
@@ -200,6 +202,8 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
       } else {
         const data = dispatch(asyncEmployerReviewOperation(postData));
       }
+      navigate("/home/AllCustomer");
+
       // history("-1");
     } catch (error) {
       console.log(error);
@@ -209,13 +213,13 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
   const handleMatchNotification = async (data) => {
     try {
       console.log(data);
-      let payload ={
-        customerId:requestID,
-        jobId:data?.jobDescription?.jobdescriptionId,
-        percentage:data.matchPercentage,
-        staffId:user.profileID
-      }
-      const res = await postRequest("staffJobMatchNotification",payload);
+      let payload = {
+        customerId: requestID,
+        jobId: data?.jobDescription?.jobdescriptionId,
+        percentage: data.matchPercentage,
+        staffId: user.profileID,
+      };
+      const res = await postRequest("staffJobMatchNotification", payload);
       console.log(res);
     } catch (error) {
       console.log(error);
@@ -351,6 +355,7 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
 
       {(operationType == "view" || operationType == "delete") && (
         <div>
+          <PaymentPage viewer="staff" customerData={userData} />
           {/* <div className="container mx-auto p-4">
             <form onSubmit={initateMatch} className="max-w-md mx-auto">
               <div className="text-center mb-6">
@@ -405,10 +410,10 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
             </form>
           </div> */}
           <div className="w-full mt-4">
-            PaymentHistory:
+            {/* PaymentHistory:
             <div className="w-9/12 ml-12">
               <PaymentHistory paymentData={userData?.paymentHistory} />
-            </div>
+            </div> */}
             {customerType == "Professional" && (
               // <ProfessionalJobListingPage />
               <div>
@@ -461,7 +466,7 @@ const FullProfileDetails = ({ customerType, operationType, requestID }) => {
                                   ${job.jobDescription.payPerHour} / hr
                                 </td>
                                 <td className="px-6 text-center">
-                                  {job.matchPercentage.toFixed(2)}%
+                                  {reduceMatch(job.matchPercentage).toFixed(2)}%
                                 </td>
                                 <td className="px-6">
                                   <button

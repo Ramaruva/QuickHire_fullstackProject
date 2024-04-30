@@ -482,6 +482,7 @@ public class RequestService {
         employerRegistrationRequest.setPhone(userProfile.getPhone());
         employerRegistrationRequest.setUserprofileid(userProfile.getUserprofileid());
         employerRegistrationRequest.setPayments(payments);
+        employerRegistrationRequest.setPrequestid(employerDetail.getEmployerId());
         return employerRegistrationRequest;
     }
 
