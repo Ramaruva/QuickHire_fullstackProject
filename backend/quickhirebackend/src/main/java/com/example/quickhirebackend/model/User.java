@@ -1,14 +1,16 @@
 package com.example.quickhirebackend.model;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
-public class User {
+public class User implements UserDetails {
 
 
     private Integer profid; // Corresponds to the "profid" column
@@ -16,8 +18,10 @@ public class User {
     @Id
     @Column(name = "username", length = 30)
     private String username; // Corresponds to the "username" column
-    private String usertype; // Corresponds to the "usertype" column
-    private String status; // Corresponds to the "status" column, nullable
+    @Enumerated(EnumType.STRING)
+    private AllTypesEnums.UserType usertype; // Corresponds to the "usertype" column
+    @Enumerated(EnumType.STRING)
+    private AllTypesEnums.UserStatus status; // Corresponds to the "status" column, nullable
 
     private  String ispasswordchanged;
 
@@ -35,6 +39,11 @@ public class User {
         this.profid = profId;
     }
 
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(usertype.name()));
+    }
+
     public String getPassword() {
         return password;
     }
@@ -47,23 +56,43 @@ public class User {
         return username;
     }
 
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
+    }
+
     public void setUsername(String username) {
         this.username = username;
     }
 
-    public String getUserType() {
+    public  AllTypesEnums.UserType getUserType() {
         return usertype;
     }
 
-    public void setUserType(String userType) {
+    public void setUserType(AllTypesEnums.UserType userType) {
         this.usertype = userType;
     }
 
-    public String getStatus() {
+    public AllTypesEnums.UserStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(AllTypesEnums.UserStatus status) {
         this.status = status;
     }
 

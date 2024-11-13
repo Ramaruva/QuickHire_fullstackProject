@@ -10,5 +10,6 @@ import java.util.Optional;
 @Repository
 public interface ProfessionalDetailsRepository  extends JpaRepository<ProfessionalDetails,Integer> {
     Optional<ProfessionalDetails> findByProfid(Integer profid);
-
+    
+   int deleteByProfid(int profid);
 }

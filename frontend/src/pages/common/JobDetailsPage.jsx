@@ -1,34 +1,84 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import CategoryList from "../../components/CategoryList";
+import { useQuery } from "../../customHooks/useQuery";
+import { useDispatch, useSelector } from "react-redux";
+import { getAllJobs } from "../../redux/jobSlice";
+import { USERTYPE, reduceMatch } from "../../types";
+import JobPosting from "../../components/Employer/JobPosting";
+import { getRequest, postRequest } from "../../API/config";
 
 const JobDetailsPage = () => {
-  const jobDetails = {
-    positionName: "Software Engineer",
-    companyName: "Innovatech Solutions",
-    startTime: "08:00 AM",
-    endTime: "04:00 PM",
-    payPerHour: "$40/hr",
-  };
+  const query = useQuery();
+  const id = query.get("id");
+  const jobData = useSelector((state) => state.jobSlice.jobs);
+  const user = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
+  let jobSpecific = jobData && jobData.find((ele) => ele.jobdescId == id);
 
-  const employerDetails = {
-    firstName: "Jane",
-    lastName: "Smith",
-    email: "jane.smith@innovatech.com",
-    phone: "(555) 123-4567",
-    address: "123 Innovation Way, Techville, TX",
-  };
+  const [isEditable, setIsEditable] = useState(false);
+  const [matchedProfessionals, setMatchedProfessionals] = useState([]);
+  const formattedStartDate =
+    jobSpecific &&
+    new Date(jobSpecific?.startDate).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  const formattedEndDate =
+    jobSpecific &&
+    new Date(jobSpecific?.endDate).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
 
-  const categoryList = [
-    {
-      type: "skills",
-      keywords: "java",
-    },
-    {
-      type: "Exp",
-      keywords: "must have 2 years exp in webdev",
-    },
-  ];
-  return (
+  const matchRequest = async(item) => {
+    try {
+      console.log(item);
+      let obj = {
+        jobId: item.jobdescId,
+        userProfileID: user.profileID,
+      };
+     // dispatch(matchRequest(obj));
+      const response = await postRequest("professionalJobMatchRequest", obj);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const getMatchedData = async () => {
+    try {
+      if (user.userType == USERTYPE.employer) {
+        const response = await getRequest("getEmployerJobMatches/" + id);
+        console.log(response.data);
+        setMatchedProfessionals(response.data);
+      } else {
+        console.log(jobSpecific);
+        matchRequest(jobSpecific);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const handleEdit = () => {
+    console.log("edit");
+    console.log(jobSpecific.qualification);
+    jobSpecific = { ...jobSpecific, qualifications: jobSpecific.qualification };
+    console.log(jobSpecific);
+    setIsEditable((state) => !state);
+  };
+  useEffect(() => {
+    if (user.userType != USERTYPE.professional) {
+      dispatch(getAllJobs(user.profileID));
+    } else {
+      dispatch(getAllJobs());
+    }
+    console.log(jobData);
+    console.log(jobSpecific);
+    jobSpecific = jobData && jobData.find((ele) => ele.jobdescId == id);
+  }, [dispatch]);
+  return isEditable ? (
+    <JobPosting isedit={true} editData={jobSpecific} handleEdit={handleEdit} />
+  ) : (
     <div className="max-w-6xl mx-auto my-10 p-5 bg-white rounded-xl shadow-lg">
       <div className="mb-6 border-b-2 border-gray-100">
         <h3 className="text-3xl text-gray-800 font-bold mb-3">Job Details</h3>
@@ -36,25 +86,33 @@ const JobDetailsPage = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
         <div className="flex items-center">
+          Position:
           <span className="ml-2 text-gray-700">
-            {jobDetails.positionName} at {jobDetails.companyName}
+            {jobSpecific?.positionName} at {jobSpecific?.companyName}
           </span>
         </div>
         <div className="flex items-center">
+          Duration:
           <span className="ml-2 text-gray-700">
-            {jobDetails.startTime} to {jobDetails.endTime}
+            {formattedStartDate} to {formattedEndDate}
           </span>
         </div>
         <div className="flex items-center">
+          StartTime & EndTime:
           <span className="ml-2 text-gray-700">
-            {jobDetails.startTime} to {jobDetails.endTime}
+            {jobSpecific?.startTime} to {jobSpecific?.endTime}
           </span>
         </div>
         <div className="flex items-center">
-          <span className="ml-2 text-gray-700">{jobDetails.payPerHour}</span>
+          Payment:
+          <span className="ml-2 text-gray-700">
+            {jobSpecific?.payPerHour} $ Pay Per Hour
+          </span>
         </div>
         <div className="w-[600px] h-fit mt-6">
-          <CategoryList categoryList={categoryList} />
+          {jobSpecific?.qualification && (
+            <CategoryList Lists={jobSpecific?.qualification} />
+          )}
         </div>
       </div>
 
@@ -66,25 +124,82 @@ const JobDetailsPage = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="flex items-center">
-          <span className="ml-2 text-gray-700">{employerDetails.email}</span>
+          Email:
+          <span className="ml-2 text-gray-700">{jobSpecific?.email}</span>
         </div>
         <div className="flex items-center">
-          <span className="ml-2 text-gray-700">{employerDetails.phone}</span>
+          Phone:
+          <span className="ml-2 text-gray-700">{jobSpecific?.phone}</span>
         </div>
         <div className="flex items-center">
-          <span className="ml-2 text-gray-700">{employerDetails.address}</span>
+          <span className="ml-2 text-gray-700">{jobSpecific?.address}</span>
         </div>
       </div>
+
       <div className="mt-4">
-        <button className="bg-accept w-fit text-white px-4 py-2 mt-2 hover:bg-green-600">
-          Request Match
+        <button
+          onClick={getMatchedData}
+          className="bg-accept w-fit text-white px-4 py-2 mt-2 hover:bg-green-600"
+        >
+          {user.userType == USERTYPE.employer
+            ? "Show Matched Professionals "
+            : "Request Match"}
         </button>
+        {user.userType == USERTYPE.employer && (
+          <button
+            onClick={handleEdit}
+            className="bg-accept w-fit text-white px-4 py-2 mt-2 hover:bg-blue-600 ml-5"
+          >
+            Edit
+          </button>
+        )}
+      </div>
+      <div className="mt-4">
+        {user.userType == USERTYPE.employer && matchedProfessionals.length > 0
+          ? renderMatchedProfessionals({ matchedProfessionals })
+          : user.userType == USERTYPE.employer && (
+              <p className="text-gray-600 mt-4 p-2">
+                No matches found!!{" "}
+                <span className="text-red-400 font-semibold">
+                  Click Show Matched Professionals to refresh.{" "}
+                </span>
+              </p>
+            )}
       </div>
     </div>
   );
 };
 
 export default JobDetailsPage;
+
+const renderMatchedProfessionals = ({ matchedProfessionals }) => {
+  return matchedProfessionals.map((match) => (
+    <div key={match.matchId} className="my-2 p-2 border rounded shadow-lg">
+      <div className="font-bold text-lg mb-4">
+        Match Percentage: {reduceMatch(match.matchPercentage)}%
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div className="text-gray-800 flex items-center">
+          Username: {match.userProfile.username}
+        </div>
+        <div className=" flex items-center">
+          Name: {match.userProfile.firstname} {match.userProfile.lastname}
+        </div>
+        {/* <div className="mt-2 mb-6 ml-6 mr-6"> */}
+        <div className="flex items-center ">
+          Email: {match.userProfile.email}
+        </div>
+        <div className="flex items-center ">
+          Phone: {match.userProfile.phone}
+        </div>
+        {/* </div> */}
+      </div>
+      <div className="mt-2">
+        <CategoryList Lists={match.professionalQualifications} />
+      </div>
+    </div>
+  ));
+};
 
 {
   /* <div>

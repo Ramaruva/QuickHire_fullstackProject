@@ -1,5 +1,10 @@
 package com.example.quickhirebackend.dto;
 
+import com.example.quickhirebackend.model.AllTypesEnums;
+import com.example.quickhirebackend.model.Payments;
+
+import java.util.List;
+
 public class EmployerRegistrationRequest {
     // Fields for UserProfile information
     private String address;
@@ -12,11 +17,31 @@ public class EmployerRegistrationRequest {
     private String pincode;
     private String username;
 
+    public Integer getPrequestid() {
+        return prequestid;
+    }
+
+    public void setPrequestid(Integer prequestid) {
+        this.prequestid = prequestid;
+    }
+
+    private  Integer prequestid;
+
     // Fields specific to EmployerRequest
-    private String requestType;
+    private AllTypesEnums.UserRequestType requestType;
     private String companyName;
 
     private  Integer userprofileid;
+
+    public List<Payments> getPayments() {
+        return payments;
+    }
+
+    public void setPayments(List<Payments> payments) {
+        this.payments = payments;
+    }
+
+    private List<Payments> payments;
 
     // Getters and setters for all fields
 
@@ -92,11 +117,11 @@ public class EmployerRegistrationRequest {
         this.username = username;
     }
 
-    public String getRequestType() {
+    public AllTypesEnums.UserRequestType getRequestType() {
         return requestType;
     }
 
-    public void setRequestType(String requestType) {
+    public void setRequestType(AllTypesEnums.UserRequestType requestType) {
         this.requestType = requestType;
     }
 

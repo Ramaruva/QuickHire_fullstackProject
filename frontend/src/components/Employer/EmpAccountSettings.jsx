@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { MdEdit } from "react-icons/md";
 import { MdDelete } from "react-icons/md";
 import {
@@ -11,16 +11,19 @@ import {
   validateZipcode,
 } from "../../validations/standardValidations";
 import ErrorMsgComponent from "../shared/ErrorMsgComponent";
+import { getRequest, postRequest, putRequest } from "../../API/config";
+import { useSelector } from "react-redux";
+import ConfirmationModal from "../../pages/common/ConfirmationModal";
 
 let intialDetails = {
-  firstName: "Gowtham",
-  lastName: "DOngari",
+  firstname: "Gowtham",
+  lastname: "DOngari",
   email: "gowtham@gmail.com",
-  phoneNo: "9988553322",
-  mailingAddress: "*29 AMbusry Blvd",
+  phone: "9988553322",
+  address: "*29 AMbusry Blvd",
   city: "Dallas",
   state: "Texas",
-  zipcode: "72509",
+  pincode: "72509",
 };
 let errorDetails = {
   firstNameError: "",
@@ -35,7 +38,28 @@ let errorDetails = {
 const EmpAccountSettings = () => {
   const [accountDetails, setAccountDetails] = useState(intialDetails);
   const [accountErrors, setAccountErrors] = useState(errorDetails);
+  const user = useSelector((state) => state.auth.user);
   const [isEditable, setIsEditable] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+
+  const handleDeleteRequest = async () => {
+    try {
+      const payLoad = {
+        userProfileId: user.profileID,
+      };
+      const { data } = await putRequest("employer/deleteRequest",payLoad);
+      console.log(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  const handleShowModal = () => {
+    setShowModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
   const handleChange = (e) => {
     try {
       setAccountDetails({ ...accountDetails, [e.target.name]: e.target.value });
@@ -43,17 +67,30 @@ const EmpAccountSettings = () => {
       console.log(error);
     }
   };
+  const getData = async () => {
+    try {
+      console.log("hilo");
+      const data = await getRequest("getEmployDetails" + "/" + user.profileID);
+      console.log(data.data);
+      setAccountDetails(data.data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
-  const handleSave = (e) => {
+  useEffect(() => {
+    getData();
+  }, []);
+  const handleSave = async (e) => {
     try {
       e.preventDefault();
       const errorObj = {
-        firstNameError: validateFirstName(accountDetails.firstName),
-        lastNameError: validateLastName(accountDetails.lastName),
+        firstNameError: validateFirstName(accountDetails.firstname),
+        lastNameError: validateLastName(accountDetails.lastname),
         emailError: validateEmail(accountDetails.email),
-        phoneError: validatePhone(accountDetails.phoneNo),
+        phoneError: validatePhone(accountDetails.phone),
         mailError: validateEmptiness(
-          accountDetails.mailingAddress,
+          accountDetails.address,
           "Mail Address is empty!"
         ),
         cityError: validateEmptiness(
@@ -64,11 +101,13 @@ const EmpAccountSettings = () => {
           accountDetails.state,
           "State Details are empty"
         ),
-        zipcodeError: validateZipcode(accountDetails.zipcode),
+        zipcodeError: validateZipcode(accountDetails.pincode),
       };
       setAccountErrors(errorObj);
       if (!checkKeysEmpty(errorObj)) {
-        alert("New Details saved");
+        delete accountDetails.username;
+        const data = await putRequest("employer/editAccount", accountDetails);
+        console.log(data);
         setAccountErrors(errorDetails);
         setIsEditable(false);
       }
@@ -88,7 +127,7 @@ const EmpAccountSettings = () => {
               <div onClick={() => setIsEditable(true)}>
                 <MdEdit />
               </div>
-              <MdDelete />
+              <MdDelete onClick={handleShowModal} />
             </div>
           </div>
           <div className="flex flex-wrap -mx-2 mb-2">
@@ -103,11 +142,11 @@ const EmpAccountSettings = () => {
                 type="text"
                 placeholder="First Name"
                 readOnly={!isEditable}
-                value={accountDetails.firstName}
-                name="firstName"
+                value={accountDetails.firstname}
+                name="firstname"
                 onChange={handleChange}
               />
-              <ErrorMsgComponent msg={accountErrors.firstNameError}/>
+              <ErrorMsgComponent msg={accountErrors.firstNameError} />
             </div>
             <div className="w-full md:w-1/2 px-2">
               <h1 className="text-xs font-semibold mb-2">Last Name</h1>
@@ -120,11 +159,11 @@ const EmpAccountSettings = () => {
                 type="text"
                 placeholder="Last Name"
                 readOnly={!isEditable}
-                value={accountDetails.lastName}
-                name="lastName"
+                value={accountDetails.lastname}
+                name="lastname"
                 onChange={handleChange}
               />
-              <ErrorMsgComponent msg={accountErrors.lastNameError.length}/>
+              <ErrorMsgComponent msg={accountErrors.lastNameError.length} />
             </div>
           </div>
           <div className="flex flex-wrap -mx-2 mb-2">
@@ -143,7 +182,7 @@ const EmpAccountSettings = () => {
                 name="email"
                 onChange={handleChange}
               />
-              <ErrorMsgComponent msg={accountErrors.emailError}/>
+              <ErrorMsgComponent msg={accountErrors.emailError} />
             </div>
             <div className="w-full md:w-1/2 px-2">
               <h1 className="text-xs font-semibold mb-2">Phone No</h1>
@@ -156,11 +195,11 @@ const EmpAccountSettings = () => {
                 type="tel"
                 placeholder="Phone No"
                 readOnly={!isEditable}
-                value={accountDetails.phoneNo}
-                name="phoneNo"
+                value={accountDetails.phone}
+                name="phone"
                 onChange={handleChange}
               />
-              <ErrorMsgComponent msg={accountErrors.phoneError}/>
+              <ErrorMsgComponent msg={accountErrors.phoneError} />
             </div>
           </div>
           <div className="flex flex-wrap -mx-2 mb-2">
@@ -175,8 +214,8 @@ const EmpAccountSettings = () => {
                 type="text"
                 placeholder="Mailing Address"
                 readOnly={!isEditable}
-                value={accountDetails.mailingAddress}
-                name="mailingAddress"
+                value={accountDetails.address}
+                name="address"
                 onChange={handleChange}
               />
               <ErrorMsgComponent msg={accountErrors.mailError} />
@@ -198,7 +237,7 @@ const EmpAccountSettings = () => {
                 name="city"
                 onChange={handleChange}
               />
-              <ErrorMsgComponent msg={accountErrors.cityError}/>
+              <ErrorMsgComponent msg={accountErrors.cityError} />
             </div>
             <div className="w-full md:w-1/3 px-2">
               <h1 className="text-xs font-semibold mb-2">State</h1>
@@ -228,37 +267,50 @@ const EmpAccountSettings = () => {
                 type="text"
                 placeholder="Zipcode"
                 readOnly={!isEditable}
-                value={accountDetails.zipcode}
-                name="zipcode"
+                value={accountDetails.pincode}
+                name="pincode"
                 onChange={handleChange}
               />
             </div>
-            <ErrorMsgComponent msg={accountErrors.zipcodeError}/>
+            <ErrorMsgComponent msg={accountErrors.zipcodeError} />
           </div>
-          {isEditable&&<div className="flex items-center justify-between mt-8 mb-8">
-            <div className="flex-1 ml-3 text-xs">
-              <button
-                type="button"
-                onClick={handleSave}
-                className="bg-accept w-fit text-white px-4 py-2 text-sm rounded hover:bg-green-600"
-              >
-                Save Changes
-              </button>
-              <button
-                type="button"
-                onClick={()=>{
-                  setIsEditable(false);
-                  setAccountDetails(intialDetails);
-                  setAccountErrors(errorDetails);
-                }}
-                className=" text-white ml-10 bg-red-700 w-32 hover:bg-red-800  focus:ring-red-300 rounded text-sm px-4 py-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
-              >
-                Cancel
-              </button>
+          {isEditable && (
+            <div className="flex items-center justify-between mt-8 mb-8">
+              <div className="flex-1 ml-3 text-xs">
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  className="bg-accept w-fit text-white px-4 py-2 text-sm rounded hover:bg-green-600"
+                >
+                  Save Changes
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsEditable(false);
+                    setAccountDetails(intialDetails);
+                    setAccountErrors(errorDetails);
+                  }}
+                  className=" text-white ml-10 bg-red-700 w-32 hover:bg-red-800  focus:ring-red-300 rounded text-sm px-4 py-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900"
+                >
+                  Cancel
+                </button>
+              </div>
             </div>
-          </div>}
+          )}
         </div>
       </div>
+      <ConfirmationModal
+        isOpen={showModal}
+        onClose={handleCloseModal}
+        onConfirm={handleDeleteRequest}
+        confirmText={"Yes!Request for Delete"}
+        cancelText={"No!"}
+      >
+        <p className="my-4 text-gray-600 text-lg leading-relaxed">
+          Are you sure wanted To Delete Your Account!
+        </p>
+      </ConfirmationModal>
     </div>
   );
 };

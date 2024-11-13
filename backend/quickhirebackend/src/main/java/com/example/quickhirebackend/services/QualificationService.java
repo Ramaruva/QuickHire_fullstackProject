@@ -33,8 +33,8 @@ public class QualificationService {
         qualificationRepository.deleteById(id);
     }
 
-    public Optional<Qualification> getQualificationByUserProfile(Integer id){
-        return  qualificationRepository.findFirstByProfid(id);
+    public List<Qualification> getQualificationByUserProfile(Integer id){
+        return  qualificationRepository.findByJobid(id);
     }
 
 }

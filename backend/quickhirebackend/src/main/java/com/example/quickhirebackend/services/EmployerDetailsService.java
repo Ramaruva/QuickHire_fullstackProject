@@ -2,7 +2,6 @@ package com.example.quickhirebackend.services;
 
 import com.example.quickhirebackend.dao.EmployerDetailsRepository;
 import com.example.quickhirebackend.model.EmployerDetails;
-import com.example.quickhirebackend.model.ProfessionalDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

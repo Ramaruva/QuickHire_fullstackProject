@@ -9,17 +9,22 @@ import {
   validateUsername,
   validateZipcode,
 } from "../../validations/standardValidations";
+import { USERREQUESTTYPE } from "../../types";
+import { useDispatch } from "react-redux";
+import { setData } from "../../redux/professionalRegisterSlice";
+import { postRequest } from "../../API/config";
 const details = {
-  firstName: "",
-  lastName: "",
+  firstname: "",
+  lastname: "",
   email: "",
   phone: "",
   address: "",
-  userName: "",
+  username: "",
   state: "",
   city: "",
-  zipcode: "",
+  pincode: "",
   companyName: "",
+  requestType:USERREQUESTTYPE.newAccount
 };
 const erroMsg = {
   firstNameError: "",
@@ -37,23 +42,16 @@ const RegistrationPage = () => {
   const query = useQuery();
   const customerType = query.get("type");
   const navigation = useNavigate();
+  const dispatch = useDispatch();
   if (customerType == "Professional") details.companyName = "dummy";
   const [userDetails, setUserDetails] = useState(details);
   const [userErrors, setUserErrors] = useState(erroMsg);
-
+  const navigate = useNavigate();
   const handleNavigation = () => {
-    localStorage.setItem(
-      "user",
-      JSON.stringify({
-        userName: userDetails.userName,
-        role: customerType == "Professional" ? "Professional" : "Empolyer",
-      })
-    );
     if (customerType == "Professional") {
+      
       navigation("/education");
-    } else {
-      navigation("/home/CreateJobs");
-    }
+    } 
   };
   const handleChange = (e) => {
     try {
@@ -70,16 +68,16 @@ const RegistrationPage = () => {
     try {
       e.preventDefault();
       const errorObj = {
-        firstNameError: validateFirstName(userDetails.firstName),
-        lastNameError: validateLastName(userDetails.lastName),
+        firstNameError: validateFirstName(userDetails.firstname),
+        lastNameError: validateLastName(userDetails.lastname),
         emailError: validateEmail(userDetails.email),
         phoneError: validatePhone(userDetails.phone),
         addressError: userDetails.address.length > 0 ? "" : "Address is Empty",
-        userNameError: validateUsername(userDetails.userName),
+        userNameError: validateUsername(userDetails.username),
         stateError:
           userDetails.state.length > 0 ? "" : "Please Enter state Name",
         cityError: userDetails.city.length > 0 ? "" : "Please Enter city Name",
-        zipcodeError: validateZipcode(userDetails.zipcode),
+        zipcodeError: validateZipcode(userDetails.pincode),
         companyNameError:
           userDetails.companyName.length > 0 ? "" : "Please Enter Company Name",
       };
@@ -87,9 +85,21 @@ const RegistrationPage = () => {
       setUserErrors(errorObj);
       if (!checkKeysEmpty(errorObj)) {
         setUserErrors(erroMsg);
+        if(customerType == "Professional"){
+          console.log(userDetails);
+          dispatch(setData(userDetails))
+          handleNavigation();
+          // navigate('/registration-success', { state: { userType: 'Professional' } });
+
+        } else {
+          postRequest("employerRegister", userDetails)
+          navigate('/registration-success', { state: { userType: 'Employer' } });
+
+        }
         setUserDetails(details);
-        alert("Registration success!");
-        handleNavigation();
+      
+        // alert("Registration success!");
+        
       }
     } catch (error) {
       console.log(error);
@@ -126,8 +136,8 @@ const RegistrationPage = () => {
               type="text"
               id="firstName"
               placeholder="First Name"
-              value={userDetails.firstName}
-              name="firstName"
+              value={userDetails.firstname}
+              name="firstname"
               onChange={handleChange}
             />
             {userErrors?.firstNameError.length > 0 && (
@@ -147,8 +157,8 @@ const RegistrationPage = () => {
               type="text"
               id="lastName"
               placeholder="Last Name"
-              value={userDetails.lastName}
-              name="lastName"
+              value={userDetails.lastname}
+              name="lastname"
               onChange={handleChange}
             />
             {userErrors?.lastNameError.length > 0 && (
@@ -193,8 +203,8 @@ const RegistrationPage = () => {
               type="text"
               id="Preferred Username"
               placeholder="Create your unique Username Name"
-              value={userDetails.userName}
-              name="userName"
+              value={userDetails.username}
+              name="username"
               onChange={handleChange}
             />
             {userErrors?.userNameError.length > 0 && (
@@ -319,10 +329,10 @@ const RegistrationPage = () => {
                   : "border-gray-300"
               }`}
               type="text"
-              placeholder="Zipcode"
-              value={userDetails.zipcode}
+              placeholder="pincode"
+              value={userDetails.pincode}
               onChange={handleChange}
-              name="zipcode"
+              name="pincode"
             />
             {userErrors?.stateError.length > 0 && (
               <p className="mt-2 text-sm text-red-600" id="username-error">

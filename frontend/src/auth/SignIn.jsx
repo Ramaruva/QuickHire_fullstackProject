@@ -1,24 +1,31 @@
 import React, { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
-import TopNavBar from "../components/TopNavBar";
 import {
   validatePassword,
   validateUsername,
 } from "../validations/standardValidations";
+import { postRequest } from "../API/config";
+import { useDispatch, useSelector } from "react-redux";
+import { getLocalItem, setLocalItem } from "../localStrorage";
+import { checkAuthenticationAsync } from "../redux/authSlice";
+import { USERTYPE } from "../types";
+import { jwtDecode } from "jwt-decode";
 
 const userDetails = {
-  userName: "",
+  username: "",
   password: "",
 };
 
 const errorMsg = {
   userError: "",
   passwordError: "",
+  apiError: "",
 };
 const SignIn = () => {
   const [loginDetails, setLoginDetails] = useState(userDetails);
   const [loginErrorMsgs, setLoginErrorMsgs] = useState(errorMsg);
+  const disPatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);
   const handleChange = (e) => {
     try {
       setLoginDetails({ ...loginDetails, [e.target.name]: e.target.value });
@@ -26,84 +33,91 @@ const SignIn = () => {
       console.log(error);
     }
   };
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const errorObj = {
+    userError: validateUsername(loginDetails.username),
+    passwordError: validatePassword(loginDetails.password),
+    apiError: "",
+  };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    // Set the new state for any possible previous API error message to clear it out.
+    setLoginErrorMsgs({
+      ...loginErrorMsgs,
+      apiError: "",
+    });
+
+    console.log(errorObj);
+    setLoginErrorMsgs(errorObj);
+
+    if (errorObj.userError.length <= 0 && errorObj.passwordError.length <= 0) {
+      // Set the new state for any possible previous API error message to clear it out.
+      setLoginErrorMsgs({
+        ...loginErrorMsgs,
+        apiError: "",
+      });
+    }
     try {
-      e.preventDefault();
-      const errorObj = {
-        userError: validateUsername(loginDetails.userName),
-        passwordError: validatePassword(loginDetails.password),
-      };
-      console.log(errorObj);
-      setLoginErrorMsgs(errorObj);
-      if (
-        errorObj.userError.length <= 0 &&
-        errorObj.passwordError.length <= 0
-      ) {
-        alert("login success");
-        setLoginErrorMsgs(errorMsg);
-        tempSignIn(loginDetails.userName);
-        setLoginDetails(userDetails);
+      const data = await postRequest("login", loginDetails);
+      if (data.status === 200) {
+        console.log(data?.data?.token);
+        setLocalItem("token", data?.data?.token);
+        await disPatch(checkAuthenticationAsync());
+        let token = getLocalItem("token");
+        let decode = jwtDecode(token);
+        console.log(decode);
+        redirect(decode.userType, decode.isPasswordChanged);
+      } else {
+        // Handle any other non-successful status codes here.
+        setLoginErrorMsgs({
+          ...loginErrorMsgs,
+          apiError: "Invalid username or password",
+        });
       }
     } catch (error) {
-      console.log(error);
+      // This will handle network errors and any other errors thrown by postRequest.
+      setLoginErrorMsgs({
+        ...loginErrorMsgs,
+        apiError:
+          error.response?.data?.message ||
+          "Invalid username or password. Please enter valid credentials.",
+      });
     }
   };
 
-  const tempSignIn = (name) => {
-    switch (name) {
-      case "gowtham123":
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            userName: "gowtham123",
-            role: "Professional",
-          })
-        );
-         navigate("/home/BrowseJobs")
-        break;
-      case "jayasri123":
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            userName: "jayasri123",
-            role: "Empolyer",
-          })
-        );
-        navigate("/home/CreateJobs")
-        break;
-      case "quickstaff123":
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            userName: "gowtham123",
-            role: "staff",
-          })
-        );
-        navigate("/home/professionalReviews")
-        break;
-      case "quickroot123":
-        localStorage.setItem(
-          "user",
-          JSON.stringify({
-            userName: "quickroot123",
-            role: "root",
-          })
-        );
-        navigate("/home/createAccount")
-        break;
-      default:
-        break;
+  const redirect = (userType, isPasswordChanged) => {
+    console.log(userType, USERTYPE.root, isPasswordChanged);
+    // Check if the password needs to be changed first
+    if (isPasswordChanged === "No") {
+        navigate("/home/PasswordChange");
+    } else {
+        // Proceed with user type specific redirection
+        switch (userType) {
+            case USERTYPE.professional:
+                navigate("/home/BrowseJobs");
+                break;
+            case USERTYPE.employer:
+                navigate("/home/CreateJobs");
+                break;
+            case USERTYPE.staff:
+                navigate("/home/professionalReviews");
+                break;
+            case USERTYPE.root:
+                navigate("/home/createAccount");
+                break;
+            default:
+                break;
+        }
     }
-  };
+};
   return (
     <>
       <div className="max-h-screen flex flex-col">
         {/* <TopNavBar  /> */}
         {/*
       This example requires updating your template:
-
+      console.
       ```
       <html class="h-full bg-white">
       <body class="h-full">
@@ -143,11 +157,11 @@ const SignIn = () => {
                   </label>
                   <div className="mt-2">
                     <input
-                      name="userName"
+                      name="username"
                       type="text"
-                      value={loginDetails.userName}
+                      value={loginDetails.username}
                       onChange={handleChange}
-                      autoComplete="userName"
+                      autoComplete="username"
                       className={`block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6 ${
                         !(loginErrorMsgs?.userError.length > 0)
                           ? "border-gray-300"
@@ -207,6 +221,11 @@ const SignIn = () => {
                   >
                     Login
                   </button>
+                  {loginErrorMsgs.apiError && (
+                    <p className="text-sm text-red-600 text-center mt-2">
+                      {loginErrorMsgs.apiError}
+                    </p>
+                  )}
                 </div>
                 <div className="text-sm text-center">
                   <a
@@ -221,7 +240,7 @@ const SignIn = () => {
               <p className="mt-10 text-center text-sm text-gray-500">
                 Not a member?{" "}
                 <Link
-                  to="/SignUp"
+                  to="/"
                   className="font-semibold leading-6 text-indigo-600 hover:text-indigo-500"
                 >
                   Create an Account

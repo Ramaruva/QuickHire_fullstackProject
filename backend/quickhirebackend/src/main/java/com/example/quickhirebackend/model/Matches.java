@@ -6,70 +6,113 @@ import jakarta.persistence.*;
 @Table(name = "matches")
 public class Matches {
 
-    private int jobid; // Presumably a foreign key, nullable
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int matchid; // Primary key, auto-incremented
-    private String matchpercentage;
-    private Integer professionalid; // Nullable foreign key
-    private Integer staffid; // Nullable foreign key
+    @Column(name = "matchid")
+    private Integer matchId;
 
-    // Constructors, getters, and setters
+    @Column(name = "matchpercentage")
+    private Integer matchPercentage;
 
+    @Column(name = "professionalid", nullable = true) // Since it's nullable in your schema
+    private Integer professionalId;
+
+    @Column(name = "jobid", nullable = true) // Since it's nullable in your schema
+    private Integer jobId;
+
+    @Column(name = "staffid", nullable = true) // Since it's nullable in your schema
+    private Integer staffId;
+
+    public AllTypesEnums.MatchType getStatus() {
+        return status;
+    }
+
+    public void setStatus(AllTypesEnums.MatchType status) {
+        this.status = status;
+    }
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status")
+    private AllTypesEnums.MatchType status;
+
+    public String getNotification() {
+        return notification;
+    }
+
+    public void setNotification(String notification) {
+        this.notification = notification;
+    }
+
+    @Column(name="notification")
+    private String notification;
+
+//    @Enumerated(EnumType.STRING)
+//    @Column(name = "matchType")
+//    private AllTypesEnums.MatchType matchType;
+
+
+
+    // Constructors
     public Matches() {
     }
 
-    // Getters and setters
-    public int getJobId() {
-        return jobid;
+    // Getters and Setters
+    public Integer getMatchId() {
+        return matchId;
     }
 
-    public void setJobId(int jobId) {
-        this.jobid = jobId;
+    public void setMatchId(Integer matchId) {
+        this.matchId = matchId;
     }
 
-    public int getMatchId() {
-        return matchid;
+    public Integer getMatchPercentage() {
+        return matchPercentage;
     }
 
-    // No setter for auto-incremented primary key
-    // public void setMatchId(int matchId) {
-    //     this.matchId = matchId;
-    // }
-
-    public String getMatchPercentage() {
-        return matchpercentage;
-    }
-
-    public void setMatchPercentage(String matchPercentage) {
-        this.matchpercentage = matchPercentage;
+    public void setMatchPercentage(Integer matchPercentage) {
+        this.matchPercentage = matchPercentage;
     }
 
     public Integer getProfessionalId() {
-        return professionalid;
+        return professionalId;
     }
 
     public void setProfessionalId(Integer professionalId) {
-        this.professionalid = professionalId;
+        this.professionalId = professionalId;
+    }
+
+    public Integer getJobId() {
+        return jobId;
+    }
+
+    public void setJobId(Integer jobId) {
+        this.jobId = jobId;
     }
 
     public Integer getStaffId() {
-        return staffid;
+        return staffId;
     }
 
     public void setStaffId(Integer staffId) {
-        this.staffid = staffId;
+        this.staffId = staffId;
     }
 
-    // toString() method for debugging purposes
-    @Override
-    public String toString() {
-        return "Matches{" +
-                "jobId=" + jobid +
-                ", matchId=" + matchid +
-                ", matchPercentage='" + matchpercentage + '\'' +
-                ", professionalId=" + professionalid +
-                ", staffId=" + staffid +
-                '}';
-    }
+//    public String getJobNotify() {
+//        return jobNotify;
+//    }
+//
+//    public void setJobNotify(String jobNotify) {
+//        this.jobNotify = jobNotify;
+//    }
+
+//    public AllTypesEnums.MatchType getMatchType() {
+//        return matchType;
+//    }
+//
+//    public void setMatchType(AllTypesEnums.MatchType matchType) {
+//        this.matchType = matchType;
+//    }
+
+    // Override toString, equals, and hashCode if necessary
+
 }

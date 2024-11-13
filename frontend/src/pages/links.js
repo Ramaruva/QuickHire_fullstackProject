@@ -1,23 +1,27 @@
-export const links = {
+export const routelinks = {
   staffLinks: [
     {
       title: "Professional Reviews",
-      link: "/home/Professional?op=review",
+      link: "/home/professionalReviews",
     },
     {
-      title: "Empolyee Reviews",
-      link: "/home/Empolyee?op=review",
+      title: "Empolyer Reviews",
+      link: "/home/employerReviews",
     },
     {
-      title: "Professional lists",
-      link: "/home/Professional?op=listing",
+      title: "Professional Delete Request",
+      link: "/home/ProfessionalLists",
     },
     {
-      title: "Empolyee Lists",
-      link: "/home/Empolyee?op=listing",
+      title: "Empolyer Delete Request",
+      link: "/home/employerLists",
     },
     {
-      title: "Notifications",
+      title:"Customers",
+      link:"/home/AllCustomer"
+    },
+    {
+      title: "Match Requests",
       link: "/home/notifications",
     },
     {
@@ -28,7 +32,7 @@ export const links = {
   employerLinks: [
     {
       title: "Create Job",
-      link: "/home/JobPosting",
+      link: "/home/CreateJobs",
     },
     {
       title: "Job Lists",
@@ -36,7 +40,15 @@ export const links = {
     },
     {
       title: "Notifications",
-      link: "/home/notifications",
+      link: "/home/notifications?user=empolyer",
+    },
+    {
+      title: "Payments",
+      link: "/home/payments",
+    },
+    {
+      title: "Settings",
+      link: "/home/Settings?user=empolyer",
     },
   ],
 
@@ -50,16 +62,23 @@ export const links = {
       link: "/home/MatchedJobs",
     },
     {
-      title: "Notifications",
-      link: "/home/notifications",
-    },
-    {
       title: "Payments",
       link: "/home/Payments",
     },
     {
-      title: "Account Settings",
-      link: "/home/AccountSettings",
+      title: "Settings",
+      link: "/home/Settings?user=professional",
     },
   ],
+  rootLinks:[
+    {
+      title: "Create Staff Accounts",
+      link: "/home/createAccount",
+    },
+    {
+      title: "Staff Accounts",
+      link: "/home/staffAccounts",
+    },
+  ]
 };
+

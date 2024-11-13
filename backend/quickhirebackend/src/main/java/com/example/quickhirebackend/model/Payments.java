@@ -2,7 +2,8 @@ package com.example.quickhirebackend.model;
 
 import jakarta.persistence.*;
 
-import java.sql.Date;
+import java.util.Date;
+
 
 @Entity
 @Table(name = "payments")
@@ -12,7 +13,7 @@ public class Payments {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer paymentid; // Corresponds to the "paymentid" column, auto-incremented
     private Integer profid; // Corresponds to the "profid" column, seems nullable
-    private String amount; // Corresponds to the "amount" column
+    private Double amount; // Corresponds to the "amount" column
     private Date startdate; // Corresponds to the "startdate" column
     private Date enddate; // Corresponds to the "enddate" column
     private String status; // Corresponds to the "status" column
@@ -36,11 +37,11 @@ public class Payments {
         this.profid = profId;
     }
 
-    public String getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(String amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 

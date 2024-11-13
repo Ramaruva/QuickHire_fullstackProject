@@ -1,14 +1,25 @@
 package com.example.quickhirebackend.dto;
-import java.sql.Date;
+
+import java.util.Date;
 
 public class PaymentDTO {
     private Integer profid;
-    private String amount;
+    private Double amount;
     private Date startdate;
     private Date enddate;
     private String status;
 
-    // Constructor, getters, and setters
+    @Override
+    public String toString() {
+        return "PaymentDTO{" +
+                "profid=" + profid +
+                ", amount=" + amount +
+                ", startdate=" + startdate +
+                ", enddate=" + enddate +
+                ", status='" + status + '\'' +
+                '}';
+    }
+// Constructor, getters, and setters
 
     public PaymentDTO() {
         // Default constructor
@@ -18,15 +29,15 @@ public class PaymentDTO {
         return profid;
     }
 
-    public void setProfId(Integer profId) {
-        this.profid = profId;
+    public void setProfId(Integer profid) {
+        this.profid = profid;
     }
 
-    public String getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(String amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 

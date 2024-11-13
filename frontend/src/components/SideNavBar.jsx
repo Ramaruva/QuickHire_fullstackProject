@@ -1,101 +1,31 @@
 import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom";
+import { routelinks } from "../pages/links";
+import { USERTYPE } from "../types";
+import { useDispatch, useSelector } from "react-redux";
+import {  checkAuthenticationAsync } from "../redux/authSlice";
+import { getLocalItem } from "../localStrorage";
+import { jwtDecode } from "jwt-decode";
 
-const staffLinks = [
-  {
-    title: "Professional Reviews",
-    link: "/home/professionalReviews",
-  },
-  {
-    title: "Empolyer Reviews",
-    link: "/home/empolyerReviews",
-  },
-  {
-    title: "Professional lists",
-    link: "/home/ProfessionalLists",
-  },
-  {
-    title: "Empolyer Lists",
-    link: "/home/empolyerLists",
-  },
-  {
-    title: "Notifications",
-    link: "/home/notifications",
-  },
-  {
-    title: "Settings",
-    link: "/home/Settings",
-  },
-];
-
-const employerLinks = [
-  {
-    title: "Create Job",
-    link: "/home/CreateJobs",
-  },
-  {
-    title: "Job Lists",
-    link: "/home/JobLists",
-  },
-  {
-    title: "Notifications",
-    link: "/home/notifications?user=empolyer",
-  },
-  {
-    title: "Payments",
-    link: "/home/payments",
-  },
-  {
-    title: "Settings",
-    link: "/home/Settings?user=empolyer",
-  },
-];
-const ProfessionalLinks = [
-  {
-    title: "Browse Jobs",
-    link: "/home/BrowseJobs",
-  },
-  {
-    title: "Matched Jobs",
-    link: "/home/MatchedJobs",
-  },
-  {
-    title: "Payments",
-    link: "/home/Payments",
-  },
-  {
-    title: "Settings",
-    link: "/home/Settings?user=professional",
-  },
-];
-
-const rootLinks = [
-  {
-    title: "Create Staff Accounts",
-    link: "/home/createAccount",
-  },
-  {
-    title: "Staff Accounts",
-    link: "/home/staffAccounts",
-  },
-];
 const SideNavBar = () => {
   // write all the links here
-  const [links, setLinks] = useState(rootLinks);
+  const [links, setLinks] = useState([]);
+  const user = useSelector((state)=>state.auth.user);
+  const dispatch = useDispatch();
   const handleLinks = (val) => {
     try {
       switch (val) {
-        case "Professional":
-          setLinks(ProfessionalLinks);
+        case USERTYPE.professional:
+          setLinks(routelinks.ProfessionalLinks);
           break;
-        case "Empolyer":
-          setLinks(employerLinks);
+        case USERTYPE.employer:
+          setLinks(routelinks.employerLinks);
           break;
-        case "staff":
-          setLinks(staffLinks);
+        case USERTYPE.staff:
+          setLinks(routelinks.staffLinks);
           break;
-        case "root":
-          setLinks(rootLinks);
+        case USERTYPE.root:
+          setLinks(routelinks.rootLinks);
           break;
         default:
           break;
@@ -105,14 +35,21 @@ const SideNavBar = () => {
     }
   };
 
-  useEffect(() => {
-    try {
-      const userDetails = JSON.parse(localStorage.getItem("user"));
-      handleLinks(userDetails?.role);
-    } catch (error) {
-      console.log(error);
-    }
-  }, []);
+  useEffect( () => {
+    const fetchData = async () => {
+      try {
+        await dispatch(checkAuthenticationAsync());
+        let token = getLocalItem("token");
+        let decode = jwtDecode(token);
+        console.log(decode);
+        handleLinks(decode.userType);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+  
+    fetchData();
+  }, [dispatch]);
   return (
     <aside>
       <div className="w-48 h-screen mt-2 ml-3 bg-gray-900 p-4 space-y-2">

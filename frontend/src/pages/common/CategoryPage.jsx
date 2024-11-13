@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import Category from "../../components/Category";
 import CategoryList from "../../components/CategoryList";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { setData,sendData } from "../../redux/professionalRegisterSlice"
+import { postRequest } from "../../API/config";
 const mystyle = {
   Header: {
     color: "#5856d6",
@@ -29,10 +32,14 @@ const mystyle = {
 };
 const CategoryPage = () => {
   const [categoryLists, setCategoryList] = useState([]);
-  const navigation = useNavigate();
+  const dispatch = useDispatch();
+  const data = useSelector((state)=>state.professionalRegister);
+  const navigate = useNavigate();
   const handleAdd = (category) => {
     try {
+       category={...category,ID: Date.now() + Math.random()}
       if (categoryLists.length > 0) {
+
         setCategoryList([...categoryLists, category]);
       } else {
         setCategoryList([category]);
@@ -44,11 +51,30 @@ const CategoryPage = () => {
   };
   const handleDelete =(index)=>{
     try {
-       const arraycat = categoryLists.splice(index,1);
+       const arraycat = categoryLists.filter((item)=>item.ID!=index);
+       //const arraycat = categoryLists.splice(index,1);
        console.log(arraycat)
        setCategoryList(arraycat);
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  const handleRegister=async()=>{
+    try {
+        let category ={
+          qualifications:categoryLists
+        }
+       //  dispatch(setCategoryList(categoryLists));
+         let sav = {...data};
+         sav.qualifications=categoryLists;
+        // dispatch(sendData(category));
+        console.log(sav);
+        let data2 = await postRequest("professionalRegister",sav);
+        navigate('/registration-success', { state: { userType: 'Professional' } });
+        console.log(data2);
+    } catch (error) {
+       console.log(error);
     }
   }
   return (
@@ -68,7 +94,7 @@ const CategoryPage = () => {
       </div>
       {categoryLists.length >= 2 && (
         <div className="ml-[300px] mt-10">
-          <button type="button" onClick={()=>navigation("/home/BrowseJobs")} className="bg-blue-500 text-xs hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+          <button type="button" onClick={handleRegister} className="bg-blue-500 text-xs hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
               Finish
           </button>
         </div>

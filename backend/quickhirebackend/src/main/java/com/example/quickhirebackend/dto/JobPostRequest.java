@@ -1,9 +1,12 @@
 package com.example.quickhirebackend.dto;
+import com.example.quickhirebackend.model.Qualification;
+
 import java.time.LocalTime;
 import java.util.Date;
+import java.util.List;
 
 public class JobPostRequest {
-    private int jobId;
+    private String jobId;
     private String positionName;
     private String firstname;
     private String lastname;
@@ -17,9 +20,49 @@ public class JobPostRequest {
     private int empid;
     private String qualificationType;
     private String qualificationKeywords;
+    private List<QualificationRecord> qualifications;
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    private String companyName;
+
+    public Integer getJobdescId() {
+        return jobdescId;
+    }
+
+    public void setJobdescId(Integer jobdescId) {
+        this.jobdescId = jobdescId;
+    }
+
+    private Integer jobdescId;
+
+    public List<Qualification> getQualification() {
+        return qualification;
+    }
+
+    public void setQualification(List<Qualification> qualification) {
+        this.qualification = qualification;
+    }
+
+    private  List<Qualification> qualification;
+
+    public List<QualificationRecord> getQualifications() {
+        return qualifications;
+    }
+
+    public void setQualifications(List<QualificationRecord> qualificationRecords) {
+        this.qualifications= qualificationRecords;
+    }
+
 
     // Getters
-    public int getJobId() { return jobId; }
+    public String getJobId() { return jobId; }
     public String getPositionName() { return positionName; }
     public String getFirstname() { return firstname; }
     public String getLastname() { return lastname; }
@@ -35,7 +78,7 @@ public class JobPostRequest {
     public String getQualificationKeywords() { return qualificationKeywords; }
 
     // Setters
-    public void setJobId(int jobId) { this.jobId = jobId; }
+    public void setJobId(String jobId) { this.jobId = jobId; }
     public void setPositionName(String positionName) { this.positionName = positionName; }
     public void setFirstname(String firstname) { this.firstname = firstname; }
     public void setLastname(String lastname) { this.lastname = lastname; }

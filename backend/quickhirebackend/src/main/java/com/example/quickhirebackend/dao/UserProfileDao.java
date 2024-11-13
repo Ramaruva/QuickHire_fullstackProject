@@ -1,7 +1,9 @@
 package com.example.quickhirebackend.dao;
 
+import com.example.quickhirebackend.customExceptions.CustomDuplicateUsernameException;
 import com.example.quickhirebackend.model.UserProfile;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,7 +14,13 @@ public class UserProfileDao {
     private  UserProfileRepository userProfileRepository;
 
     public UserProfile CreateUser(UserProfile user){
-        return  userProfileRepository.save(user);
+        try{
+            return  userProfileRepository.save(user);
+        }
+        catch (DataIntegrityViolationException e){
+            throw new CustomDuplicateUsernameException("Username Already Existed!");
+        }
+
     }
 
     public List<UserProfile> getAllUsers() {

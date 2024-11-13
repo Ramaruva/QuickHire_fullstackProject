@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import SignIn from "./auth/SignIn";
-import SignUp from "./auth/signUp";
+// import SignUp from "./auth/signUp";
 import LandingPage from "./auth/LandingPage";
 import Home from "./pages/Home";
 import "./globals.css";
@@ -21,21 +21,36 @@ import BrowseJobs from "./pages/Professionals/BrowseJobs";
 import MatchedJobs from "./pages/Professionals/MatchedJobs";
 import JobDetailsPage from "./pages/common/JobDetailsPage";
 import CategoryPage from "./pages/common/CategoryPage";
+import { useDispatch } from "react-redux";
+import { checkAuthenticationAsync } from "./redux/authSlice";
+import LoadingSpinner from "./components/LoadingSpinner";
+import RegistrationSuccessPage from "./pages/common/RegistrationSuccessPage";
+import AllProfiles from "./pages/Staff/AllProfiles";
 
 const App = () => {
+  const dispatch = useDispatch();
+
+  useEffect(()=>{
+   dispatch(checkAuthenticationAsync());
+   //console.log(decode);
+  },[dispatch])
   return (
+    <>
+    <LoadingSpinner/>
     <Routes>
       <Route index element={<LandingPage />} />
 
       <Route path="/SignIn" element={<SignIn />} />
-      <Route path="/SignUp" element={<SignUp />} />
+      {/* <Route path="/SignUp" element={<SignUp />} /> */}
       <Route path="/RegistrationPage" element={<RegistrationPage />} />
       <Route path="/education" element={<Education />} />
       <Route path="/category" element={<CategoryPage />} />
+      <Route path="/registration-success" element={<RegistrationSuccessPage/>}/>
 
       <Route path="/home" element={<Home />}>
         {/* childrens */}
         {/* Staff routes starts here */}
+        
         <Route
           path="/home/professionalReviews"
           element={
@@ -43,25 +58,30 @@ const App = () => {
           }
         />
         <Route
-          path="/home/empolyerReviews"
-          element={<Profiles customerType={"Empolyer"} viewType={"review"} />}
+          path="/home/employerReviews"
+          element={<Profiles customerType={"Employer"} viewType={"review"} />}
         />
         <Route
           path="/home/ProfessionalLists"
-          element={<Profiles customerType={"Professional"} viewType={"list"} />}
+          element={<Profiles customerType={"Professional"} viewType={"delete"} />}
         />
         <Route
-          path="/home/empolyerLists"
-          element={<Profiles customerType={"Empolyer"} viewType={"list"} />}
+          path="/home/employerLists"
+          element={<Profiles customerType={"Employer"} viewType={"delete"} />}
         />
+        <Route
+          path="/home/AllCustomer" 
+          element={<AllProfiles />}
+          />
         <Route path="/home/individual" element={<IndividualPage />} />
 
         {/* Staff routes end here */}
 
-        {/* Empolyer routes start here */}
+        {/* Employer routes start here */}
         <Route path="/home/CreateJobs" element={<CreateJob />} />
         <Route path="/home/JobLists" element={<JobList />} />
-        {/* Empolyer routes end here */}
+        
+        {/* Employer routes end here */}
 
         {/* Professional routes start here */}
         <Route path="/home/BrowseJobs" element={<BrowseJobs />} />
@@ -82,7 +102,10 @@ const App = () => {
         {/* common routes end here */}
       </Route>
     </Routes>
+    </>
   );
 };
+
+
 
 export default App;
